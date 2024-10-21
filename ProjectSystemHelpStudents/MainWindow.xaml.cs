@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ProjectSystemHelpStudents.UsersContent;
+using ProjectSystemHelpStudents.Helper;
 
 namespace ProjectSystemHelpStudents
 {
@@ -23,6 +25,13 @@ namespace ProjectSystemHelpStudents
         public MainWindow()
         {
             InitializeComponent();
+            AuthPage authPage = new AuthPage();
+            frmAuth.Content = authPage;
+
+            FrmClass.frmAuth = frmAuth;
+            FrmClass.frmReg = frmReg;
+            FrmClass.frmContentUser = frmContentUser;
+            FrmClass.frmContentAdmin = frmContentAdmin;
         }
     }
 }

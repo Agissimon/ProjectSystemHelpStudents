@@ -5,8 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="500" Width="800" Icon="/Resources/Icon/logo001.png" Style="{StaticResource mainWindowStyle}">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Image Source="/Resources/Icon/logo2.png"/>
+        </StackPanel>
+
+        <Frame x:Name="frmAuth" NavigationUIVisibility="Hidden" Grid.Row="1" Grid.RowSpan="2"/>
+        <Frame x:Name="frmContentAdmin" NavigationUIVisibility="Hidden" Grid.Row="1" Grid.RowSpan="2"/>
+        <Frame x:Name="frmContentUser" NavigationUIVisibility="Hidden" Grid.Row="1" Grid.RowSpan="2"/>
+        <Frame x:Name="frmReg" NavigationUIVisibility="Hidden" Grid.Row="1" Grid.RowSpan="2"/>
     </Grid>
 </Window>
