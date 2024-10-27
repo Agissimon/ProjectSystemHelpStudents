@@ -28,10 +28,16 @@ namespace ProjectSystemHelpStudents
             AuthPage authPage = new AuthPage();
             frmAuth.Content = authPage;
 
+            FrmClass.frmStackPanelButton = frmStackPanelButton;
             FrmClass.frmAuth = frmAuth;
             FrmClass.frmReg = frmReg;
             FrmClass.frmContentUser = frmContentUser;
             FrmClass.frmContentAdmin = frmContentAdmin;
+        }
+
+        private void frmStackPanelButton_Navigated(object sender, NavigationEventArgs e)
+        {
+
         }
     }
 }

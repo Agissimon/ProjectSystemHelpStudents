@@ -10,10 +10,10 @@ namespace ProjectSystemHelpStudents.Helper
 {
     internal class FrmClass
     {
+        public static Frame frmStackPanelButton;
         public static Frame frmContentUser;
         public static Frame frmContentAdmin;
         public static Frame frmAuth;
         public static Frame frmReg;
-        public static User userLog;
     }
 }

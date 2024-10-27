@@ -22,18 +22,16 @@ namespace ProjectSystemHelpStudents.UsersContent
     /// </summary>
     public partial class AuthPage : Page
     {
+        public static User userLog;
+
         int logCount = 0;
-        public static int idUser;
-        public static string nameUser;
         public AuthPage()
         {
             InitializeComponent();
         }
 
-        private void btnLogIn_Click(object sender, RoutedEventArgs e, User userLog)
+        private void btnLogIn_Click(object sender, RoutedEventArgs e)
         {
-
-
             if (string.IsNullOrWhiteSpace(txbLogin.Text))
             {
                 MessageBox.Show("Вы не ввели логин пользователя");
@@ -62,7 +60,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                     }
                     else
                     {
-                       user = userLog;
+                        userLog = user;
                         if (user.RoleUser == 1)
                         {
                             //MessageBox.Show("Здравствуйте, " + user.Name);
@@ -72,11 +70,13 @@ namespace ProjectSystemHelpStudents.UsersContent
                         }
                         else if (user.RoleUser == 2)
                         {
-                            MessageBox.Show("Здравствуйте, " + user.Name);
-                            idUser = user.IdUser;
-                            nameUser = user.Name;
-                            UserPage content = new UserPage();
+                            UserSession.IdUser = user.IdUser;
+                            UserSession.NameUser = user.Name;
+                            MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
+                            UpcomingTasksPage content = new UpcomingTasksPage();
                             FrmClass.frmContentUser.Content = content;
+                            StackPanelButtonPage _content = new StackPanelButtonPage();
+                            FrmClass.frmStackPanelButton.Content = _content;
                         }
                     }
                 }

@@ -4,183 +4,294 @@
              xmlns:local="clr-namespace:ProjectSystemHelpStudents"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-    <ResourceDictionary>
+        <ResourceDictionary>
 
-        <Style TargetType="Window" x:Key="mainWindowStyle">
-            <Setter Property="Background" Value="#E6E6FA"/>
-            <Setter Property="Foreground" Value="#4169E1"/>
-        </Style>
-
-        <Style x:Key="dataGridCellStyle" TargetType="DataGridCell">
-            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
-        </Style>
-
-        <Style x:Key="dataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-
-        <Style x:Key="chbNorm" TargetType="CheckBox">
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#4169E1"/>
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="Width" Value="150"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="CheckBox">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Background="{TemplateBinding Background}" CornerRadius="5">
-                                <Grid>
-                                    <CheckBox x:Name="checkBox" IsChecked="{Binding IsChecked, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" Margin="5"/>
-                                </Grid>
+            <Style x:Key="btnTransparentStyle" TargetType="Button">
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="Normal"/>
+                <Setter Property="Margin" Value="0,5,0,5"/>
+                <Setter Property="Padding" Value="5,0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0">
+                                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
                             </Border>
-                            <ContentPresenter x:Name="contentPresenter" Grid.Column="1" Content="{TemplateBinding Content}" VerticalAlignment="Center" Margin="5"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#FFE0E0E0"/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="border" Property="Background" Value="#FFFFFF"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="checkBox" Property="Foreground" Value="#ADADAD"/>
-                                <Setter TargetName="contentPresenter" Property="Opacity" Value="0.5"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="#e74c3c"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <Style x:Key="btnNorm" TargetType="Button">
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#4169E1"/>
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="Width" Value="150"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
+            <Style TargetType="Window" x:Key="mainWindowStyle">
+                <Setter Property="Background" Value="#333"/>
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
 
-        <Style x:Key="btnArr" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="Width" Value="25"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="14"/>
-        </Style>
+            <Style x:Key="dataGridCellStyle" TargetType="DataGridCell">
+                <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#444"/>
+            </Style>
 
-        <Style x:Key="btnlow" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="Width" Value="150"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
+            <Style x:Key="dataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Background" Value="#555"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
 
-        <Style x:Key="txbNorm" TargetType="TextBox">
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#4169E1"/>
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="Width" Value="150"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
+            <Style x:Key="navButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="Padding" Value="5,10"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#555"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="#444"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <Style x:Key="txbLow" TargetType="TextBox">
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#4169E1"/>
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="Width" Value="20"/>
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
+            <Style x:Key="primaryButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="#e74c3c"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Padding" Value="10,5"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="5">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#c0392b"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="#a93226"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <Style x:Key="psbNorm" TargetType="PasswordBox">
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#4169E1"/>
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="Width" Value="150"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
+            <Style x:Key="headerTextStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="Margin" Value="0,0,0,20"/>
+            </Style>
 
-        <Style x:Key="txcNorm" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
+            <Style x:Key="subHeaderTextStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="Gray"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="0,20,0,10"/>
+            </Style>
 
-        <Style x:Key="txcTitle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="35"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
+            <Style x:Key="textBoxStyle" TargetType="TextBox">
+                <Setter Property="Background" Value="#444"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="BorderBrush" Value="#555"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="0,5,0,5"/>
+                <Setter Property="Padding" Value="5"/>
+            </Style>
 
-        <Style x:Key="txcTitle1" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="FontStyle" Value="Normal"/>
-        </Style>
+            <Style x:Key="labelStyle" TargetType="Label">
+                <Setter Property="Foreground" Value="#AAAAAA"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Margin" Value="0,5,0,5"/>
+            </Style>
 
-        <Style x:Key="txcLow" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="10"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
+            <Style x:Key="btnNorm" TargetType="Button">
+                <Setter Property="Background" Value="#FFFFFF"/>
+                <Setter Property="BorderBrush" Value="#4169E1"/>
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="Width" Value="150"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
 
-        <Style x:Key="lbLow" TargetType="Label">
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="10"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
+            <Style x:Key="btnArr" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Width" Value="25"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+
+            <Style x:Key="btnlow" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="Width" Value="150"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+
+            <Style x:Key="txbNorm" TargetType="TextBox">
+                <Setter Property="Background" Value="#FFFFFF"/>
+                <Setter Property="BorderBrush" Value="#4169E1"/>
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="Width" Value="150"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+
+            <Style x:Key="txbLow" TargetType="TextBox">
+                <Setter Property="Background" Value="#FFFFFF"/>
+                <Setter Property="BorderBrush" Value="#4169E1"/>
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="Width" Value="20"/>
+                <Setter Property="Height" Value="20"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+
+            <Style x:Key="psbNorm" TargetType="PasswordBox">
+                <Setter Property="Background" Value="#FFFFFF"/>
+                <Setter Property="BorderBrush" Value="#4169E1"/>
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="Width" Value="150"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+
+            <Style x:Key="txcNorm" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+
+            <Style x:Key="txcTitle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="35"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+
+            <Style x:Key="txcTitle1" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="FontStyle" Value="Normal"/>
+            </Style>
+
+            <Style x:Key="txcLow" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+
+            <Style x:Key="lbLow" TargetType="Label">
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
 
 
-        <Style TargetType="ComboBox" x:Key="cmbNorm">
-            <Setter Property="FontFamily" Value="Candara"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Width" Value="150"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#4169E1"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Foreground" Value="#4169E1"/>
-            <Setter Property="IsEditable" Value="True"/>
-        </Style>
+            <Style TargetType="ComboBox" x:Key="cmbNorm">
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Width" Value="150"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="Background" Value="#FFFFFF"/>
+                <Setter Property="BorderBrush" Value="#4169E1"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="IsEditable" Value="True"/>
+            </Style>
 
+            <Style x:Key="chbNorm" TargetType="CheckBox">
+                <Setter Property="Background" Value="#FFFFFF"/>
+                <Setter Property="BorderBrush" Value="#4169E1"/>
+                <Setter Property="Foreground" Value="#4169E1"/>
+                <Setter Property="Width" Value="150"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="CheckBox">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Background="{TemplateBinding Background}" CornerRadius="5">
+                                    <Grid>
+                                        <CheckBox x:Name="checkBox" IsChecked="{Binding IsChecked, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" Margin="5"/>
+                                    </Grid>
+                                </Border>
+                                <ContentPresenter x:Name="contentPresenter" Grid.Column="1" Content="{TemplateBinding Content}" VerticalAlignment="Center" Margin="5"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FFE0E0E0"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter TargetName="border" Property="Background" Value="#FFFFFF"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="checkBox" Property="Foreground" Value="#ADADAD"/>
+                                    <Setter TargetName="contentPresenter" Property="Opacity" Value="0.5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-    </ResourceDictionary>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
