@@ -1,0 +1,21 @@
+﻿<Window x:Class="ProjectSystemHelpStudents.TaskDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ProjectSystemHelpStudents"
+        mc:Ignorable="d"
+        Title="Детали задачи" Height="400" Width="600" WindowStartupLocation="CenterScreen" Background="#222"  Icon="/Resources/Icon/logo001.png">
+
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+            <TextBlock Text="Описание:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
+            <TextBlock Text="{Binding Description}" FontSize="14" Foreground="Gray" TextWrapping="Wrap" Margin="0,0,0,10"/>
+            <TextBlock Text="Статус:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
+            <TextBlock Text="{Binding StatusTask}" FontSize="14" Foreground="LightGray" Margin="0,0,0,10"/>
+            <TextBlock Text="Дата завершения:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
+            <TextBlock Text="{Binding EndDate}" FontSize="14" Foreground="LightGray"/>
+        </StackPanel>
+    </Grid>
+</Window>
