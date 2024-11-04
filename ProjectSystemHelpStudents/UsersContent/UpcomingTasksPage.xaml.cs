@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -15,8 +16,30 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             InitializeComponent();
             _startOfWeek = DateTime.Today;
-            LoadTasks();
+            RefreshPage();
+        }
+
+        private void RefreshPage()
+        {
+            UpdateTodayDateText();
             UpdateWeekText();
+            LoadTasks();
+            LoadWeekTimeline();
+        }
+
+        private void UpdateTodayDateText()
+        {
+            // Форматируем сегодняшнюю дату в виде "29 октября - Сегодня - Вторник"
+            string todayDate = DateTime.Today.ToString("dd MMMM");
+            string dayOfWeek = DateTime.Today.ToString("dddd");
+
+            TodayDateTextBlock.Text = $"{todayDate} - Сегодня - {dayOfWeek}";
+        }
+
+        private void UpdateWeekText()
+        {
+            var endOfWeek = _startOfWeek.AddDays(6);
+            CurrentWeekText.Text = $"{_startOfWeek:dd MMMM} - {endOfWeek:dd MMMM}";
         }
 
         private void LoadTasks()
@@ -52,22 +75,53 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
         }
 
-        private void ToggleTaskStatus_Click(object sender, RoutedEventArgs e)
+        private void LoadWeekTimeline()
         {
-            var checkBox = sender as CheckBox;
-            var task = checkBox.DataContext as TaskViewModel;
-
-            if (task != null)
+            WeekDaysTimeline.Items.Clear();
+            for (int i = 0; i < 7; i++)
             {
-                var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.Title == task.Title);
-                if (dbTask != null)
+                var day = _startOfWeek.AddDays(i);
+                var dayButton = new Button
                 {
-                    // Toggle task status
-                    dbTask.StatusTask = checkBox.IsChecked == true ? "Завершено" : "В процессе";
-                    DBClass.entities.SaveChanges();
-                    LoadTasks();
-                }
+                    Content = day.ToString("ddd dd"),
+                    Width = 60,
+                    Margin = new Thickness(5),
+                    Background = GetButtonBackgroundColor(day),
+                    Foreground = Brushes.Black,
+                    BorderThickness = new Thickness(0),
+                    IsEnabled = false
+                };
+
+                WeekDaysTimeline.Items.Add(dayButton);
             }
+        }
+
+        private Brush GetButtonBackgroundColor(DateTime day)
+        {
+            if (day == DateTime.Today)
+                return Brushes.Red;
+            else if (day < DateTime.Today)
+                return Brushes.Gray;
+            else
+                return Brushes.LightGray;
+        }
+
+        private void Today_Click(object sender, RoutedEventArgs e)
+        {
+            _startOfWeek = DateTime.Today;
+            RefreshPage();
+        }
+
+        private void PreviousWeek_Click(object sender, RoutedEventArgs e)
+        {
+            _startOfWeek = _startOfWeek.AddDays(-7);
+            RefreshPage();
+        }
+
+        private void NextWeek_Click(object sender, RoutedEventArgs e)
+        {
+            _startOfWeek = _startOfWeek.AddDays(7);
+            RefreshPage();
         }
 
         private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -80,24 +134,21 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
         }
 
-        private void NextWeek_Click(object sender, RoutedEventArgs e)
+        private void ToggleTaskStatus_Click(object sender, RoutedEventArgs e)
         {
-            _startOfWeek = _startOfWeek.AddDays(7);
-            LoadTasks();
-            UpdateWeekText();
-        }
+            var checkBox = sender as CheckBox;
+            var task = checkBox.DataContext as TaskViewModel;
 
-        private void PreviousWeek_Click(object sender, RoutedEventArgs e)
-        {
-            _startOfWeek = _startOfWeek.AddDays(-7);
-            LoadTasks();
-            UpdateWeekText();
-        }
-
-        private void UpdateWeekText()
-        {
-            var endOfWeek = _startOfWeek.AddDays(6);
-            CurrentWeekText.Text = $"{_startOfWeek:dd MMMM} - {endOfWeek:dd MMMM}";
+            if (task != null)
+            {
+                var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.Title == task.Title);
+                if (dbTask != null)
+                {
+                    dbTask.StatusTask = checkBox.IsChecked == true ? "Завершено" : "В процессе";
+                    DBClass.entities.SaveChanges();
+                    LoadTasks();
+                }
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

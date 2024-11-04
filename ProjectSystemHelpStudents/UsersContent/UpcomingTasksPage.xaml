@@ -10,10 +10,21 @@
     <StackPanel Margin="10">
         <TextBlock Text="Предстоящее" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+            <Button Content="&lt; Сегодня" Click="Today_Click" Margin="5" Background="Transparent" Foreground="White"/>
             <Button Content="&lt; Предыдущая неделя" Click="PreviousWeek_Click" Margin="5"/>
-            <TextBlock Name="CurrentWeekText" Text="29 октября - 4 ноября" FontSize="18" Foreground="White" Margin="5,0"/>
+            <TextBlock Name="CurrentWeekText" Text="Октябрь 2024" FontSize="18" Foreground="White" Margin="5,0"/>
             <Button Content="Следующая неделя &gt;" Click="NextWeek_Click" Margin="5"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+            <ItemsControl Name="WeekDaysTimeline" Margin="5">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
         </StackPanel>
 
         <TextBlock Text="Просрочено" FontSize="18" Foreground="Red" Margin="0,10"/>
@@ -48,7 +59,8 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <TextBlock Text="29 октября - Сегодня - Вторник" FontSize="18" Foreground="White" Margin="0,20"/>
+        <TextBlock Name="TodayDateTextBlock" FontSize="18" Foreground="White" Margin="0,20"/>
+
         <ListView Name="TasksListView" Background="Black" BorderBrush="Gray" BorderThickness="0,0,0,1" Margin="0,5"
                   SelectionChanged="TaskListView_SelectionChanged">
             <ListView.ItemTemplate>
