@@ -5,8 +5,36 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents"
         mc:Ignorable="d"
-        Title="Добавление задачи" Height="400" Width="600" WindowStartupLocation="CenterScreen" Background="#222"  Icon="/Resources/Icon/logo001.png">
+        Title="My Task" Height="500" Width="500" Icon="/Resources/Icon/logo001.png" MinWidth="500" MinHeight="500" MaxWidth="500" MaxHeight="500" Style="{StaticResource mainWindowStyle}">
     <Grid>
-        
-    </Grid>
+
+        <StackPanel>
+            <TextBlock Style="{StaticResource txcNorm}" Text="Название задачи:"/>
+            <TextBox Style="{StaticResource txbNorm}" x:Name="txtTitle" Width="300" Margin="5"/>
+
+            <TextBlock Style="{StaticResource txcNorm}" Text="Описание задачи:" Margin="0,10,0,0"/>
+            <TextBox Style="{StaticResource txbNorm}" x:Name="txtDescription" Width="300" Height="100" Margin="5" TextWrapping="Wrap"/>
+
+            <TextBlock Style="{StaticResource txcNorm}" Text="Дата завершения:" Margin="0,10,0,0"/>
+            <DatePicker x:Name="dpEndDate" Width="150" Margin="5"/>
+
+            <TextBlock Style="{StaticResource txcNorm}"  Text="Категория:" Margin="0,10,0,0"/>
+            <ComboBox x:Name="cmbCategory" Width="150" Margin="5">
+                <ComboBoxItem Content="Ежедневные"/>
+                <ComboBoxItem Content="Еженедельные"/>
+                <ComboBoxItem Content="Ежемесячные"/>
+                <ComboBoxItem Content="Квартальные"/>
+                <ComboBoxItem Content="Годовые"/>
+            </ComboBox>
+
+            <TextBlock Style="{StaticResource txcNorm}" Text="Приоритет:" Margin="0,10,0,0"/>
+            <ComboBox x:Name="cmbPriority" Width="150" Margin="5">
+                <ComboBoxItem Content="Высокий приоритет"/>
+                <ComboBoxItem Content="Средний приоритет"/>
+                <ComboBoxItem Content="Низкий приоритет"/>
+            </ComboBox>
+
+            <Button Style="{StaticResource btnNorm}" Content="Сохранить" Click="SaveTask_Click" Width="100" HorizontalAlignment="Center" Margin="5"/>
+        </StackPanel>
+        </Grid>
 </Window>
