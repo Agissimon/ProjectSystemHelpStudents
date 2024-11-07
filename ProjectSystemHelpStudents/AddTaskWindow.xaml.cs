@@ -33,6 +33,7 @@ namespace ProjectSystemHelpStudents
             string title = txtTitle.Text;
             string description = txtDescription.Text;
             DateTime? endDate = dpEndDate.SelectedDate;
+
             string categoryName = (cmbCategory.SelectedItem as ComboBoxItem)?.Content.ToString();
             string priorityName = (cmbPriority.SelectedItem as ComboBoxItem)?.Content.ToString();
 
@@ -48,7 +49,6 @@ namespace ProjectSystemHelpStudents
                 MessageBox.Show("Пожалуйста, выберите дату завершения.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
             try
             {
                 // Находим категорию и приоритет по имени
@@ -70,7 +70,6 @@ namespace ProjectSystemHelpStudents
                 // Добавляем задачу в базу данных
                 DBClass.entities.Task.Add(newTask);
                 DBClass.entities.SaveChanges();
-
                 MessageBox.Show("Задача успешно добавлена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 // Закрываем окно после сохранения
@@ -83,5 +82,3 @@ namespace ProjectSystemHelpStudents
         }
     }
 }
-
-
