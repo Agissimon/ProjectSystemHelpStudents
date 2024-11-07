@@ -8,6 +8,6 @@ namespace ProjectSystemHelpStudents.Helper
 {
     internal class DBClass
     {
-        public static TaskManagementEntities entities = new TaskManagementEntities();
+        public static TaskManagementEntities1 entities = new TaskManagementEntities1();
     }
 }

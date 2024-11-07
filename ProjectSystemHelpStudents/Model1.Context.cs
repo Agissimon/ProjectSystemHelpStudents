@@ -13,10 +13,10 @@ namespace ProjectSystemHelpStudents
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class TaskManagementEntities : DbContext
+    public partial class TaskManagementEntities1 : DbContext
     {
-        public TaskManagementEntities()
-            : base("name=TaskManagementEntities")
+        public TaskManagementEntities1()
+            : base("name=TaskManagementEntities1")
         {
         }
     

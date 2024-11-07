@@ -38,7 +38,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             {
                 try
                 {
-                    using (var context = new TaskManagementEntities())
+                    using (var context = new TaskManagementEntities1())
                     {
                         int maxUserId = context.Users.Max(u => (int?)u.IdUser) ?? 0;
 
