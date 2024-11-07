@@ -22,8 +22,6 @@ namespace ProjectSystemHelpStudents.UsersContent
     /// </summary>
     public partial class AuthPage : Page
     {
-        public static User userLog;
-
         int logCount = 0;
         public AuthPage()
         {
@@ -44,7 +42,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
             else
             {
-                var user = DBClass.entities.User.Where(i => i.Login == txbLogin.Text && i.Password == psbPassword.Password).FirstOrDefault();
+                var user = DBClass.entities.Users.Where(i => i.Login == txbLogin.Text && i.Password == psbPassword.Password).FirstOrDefault();
 
                 if (logCount == 4)
                 {
@@ -60,7 +58,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                     }
                     else
                     {
-                        userLog = user;
                         if (user.RoleUser == 1)
                         {
                             //MessageBox.Show("Здравствуйте, " + user.Name);

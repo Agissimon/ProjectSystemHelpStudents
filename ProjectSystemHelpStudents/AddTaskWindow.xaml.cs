@@ -33,8 +33,8 @@ namespace ProjectSystemHelpStudents
             string title = txtTitle.Text;
             string description = txtDescription.Text;
             DateTime? endDate = dpEndDate.SelectedDate;
-            string category = (cmbCategory.SelectedItem as ComboBoxItem)?.Content.ToString();
-            string priority = (cmbPriority.SelectedItem as ComboBoxItem)?.Content.ToString();
+            string categoryName = (cmbCategory.SelectedItem as ComboBoxItem)?.Content.ToString();
+            string priorityName = (cmbPriority.SelectedItem as ComboBoxItem)?.Content.ToString();
 
             // Проверка, что все обязательные поля заполнены
             if (string.IsNullOrWhiteSpace(title))
@@ -48,32 +48,29 @@ namespace ProjectSystemHelpStudents
                 MessageBox.Show("Пожалуйста, выберите дату завершения.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            int maxIdTask = DBClass.entities.Task.Max(t => (int?)t.IdTask) ?? 0;
-            int maxIdTaskPrioritie = DBClass.entities.TaskPriorities.Max(t => (int?)t.IDTaskPriorities) ?? 0;
-    
-            var newTask = new Task
-            {
-                IdTask = maxIdTask + 1,
-                Title = title,
-                Description = description,
-                EndDate = endDate.Value,
-                StatusTask = "Не завершено",
-                IdUser = UserSession.IdUser
-            };
-            TaskPriorities taskpriorities = new TaskPriorities
-            {
-                IDTaskPriorities = maxIdTaskPrioritie + 1,
-                IdTask = newTask.IdTask,
-                Category = category,
-                Prioritie = priority,
-                Label = title
-            };
 
             try
             {
-                DBClass.entities.TaskPriorities.Add(taskpriorities);
+                // Находим категорию и приоритет по имени
+                var category = DBClass.entities.Category.FirstOrDefault(c => c.Name == categoryName);
+                var priority = DBClass.entities.Priority.FirstOrDefault(p => p.Name == priorityName);
+
+                // Создаем новую задачу
+                var newTask = new Task
+                {
+                    Title = title,
+                    Description = description,
+                    EndDate = endDate.Value,
+                    StatusId = DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId ?? 1, // Устанавливаем статус по умолчанию
+                    IdUser = UserSession.IdUser,
+                    CategoryId = (int)(category?.CategoryId),
+                    PriorityId = (int)(priority?.PriorityId)
+                };
+
+                // Добавляем задачу в базу данных
                 DBClass.entities.Task.Add(newTask);
                 DBClass.entities.SaveChanges();
+
                 MessageBox.Show("Задача успешно добавлена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 // Закрываем окно после сохранения
@@ -86,4 +83,5 @@ namespace ProjectSystemHelpStudents
         }
     }
 }
+
 

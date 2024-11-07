@@ -38,9 +38,9 @@ namespace ProjectSystemHelpStudents.UsersContent
             {
                 try
                 {
-                    using (var context = new ProectEntities())
+                    using (var context = new TaskManagementEntities())
                     {
-                        int maxUserId = context.User.Max(u => (int?)u.IdUser) ?? 0;
+                        int maxUserId = context.Users.Max(u => (int?)u.IdUser) ?? 0;
 
                         string[] fioParts = fio.Split(' ');
                         string name = fioParts.Length > 0 ? fioParts[0] : "";
@@ -52,7 +52,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                             patronymic = "";
                         }
 
-                        User newUser = new User
+                        Users newUser = new Users
                         {
                             IdUser = maxUserId + 1,
                             Login = login,
@@ -64,7 +64,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                             Mail = mail
                         };
 
-                        context.User.Add(newUser);
+                        context.Users.Add(newUser);
 
                         context.SaveChanges();
 

@@ -10,8 +10,9 @@ namespace ProjectSystemHelpStudents.Helper
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public string StatusTask { get; set; }
-        public string EndDate { get; set; }
+        public string Status { get; set; }
+        public DateTime EndDate{ get; set; }
+        public string EndDateFormatted { get; set; }
         public bool IsCompleted { get; set; }
     }
 }

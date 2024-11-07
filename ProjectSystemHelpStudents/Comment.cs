@@ -12,14 +12,15 @@ namespace ProjectSystemHelpStudents
     using System;
     using System.Collections.Generic;
     
-    public partial class TaskPriorities
+    public partial class Comment
     {
-        public int IDTaskPriorities { get; set; }
-        public int IdTask { get; set; }
-        public string Category { get; set; }
-        public string Prioritie { get; set; }
-        public string Label { get; set; }
+        public int Id { get; set; }
+        public string Content { get; set; }
+        public Nullable<System.DateTime> CreatedAt { get; set; }
+        public Nullable<int> IdTask { get; set; }
+        public Nullable<int> IdUser { get; set; }
     
         public virtual Task Task { get; set; }
+        public virtual Users Users { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace ProjectSystemHelpStudents.Helper
 {
     public class User
     {
+        public static User UserLog { get; set; }
         public int IdUser { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
@@ -17,6 +18,6 @@ namespace ProjectSystemHelpStudents.Helper
         public string Mail { get; set; }
 
         public string UserFIO => $"{Surname} {Name} {Patronymic}";
-    }
 
+    }
 }

@@ -17,22 +17,28 @@ namespace ProjectSystemHelpStudents
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Task()
         {
-            this.Fail = new HashSet<Fail>();
-            this.TaskPriorities = new HashSet<TaskPriorities>();
+            this.Comment = new HashSet<Comment>();
+            this.Files = new HashSet<Files>();
         }
     
         public int IdTask { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public System.DateTime CreationDate { get; set; }
-        public string StatusTask { get; set; }
         public System.DateTime EndDate { get; set; }
+        public int CategoryId { get; set; }
+        public int PriorityId { get; set; }
+        public int StatusId { get; set; }
         public int IdUser { get; set; }
+        public Nullable<int> ProjectId { get; set; }
     
+        public virtual Category Category { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Fail> Fail { get; set; }
-        public virtual User User { get; set; }
+        public virtual ICollection<Comment> Comment { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<TaskPriorities> TaskPriorities { get; set; }
+        public virtual ICollection<Files> Files { get; set; }
+        public virtual Priority Priority { get; set; }
+        public virtual Project Project { get; set; }
+        public virtual Status Status { get; set; }
+        public virtual Users Users { get; set; }
     }
 }

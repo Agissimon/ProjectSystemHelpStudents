@@ -29,7 +29,6 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void UpdateTodayDateText()
         {
-            // Форматируем сегодняшнюю дату в виде "29 октября - Сегодня - Вторник"
             string todayDate = DateTime.Today.ToString("dd MMMM");
             string dayOfWeek = DateTime.Today.ToString("dddd");
 
@@ -46,24 +45,34 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             try
             {
+                // Загружаем все задачи с их статусом
                 var allTasks = DBClass.entities.Task
-                    .AsEnumerable()
                     .Select(t => new TaskViewModel
                     {
                         Title = t.Title,
                         Description = t.Description,
-                        StatusTask = t.StatusTask,
-                        EndDate = t.EndDate != DateTime.MinValue ? t.EndDate.ToString("dd MMMM yyyy") : "Без срока",
-                        IsCompleted = t.StatusTask == "Завершено"
+                        Status = t.Status != null ? t.Status.Name : "Без статуса",
+                        EndDate = t.EndDate, // Загружаем EndDate как DateTime, без преобразования
+                        IsCompleted = t.Status != null && t.Status.Name == "Завершено"
                     })
                     .ToList();
 
+                // Преобразуем EndDate в строку после загрузки данных
+                foreach (var task in allTasks)
+                {
+                    task.EndDateFormatted = task.EndDate != DateTime.MinValue
+                        ? task.EndDate.ToString("dd MMMM yyyy")
+                        : "Без срока";
+                }
+
+                // Просроченные задачи
                 var overdueTasks = allTasks
-                    .Where(t => t.EndDate != "Без срока" && DateTime.Parse(t.EndDate) < DateTime.Today && !t.IsCompleted)
+                    .Where(t => t.EndDateFormatted != "Без срока" && DateTime.Parse(t.EndDateFormatted) < DateTime.Today && !t.IsCompleted)
                     .ToList();
 
+                // Задачи на текущую неделю
                 var weekTasks = allTasks
-                    .Where(t => t.EndDate != "Без срока" && DateTime.Parse(t.EndDate) >= _startOfWeek && DateTime.Parse(t.EndDate) < _startOfWeek.AddDays(7) && !t.IsCompleted)
+                    .Where(t => t.EndDateFormatted != "Без срока" && DateTime.Parse(t.EndDateFormatted) >= _startOfWeek && DateTime.Parse(t.EndDateFormatted) < _startOfWeek.AddDays(7) && !t.IsCompleted)
                     .ToList();
 
                 OverdueTasksListView.ItemsSource = overdueTasks;
@@ -74,6 +83,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                 MessageBox.Show("Ошибка при загрузке задач: " + ex.Message);
             }
         }
+
 
         private void LoadWeekTimeline()
         {
@@ -144,7 +154,11 @@ namespace ProjectSystemHelpStudents.UsersContent
                 var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.Title == task.Title);
                 if (dbTask != null)
                 {
-                    dbTask.StatusTask = checkBox.IsChecked == true ? "Завершено" : "В процессе";
+                    // Меняем статус на "Завершено" или "В процессе"
+                    dbTask.StatusId = (int)(checkBox.IsChecked == true
+                        ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId
+                        : DBClass.entities.Status.FirstOrDefault(s => s.Name == "В процессе")?.StatusId);
+
                     DBClass.entities.SaveChanges();
                     LoadTasks();
                 }

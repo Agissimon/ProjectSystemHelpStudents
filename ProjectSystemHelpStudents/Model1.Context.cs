@@ -13,10 +13,10 @@ namespace ProjectSystemHelpStudents
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class ProectEntities : DbContext
+    public partial class TaskManagementEntities : DbContext
     {
-        public ProectEntities()
-            : base("name=ProectEntities")
+        public TaskManagementEntities()
+            : base("name=TaskManagementEntities")
         {
         }
     
@@ -25,11 +25,14 @@ namespace ProjectSystemHelpStudents
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Fail> Fail { get; set; }
-        public virtual DbSet<History> History { get; set; }
+        public virtual DbSet<Category> Category { get; set; }
+        public virtual DbSet<Comment> Comment { get; set; }
+        public virtual DbSet<Files> Files { get; set; }
+        public virtual DbSet<Priority> Priority { get; set; }
+        public virtual DbSet<Project> Project { get; set; }
+        public virtual DbSet<Status> Status { get; set; }
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<Task> Task { get; set; }
-        public virtual DbSet<TaskPriorities> TaskPriorities { get; set; }
-        public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<Users> Users { get; set; }
     }
 }
