@@ -32,7 +32,7 @@ namespace ProjectSystemHelpStudents.UsersContent
         private void btnMail_Click(object sender, RoutedEventArgs e)
         {
             var clientEmail = txbForPass.Text;
-            var user = DBClass.entities.User.Where(i => i.Mail == clientEmail).FirstOrDefault();
+            var user = DBClass.entities.Users.Where(i => i.Mail == clientEmail).FirstOrDefault();
 
             if (user == null)
             {

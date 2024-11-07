@@ -12,26 +12,17 @@ namespace ProjectSystemHelpStudents
     using System;
     using System.Collections.Generic;
     
-    public partial class User
+    public partial class Priority
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public User()
+        public Priority()
         {
-            this.History = new HashSet<History>();
             this.Task = new HashSet<Task>();
         }
     
-        public int IdUser { get; set; }
+        public int PriorityId { get; set; }
         public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Login { get; set; }
-        public string Password { get; set; }
-        public string Patronymic { get; set; }
-        public int RoleUser { get; set; }
-        public string Mail { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<History> History { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Task { get; set; }
     }

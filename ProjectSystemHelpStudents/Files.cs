@@ -12,12 +12,12 @@ namespace ProjectSystemHelpStudents
     using System;
     using System.Collections.Generic;
     
-    public partial class Fail
+    public partial class Files
     {
-        public int IdFail { get; set; }
-        public string NameFail { get; set; }
-        public string WayToFail { get; set; }
-        public int IdTask { get; set; }
+        public int Id { get; set; }
+        public string FilePath { get; set; }
+        public string FileType { get; set; }
+        public Nullable<int> TaskId { get; set; }
     
         public virtual Task Task { get; set; }
     }
