@@ -79,6 +79,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="SearchWindow.xaml.cs">
+      <DependentUpon>SearchWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UsersContent\CompletedPage.xaml.cs">
+      <DependentUpon>CompletedPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UsersContent\FiltersPage.xaml.cs">
+      <DependentUpon>FiltersPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UsersContent\IncomingPage.xaml.cs">
+      <DependentUpon>IncomingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UsersContent\TodayPage.xaml.cs">
+      <DependentUpon>TodayPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AddTaskWindow.xaml.cs">
       <DependentUpon>AddTaskWindow.xaml</DependentUpon>
     </Compile>
@@ -152,6 +167,26 @@
     <Compile Include="UsersContent\UserPage.xaml.cs">
       <DependentUpon>UserPage.xaml</DependentUpon>
     </Compile>
+    <Page Include="SearchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UsersContent\CompletedPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UsersContent\FiltersPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UsersContent\IncomingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UsersContent\TodayPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AddTaskWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

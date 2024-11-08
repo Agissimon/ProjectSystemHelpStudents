@@ -13,7 +13,7 @@
             <TextBlock Text="Описание:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
             <TextBlock Text="{Binding Description}" FontSize="14" Foreground="Gray" TextWrapping="Wrap" Margin="0,0,0,10"/>
             <TextBlock Text="Статус:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
-            <TextBlock Text="{Binding StatusTask}" FontSize="14" Foreground="LightGray" Margin="0,0,0,10"/>
+            <TextBlock Text="{Binding Status}" FontSize="14" Foreground="LightGray" Margin="0,0,0,10"/>
             <TextBlock Text="Дата завершения:" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
             <TextBlock Text="{Binding EndDate}" FontSize="14" Foreground="LightGray"/>
         </StackPanel>

@@ -60,9 +60,7 @@
         </ListView>
 
         <TextBlock Name="TodayDateTextBlock" FontSize="18" Foreground="White" Margin="0,20"/>
-
-        <ListView Name="TasksListView" Background="Black" BorderBrush="Gray" BorderThickness="0,0,0,1" Margin="0,5"
-                  SelectionChanged="TaskListView_SelectionChanged">
+        <ListView Name="TasksListView" Background="Black" BorderBrush="Gray" BorderThickness="0,0,0,1" Margin="0,5" SelectionChanged="TaskListView_SelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="10" Background="#333">

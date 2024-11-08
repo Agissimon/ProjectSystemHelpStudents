@@ -20,7 +20,7 @@ namespace ProjectSystemHelpStudents.UsersContent
     /// <summary>
     /// Логика взаимодействия для FogotPassWindow.xaml
     /// </summary>
-    public partial class FogotPassWindow : Window
+    public partial class FogotPassWindow : System.Windows.Window
     {
         public FogotPassWindow()
         {
