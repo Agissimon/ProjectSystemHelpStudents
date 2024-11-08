@@ -1,0 +1,22 @@
+﻿<Window x:Class="ProjectSystemHelpStudents.SearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ProjectSystemHelpStudents"
+        mc:Ignorable="d"
+        Title="MyTask" Height="550" Width="400" Icon="/Resources/Icon/logo001.png" Style="{StaticResource mainWindowStyle}"  WindowStartupLocation="CenterScreen">
+    <Grid>
+        <StackPanel>
+            <TextBox x:Name="txtSearchQuery" Width="380" Height="30" Margin="10" Style="{StaticResource txbNorm}" />
+
+            <Button Content="Поиск" Width="100" Margin="10" Style="{StaticResource btnNorm}" Click="SearchButton_Click"/>
+
+            <TextBlock Text="История поиска:" Margin="10,20,0,10"  Style="{StaticResource txcNorm}"/>
+            <ListBox x:Name="lstSearchHistory" Width="380" Height="100" Margin="10" />
+
+            <TextBlock Text="Результаты поиска:" Margin="10,20,0,10" Style="{StaticResource txcNorm}"/>
+            <ListBox x:Name="lstSearchResults" Width="380" Height="200" Margin="10" />
+        </StackPanel>
+    </Grid>
+</Window>

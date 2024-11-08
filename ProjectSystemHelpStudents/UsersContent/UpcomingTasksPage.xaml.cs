@@ -45,19 +45,17 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             try
             {
-                // Загружаем все задачи с их статусом
                 var allTasks = DBClass.entities.Task
                     .Select(t => new TaskViewModel
                     {
                         Title = t.Title,
                         Description = t.Description,
                         Status = t.Status != null ? t.Status.Name : "Без статуса",
-                        EndDate = t.EndDate, // Загружаем EndDate как DateTime, без преобразования
+                        EndDate = t.EndDate,
                         IsCompleted = t.Status != null && t.Status.Name == "Завершено"
                     })
                     .ToList();
 
-                // Преобразуем EndDate в строку после загрузки данных
                 foreach (var task in allTasks)
                 {
                     task.EndDateFormatted = task.EndDate != DateTime.MinValue
@@ -154,7 +152,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                 var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.Title == task.Title);
                 if (dbTask != null)
                 {
-                    // Меняем статус на "Завершено" или "В процессе"
                     dbTask.StatusId = (int)(checkBox.IsChecked == true
                         ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId
                         : DBClass.entities.Status.FirstOrDefault(s => s.Name == "В процессе")?.StatusId);

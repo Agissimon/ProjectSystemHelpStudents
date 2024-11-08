@@ -1,5 +1,4 @@
-﻿using ProjectSystemHelpStudents.Helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,19 +10,20 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ProjectSystemHelpStudents
+
+namespace ProjectSystemHelpStudents.UsersContent
 {
     /// <summary>
-    /// Логика взаимодействия для TaskDetailsWindow.xaml
+    /// Логика взаимодействия для TodayPage.xaml
     /// </summary>
-    public partial class TaskDetailsWindow : System.Windows.Window
+    public partial class TodayPage : Page
     {
-        public TaskDetailsWindow(TaskViewModel task)
+        public TodayPage()
         {
             InitializeComponent();
-            DataContext = task;
         }
     }
 }

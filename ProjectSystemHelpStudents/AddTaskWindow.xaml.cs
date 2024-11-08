@@ -20,7 +20,7 @@ namespace ProjectSystemHelpStudents
     /// <summary>
     /// Логика взаимодействия для AddTaskWindow.xaml
     /// </summary>
-    public partial class AddTaskWindow : Window
+    public partial class AddTaskWindow : System.Windows.Window
     {
         public AddTaskWindow()
         {
