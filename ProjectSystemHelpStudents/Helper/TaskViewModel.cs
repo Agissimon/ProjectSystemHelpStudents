@@ -15,4 +15,10 @@ namespace ProjectSystemHelpStudents.Helper
         public string EndDateFormatted { get; set; }
         public bool IsCompleted { get; set; }
     }
+
+    public class TaskGroupViewModel
+    {
+        public string DateHeader { get; set; }
+        public List<TaskViewModel> Tasks { get; set; }
+    }
 }

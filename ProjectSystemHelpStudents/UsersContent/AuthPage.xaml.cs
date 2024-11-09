@@ -70,10 +70,18 @@ namespace ProjectSystemHelpStudents.UsersContent
                             UserSession.IdUser = user.IdUser;
                             UserSession.NameUser = user.Name;
                             MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
-                            UpcomingTasksPage content = new UpcomingTasksPage();
-                            FrmClass.frmContentUser.Content = content;
-                            StackPanelButtonPage _content = new StackPanelButtonPage();
-                            FrmClass.frmStackPanelButton.Content = _content;
+
+                            var mainWindow = Application.Current.MainWindow as MainWindow;
+
+                            if (mainWindow != null)
+                            {
+                                // Clear the frame content
+                                mainWindow.frmAuth.Content = null;
+
+                                // Optionally, navigate to another page
+                                mainWindow.frmContentUser.Navigate(new UpcomingTasksPage());
+                                mainWindow.frmStackPanelButton.Navigate(new StackPanelButtonPage());
+                            }
                         }
                     }
                 }
