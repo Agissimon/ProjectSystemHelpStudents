@@ -23,7 +23,7 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             UpdateTodayDateText();
             UpdateWeekText();
-            LoadTasks();
+            RefreshTasks();
             LoadWeekTimeline();
         }
 
@@ -31,7 +31,6 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             string todayDate = DateTime.Today.ToString("dd MMMM");
             string dayOfWeek = DateTime.Today.ToString("dddd");
-
             TodayDateTextBlock.Text = $"{todayDate} - Сегодня - {dayOfWeek}";
         }
 
@@ -41,47 +40,60 @@ namespace ProjectSystemHelpStudents.UsersContent
             CurrentWeekText.Text = $"{_startOfWeek:dd MMMM} - {endOfWeek:dd MMMM}";
         }
 
-        private void LoadTasks()
+        private void RefreshTasks()
         {
             try
             {
-                var allTasks = DBClass.entities.Task
+                var allTasksFromDb = DBClass.entities.Task
+                    .Where(t => t.Status.Name != "Завершено") // Фильтрация по статусу "Завершено"
+                    .Select(t => new
+                    {
+                        t.Title,
+                        t.Description,
+                        StatusName = t.Status != null ? t.Status.Name : "Без статуса",
+                        t.EndDate
+                    })
+                    .ToList();
+
+                var allTasks = allTasksFromDb
                     .Select(t => new TaskViewModel
                     {
                         Title = t.Title,
                         Description = t.Description,
-                        Status = t.Status != null ? t.Status.Name : "Без статуса",
+                        Status = t.StatusName,
                         EndDate = t.EndDate,
-                        IsCompleted = t.Status != null && t.Status.Name == "Завершено"
+                        IsCompleted = t.StatusName == "Завершено",
+                        EndDateFormatted = t.EndDate.Date == DateTime.Today ? "Сегодня" :
+                                           t.EndDate.Date == DateTime.Today.AddDays(1) ? "Завтра" :
+                                           $"{t.EndDate:dd MMMM yyyy} - {t.EndDate:dddd}"
                     })
+                    .OrderBy(t => t.EndDate)
                     .ToList();
 
-                foreach (var task in allTasks)
+                var overdueTasks = allTasks.Where(t => t.EndDate < DateTime.Today).ToList();
+                OverdueTasksListView.ItemsSource = overdueTasks;
+
+                var upcomingTasks = allTasks.Where(t => t.EndDate >= DateTime.Today).ToList();
+                var groupedTasks = new List<TaskGroupViewModel>();
+
+                foreach (var task in upcomingTasks)
                 {
-                    task.EndDateFormatted = task.EndDate != DateTime.MinValue
-                        ? task.EndDate.ToString("dd MMMM yyyy")
-                        : "Без срока";
+                    var group = groupedTasks.FirstOrDefault(g => g.DateHeader == task.EndDateFormatted);
+                    if (group == null)
+                    {
+                        group = new TaskGroupViewModel { DateHeader = task.EndDateFormatted, Tasks = new List<TaskViewModel>() };
+                        groupedTasks.Add(group);
+                    }
+                    group.Tasks.Add(task);
                 }
 
-                // Просроченные задачи
-                var overdueTasks = allTasks
-                    .Where(t => t.EndDateFormatted != "Без срока" && DateTime.Parse(t.EndDateFormatted) < DateTime.Today && !t.IsCompleted)
-                    .ToList();
-
-                // Задачи на текущую неделю
-                var weekTasks = allTasks
-                    .Where(t => t.EndDateFormatted != "Без срока" && DateTime.Parse(t.EndDateFormatted) >= _startOfWeek && DateTime.Parse(t.EndDateFormatted) < _startOfWeek.AddDays(7) && !t.IsCompleted)
-                    .ToList();
-
-                OverdueTasksListView.ItemsSource = overdueTasks;
-                TasksListView.ItemsSource = weekTasks;
+                TasksListView.ItemsSource = groupedTasks;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Ошибка при загрузке задач: " + ex.Message);
             }
         }
-
 
         private void LoadWeekTimeline()
         {
@@ -99,19 +111,15 @@ namespace ProjectSystemHelpStudents.UsersContent
                     BorderThickness = new Thickness(0),
                     IsEnabled = false
                 };
-
                 WeekDaysTimeline.Items.Add(dayButton);
             }
         }
 
         private Brush GetButtonBackgroundColor(DateTime day)
         {
-            if (day == DateTime.Today)
-                return Brushes.Red;
-            else if (day < DateTime.Today)
-                return Brushes.Gray;
-            else
-                return Brushes.LightGray;
+            if (day == DateTime.Today) return Brushes.Red;
+            else if (day < DateTime.Today) return Brushes.Gray;
+            else return Brushes.LightGray;
         }
 
         private void Today_Click(object sender, RoutedEventArgs e)
@@ -152,12 +160,12 @@ namespace ProjectSystemHelpStudents.UsersContent
                 var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.Title == task.Title);
                 if (dbTask != null)
                 {
-                    dbTask.StatusId = (int)(checkBox.IsChecked == true
-                        ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId
-                        : DBClass.entities.Status.FirstOrDefault(s => s.Name == "В процессе")?.StatusId);
-
+                    // Меняем статус на "Завершено" при установке галочки
+                    dbTask.StatusId = (int)(checkBox.IsChecked == true ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId : DBClass.entities.Status.FirstOrDefault(s => s.Name == "В процессе")?.StatusId);
                     DBClass.entities.SaveChanges();
-                    LoadTasks();
+
+                    // Обновляем список, чтобы завершенные задачи пропали
+                    RefreshTasks();
                 }
             }
         }
@@ -166,6 +174,7 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             AddTaskWindow addTaskWindow = new AddTaskWindow();
             addTaskWindow.ShowDialog();
+            RefreshTasks();
         }
     }
 }
