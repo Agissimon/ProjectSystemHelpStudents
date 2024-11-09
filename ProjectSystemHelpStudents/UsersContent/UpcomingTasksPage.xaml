@@ -14,9 +14,9 @@
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
                 <Button Content="&lt; Сегодня" Click="Today_Click" Margin="5" Background="Transparent" Foreground="White"/>
-                <Button Content="&lt; Предыдущая неделя" Click="PreviousWeek_Click" Margin="5"/>
-                <TextBlock Name="CurrentWeekText" Text="Октябрь 2024" FontSize="18" Foreground="White" Margin="5,0"/>
-                <Button Content="Следующая неделя &gt;" Click="NextWeek_Click" Margin="5"/>
+                <Button Content="&lt; Предыдущая неделя" Style="{StaticResource btnlow}" Click="PreviousWeek_Click" Foreground="White" Margin="5"/>
+                <TextBlock Name="CurrentWeekText" Style="{StaticResource txcLow}" Text="Октябрь 2024" FontSize="18" Foreground="White" Margin="5,0"/>
+                <Button Content="Следующая неделя &gt;" Style="{StaticResource btnlow}" Click="NextWeek_Click" Foreground="White" Margin="5"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
@@ -68,14 +68,26 @@
                     <DataTemplate DataType="{x:Type local:TaskGroupViewModel}">
                         <StackPanel>
                             <TextBlock Text="{Binding DateHeader}" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,10,0,5"/>
-
-                            <!-- Используем вложенный ListView вместо ItemsControl -->
                             <ListView ItemsSource="{Binding Tasks}" Background="Transparent" SelectionChanged="TaskListView_SelectionChanged">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="10" Background="#333">
                                             <StackPanel Orientation="Horizontal">
-                                                <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted}" Click="ToggleTaskStatus_Click"/>
+                                                <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted}" Click="ToggleTaskStatus_Click">
+                                                    <CheckBox.Style>
+                                                        <Style TargetType="CheckBox">
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="CheckBox">
+                                                                        <Border Width="20" Height="20" CornerRadius="10" BorderBrush="Gray" BorderThickness="2" Background="{TemplateBinding Background}">
+                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        </Border>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </CheckBox.Style>
+                                                </CheckBox>
                                                 <StackPanel Margin="10,0,0,0">
                                                     <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
                                                     <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>

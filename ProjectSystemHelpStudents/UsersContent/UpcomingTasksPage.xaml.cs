@@ -45,7 +45,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             try
             {
                 var allTasksFromDb = DBClass.entities.Task
-                    .Where(t => t.Status.Name != "Завершено") // Фильтрация по статусу "Завершено"
+                    .Where(t => t.Status.Name != "Завершено")
                     .Select(t => new
                     {
                         t.Title,
