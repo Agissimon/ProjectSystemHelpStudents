@@ -160,11 +160,9 @@ namespace ProjectSystemHelpStudents.UsersContent
                 var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.Title == task.Title);
                 if (dbTask != null)
                 {
-                    // Меняем статус на "Завершено" при установке галочки
-                    dbTask.StatusId = (int)(checkBox.IsChecked == true ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId : DBClass.entities.Status.FirstOrDefault(s => s.Name == "В процессе")?.StatusId);
+                    dbTask.StatusId = (int)(checkBox.IsChecked == true ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId : DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId);
                     DBClass.entities.SaveChanges();
 
-                    // Обновляем список, чтобы завершенные задачи пропали
                     RefreshTasks();
                 }
             }
