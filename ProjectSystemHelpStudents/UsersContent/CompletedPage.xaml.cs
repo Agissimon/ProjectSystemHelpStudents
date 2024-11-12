@@ -1,67 +1,44 @@
 ﻿using ProjectSystemHelpStudents.Helper;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
-    /// <summary>
-    /// Логика взаимодействия для CompletedPage.xaml
-    /// </summary>
     public partial class CompletedPage : Page
     {
         public CompletedPage()
         {
             InitializeComponent();
-            UpdateTodayDateText();
             LoadTasks();
-        }
-
-        private void UpdateTodayDateText()
-        {
-            string todayDate = DateTime.Today.ToString("dd MMMM");
-            string dayOfWeek = DateTime.Today.ToString("dddd");
-            
         }
 
         private void LoadTasks()
         {
             try
             {
-                var allTasks = DBClass.entities.Task
+                var completedTasks = DBClass.entities.Task
+                    .Where(t => t.Status != null && t.Status.Name == "Завершено")
                     .Select(t => new TaskViewModel
                     {
                         Title = t.Title,
                         Description = t.Description,
-                        Status = t.Status != null ? t.Status.Name : "Без статуса",
+                        Status = t.Status.Name,
                         EndDate = t.EndDate,
-                        IsCompleted = t.Status != null && t.Status.Name == "Завершено"
+                        IsCompleted = true
                     })
                     .ToList();
 
-                foreach (var task in allTasks)
+                foreach (var task in completedTasks)
                 {
                     task.EndDateFormatted = task.EndDate != DateTime.MinValue
                         ? task.EndDate.ToString("dd MMMM yyyy")
                         : "Без срока";
                 }
 
-                var todayTasks = allTasks
-                    .Where(t => t.EndDateFormatted != "Без срока" && DateTime.Parse(t.EndDateFormatted) == DateTime.Today && !t.IsCompleted)
-                    .ToList();
-
-                TasksListView.ItemsSource = todayTasks;
+                TasksListView.ItemsSource = null;
+                TasksListView.ItemsSource = completedTasks;
             }
             catch (Exception ex)
             {
@@ -69,15 +46,6 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
         }
 
-        private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (sender is ListView listView && listView.SelectedItem is TaskViewModel selectedTask)
-            {
-                var detailsWindow = new TaskDetailsWindow(selectedTask);
-                detailsWindow.ShowDialog();
-                listView.SelectedItem = null;
-            }
-        }
 
         private void ToggleTaskStatus_Click(object sender, RoutedEventArgs e)
         {
@@ -91,12 +59,45 @@ namespace ProjectSystemHelpStudents.UsersContent
                 {
                     dbTask.StatusId = (int)(checkBox.IsChecked == true
                         ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId
-                        : DBClass.entities.Status.FirstOrDefault(s => s.Name == "В процессе")?.StatusId);
+                        : DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId);
 
                     DBClass.entities.SaveChanges();
+
                     LoadTasks();
                 }
             }
         }
+
+        private void DeleteHistory_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var completedTasks = DBClass.entities.Task
+                    .Where(t => t.Status != null && t.Status.Name == "Завершено")
+                    .ToList();
+
+                DBClass.entities.Task.RemoveRange(completedTasks);
+                DBClass.entities.SaveChanges();
+
+                MessageBox.Show("История завершенных задач очищена.");
+
+                LoadTasks();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка при удалении завершенных задач: " + ex.Message);
+            }
+        }
+    
+        private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ListView listView && listView.SelectedItem is TaskViewModel selectedTask)
+            {
+                var detailsWindow = new TaskDetailsWindow(selectedTask);
+                detailsWindow.ShowDialog();
+                listView.SelectedItem = null;
+            }
+        }
+
     }
 }

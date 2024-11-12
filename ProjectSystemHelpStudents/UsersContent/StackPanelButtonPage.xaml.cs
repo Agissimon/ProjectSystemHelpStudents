@@ -10,6 +10,15 @@ namespace ProjectSystemHelpStudents.UsersContent
         public StackPanelButtonPage()
         {
             InitializeComponent();
+            DataContext = this;
+            UserNameButton.Content = UserSession.NameUser;  
+        }
+        private void UserNameButton_Click(object sender, RoutedEventArgs e)
+        {
+            UserPage content = new UserPage();
+            FrmClass.frmContentUser.Content = content;
+            StackPanelButtonPage _content = new StackPanelButtonPage();
+            FrmClass.frmStackPanelButton.Content = _content;
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
@@ -60,7 +69,6 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-
         }
 
         private void WorkButton_Click(object sender, RoutedEventArgs e)
@@ -69,6 +77,6 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void StudyButton_Click(object sender, RoutedEventArgs e)
         {
-        }
+        } 
     }
 }

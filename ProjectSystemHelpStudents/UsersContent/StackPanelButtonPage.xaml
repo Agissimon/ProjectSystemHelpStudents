@@ -14,9 +14,7 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Background="#333333">
-            <TextBlock Text=" Matvey" Foreground="White" FontSize="18" Margin="0,0,0,20" FontWeight="Bold"/>
-
-            <Button x:Name="UserNameButton" Content="{Binding NameUser}" Background="Transparent" Foreground="White" FontSize="18" FontWeight="Bold"/>
+            <Button x:Name="UserNameButton" FontSize="16" FontWeight="Bold" Style="{StaticResource btnTransparentStyle}" Content="{Binding NameUser}" Click="UserNameButton_Click"/>
 
             <StackPanel>
                 <Button Content=" Поиск" Style="{StaticResource btnTransparentStyle}" Click="SearchButton_Click" />
