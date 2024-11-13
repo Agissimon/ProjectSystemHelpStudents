@@ -8,7 +8,43 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="IncomingPage">
 
-    <Grid>
-        
+    <Grid Margin="20">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10">
+                <TextBlock Text="Входящие" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                <ListView Name="TasksListView" Background="Black" BorderBrush="Gray" BorderThickness="0,0,0,1" Margin="0,5" SelectionChanged="TaskListView_SelectionChanged">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="10" Background="#333">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted, Mode=TwoWay}" Click="ToggleTaskStatus_Click">
+                                        <CheckBox.Style>
+                                            <Style TargetType="CheckBox">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="CheckBox">
+                                                            <Border Width="20" Height="20" CornerRadius="10" BorderBrush="Gray" BorderThickness="2" Background="{TemplateBinding Background}">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </CheckBox.Style>
+                                    </CheckBox>
+                                    <StackPanel Margin="10,0,0,0">
+                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                        <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
+                                        <TextBlock Text="{Binding EndDate}" Foreground="LightGray" FontSize="12"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Button Content="+ Добавить задачу" HorizontalAlignment="Left" Margin="0,20,0,0" Width="200" Click="ButtonCreateTask_Click"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

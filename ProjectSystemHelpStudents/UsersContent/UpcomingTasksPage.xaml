@@ -103,8 +103,6 @@
                 </ListView.Resources>
             </ListView>
 
-
-
             <Button Content="+ Добавить задачу" HorizontalAlignment="Left" Margin="0,20,0,0" Width="200" Click="Button_Click"/>
         </StackPanel>
     </ScrollViewer>

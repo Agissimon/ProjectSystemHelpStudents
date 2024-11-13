@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents"
         mc:Ignorable="d"
-        Title="MyTask" Height="550" Width="400" Icon="/Resources/Icon/logo001.png" Style="{StaticResource mainWindowStyle}"  WindowStartupLocation="CenterScreen">
+        Title="MyTask" Height="550" Width="400" Icon="/Resources/Icon/logo001.png" MinWidth="400" MinHeight="550" MaxWidth="400" MaxHeight="550" Style="{StaticResource mainWindowStyle}"  WindowStartupLocation="CenterScreen">
     <Grid>
         <StackPanel>
             <TextBox x:Name="txtSearchQuery" Width="380" Height="30" Margin="10" Style="{StaticResource txbNorm}" />

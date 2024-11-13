@@ -15,6 +15,8 @@ namespace ProjectSystemHelpStudents.UsersContent
         }
         private void UserNameButton_Click(object sender, RoutedEventArgs e)
         {
+            int userId = UserSession.IdUser;
+
             UserPage content = new UserPage();
             FrmClass.frmContentUser.Content = content;
             StackPanelButtonPage _content = new StackPanelButtonPage();

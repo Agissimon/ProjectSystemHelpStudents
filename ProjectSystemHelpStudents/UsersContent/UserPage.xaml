@@ -6,12 +6,21 @@
     <Grid Margin="20">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBlock Text="Редактирование данных пользователя" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+                <TextBlock Text="Редактирование данных пользователя" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
 
-                <TextBlock Text="Имя пользователя:" FontSize="16" Margin="0,0,0,5"/>
-                <TextBox x:Name="UserNameTextBox" FontSize="16" Margin="0,0,0,10" Text="{Binding NameUser, Mode=TwoWay}"/>
+                <TextBlock Text="Имя:" Style="{StaticResource textBlockTransparentStyle}"/>
+                <TextBox x:Name="UserNameTextBox" Style="{StaticResource textBoxTransparentStyle}"/>
 
-                <Button Content="Сохранить" FontSize="16" Click="SaveButton_Click"/>
+                <TextBlock Text="Фамилия:" Style="{StaticResource textBlockTransparentStyle}"/>
+                <TextBox x:Name="UserSurnameTextBox" Style="{StaticResource textBoxTransparentStyle}"/>
+
+                <TextBlock Text="Отчество:" Style="{StaticResource textBlockTransparentStyle}"/>
+                <TextBox x:Name="UserPatronymicTextBox" Style="{StaticResource textBoxTransparentStyle}"/>
+
+                <TextBlock Text="Email:" Style="{StaticResource textBlockTransparentStyle}"/>
+                <TextBox x:Name="UserEmailTextBox" Style="{StaticResource textBoxTransparentStyle}"/>
+
+                <Button Content="Сохранить" Style="{StaticResource btnTransparentStyle}" Click="SaveButton_Click"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
