@@ -32,7 +32,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             try
             {
                 var completedTasks = DBClass.entities.Task
-                    .Where(t => t.Project != null && t.Project.Name == "Входящие" && t.Status.Name == "Не завершено")
+                    .Where(t => t.Project != null && t.Project.Name == "Входящие" && t.Status.Name == "Не завершено" && t.IdUser == UserSession.IdUser)
                     .Select(t => new TaskViewModel
                     {
                         Title = t.Title,
