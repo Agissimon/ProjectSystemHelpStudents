@@ -28,7 +28,8 @@ namespace ProjectSystemHelpStudents.UsersContent
             try
             {
                 var allTasks = DBClass.entities.Task
-                    .Select(t => new TaskViewModel
+                    .Where(t => t.IdUser == UserSession.IdUser)
+                    .Select(t => new TaskViewModel 
                     {
                         Title = t.Title,
                         Description = t.Description,

@@ -45,7 +45,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             try
             {
                 var allTasksFromDb = DBClass.entities.Task
-                    .Where(t => t.Status.Name != "Завершено")
+                    .Where(t => t.Status.Name != "Завершено" && t.IdUser == UserSession.IdUser)
                     .Select(t => new
                     {
                         t.Title,

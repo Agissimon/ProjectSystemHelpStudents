@@ -107,7 +107,6 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Helper\ConvertorsColors.cs" />
-    <Compile Include="Helper\DayTasksViewModel.cs" />
     <Compile Include="Helper\DBClass.cs" />
     <Compile Include="Helper\FrmClass.cs" />
     <Compile Include="Helper\TaskViewModel.cs" />
