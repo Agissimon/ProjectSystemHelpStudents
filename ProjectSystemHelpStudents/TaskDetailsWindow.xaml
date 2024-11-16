@@ -1,8 +1,8 @@
 ﻿<Window x:Class="ProjectSystemHelpStudents.TaskDetailsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Детали задачи" Height="600" Width="700"
-        Background="#222" WindowStartupLocation="CenterScreen">
+        Title="MyTask" Height="600" Width="800" MinHeight="600" MinWidth="800" Icon="/Resources/Icon/logo001.png" Style="{StaticResource mainWindowStyle}"  WindowStartupLocation="CenterScreen">
+    
     <Grid Margin="10">
         <StackPanel Orientation="Horizontal">
             <StackPanel Width="502">
@@ -27,7 +27,7 @@
                 <TextBlock Text="Проект" Style="{StaticResource textBlockTransparentStyle}" Margin="0,10,0,5"/>
                 <ComboBox x:Name="ProjectComboBox"
                       Width="150"
-                      Foreground="White"
+                      Foreground="Black"
                       Background="#333"
                       BorderBrush="Transparent"
                       FontSize="14"
@@ -36,24 +36,27 @@
                       SelectedValue="{Binding ProjectId, Mode=TwoWay}"/>
 
                 <TextBlock Text="Срок выполнения" Style="{StaticResource textBlockTransparentStyle}" Margin="0,10,0,5"/>
-                <StackPanel Orientation="Horizontal">
-                    <DatePicker x:Name="EndDatePicker" SelectedDate="{Binding EndDate}" Foreground="White" Background="#333" BorderBrush="Transparent"/>
-                </StackPanel>
+                <DatePicker x:Name="EndDatePicker" SelectedDate="{Binding EndDate}" Foreground="White" Background="#333" BorderBrush="Transparent"/>
 
                 <TextBlock Text="Приоритет" Style="{StaticResource textBlockTransparentStyle}" Margin="0,10,0,5"/>
                 <ComboBox x:Name="PriorityComboBox"
                       Width="151"
-                      Foreground="White"
+                      Foreground="Black"
                       Background="#333"
                       BorderBrush="Transparent"
                       FontSize="14"
                       DisplayMemberPath="Name"
                       SelectedValuePath="PriorityId"
                       SelectedValue="{Binding PriorityId, Mode=TwoWay}"/>
-
                 <TextBlock Style="{StaticResource textBlockTransparentStyle}" Text="Метки" Margin="0,10,0,5"/>
-                <ComboBox x:Name="TagsComboBox" Width="150" IsEditable="True" Foreground="White" Background="#333" BorderBrush="Transparent"/>
-
+                <ComboBox x:Name="TagsComboBox" Width="151"
+                    Foreground="Black"
+                    Background="#333"
+                    BorderBrush="Transparent"
+                    FontSize="14"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="TagsId"
+                    SelectedValue="{Binding TagsId, Mode=TwoWay}"/>
                 <Button Content="Сохранить" Click="SaveButton_Click" Style="{StaticResource btnTransparentStyle}" HorizontalAlignment="Center" Margin="0,10,0,5"/>
             </StackPanel>
         </StackPanel>

@@ -91,6 +91,9 @@
     <Compile Include="UsersContent\IncomingPage.xaml.cs">
       <DependentUpon>IncomingPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UsersContent\MyProjectPage.xaml.cs">
+      <DependentUpon>MyProjectPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UsersContent\TodayPage.xaml.cs">
       <DependentUpon>TodayPage.xaml</DependentUpon>
     </Compile>
@@ -179,6 +182,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UsersContent\IncomingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UsersContent\MyProjectPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

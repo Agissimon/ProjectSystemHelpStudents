@@ -1,6 +1,7 @@
 ﻿using ProjectSystemHelpStudents.Helper;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace ProjectSystemHelpStudents.Helper
@@ -8,16 +9,13 @@ namespace ProjectSystemHelpStudents.Helper
     public class TaskViewModel : INotifyPropertyChanged
     {
         private int _priorityId;
-        private string _priorityName;
         private int _projectId;
-        private string _projectName;
         private string _title;
         private string _description;
         private DateTime _endDate;
         private bool _isCompleted;
         private string _Status;
         public string EndDateFormatted { get; set; }
-
         public int IdTask { get; set; }
         public string Status
         {
@@ -44,19 +42,6 @@ namespace ProjectSystemHelpStudents.Helper
             }
         }
 
-        public string PriorityName
-        {
-            get => _priorityName;
-            set
-            {
-                if (_priorityName != value)
-                {
-                    _priorityName = value;
-                    OnPropertyChanged(nameof(PriorityName));
-                }
-            }
-        }
-
         public int ProjectId
         {
             get => _projectId;
@@ -66,19 +51,6 @@ namespace ProjectSystemHelpStudents.Helper
                 {
                     _projectId = value;
                     OnPropertyChanged(nameof(ProjectId));
-                }
-            }
-        }
-
-        public string ProjectName
-        {
-            get => _projectName;
-            set
-            {
-                if (_projectName != value)
-                {
-                    _projectName = value;
-                    OnPropertyChanged(nameof(ProjectName));
                 }
             }
         }
@@ -145,6 +117,12 @@ namespace ProjectSystemHelpStudents.Helper
     public class TaskGroupViewModel
     {
         public string DateHeader { get; set; }
-        public List<TaskViewModel> Tasks { get; set; }
+        public ObservableCollection<TaskViewModel> Tasks { get; set; }
+
+        public TaskGroupViewModel()
+        {
+            Tasks = new ObservableCollection<TaskViewModel>();
+        }
     }
+
 }

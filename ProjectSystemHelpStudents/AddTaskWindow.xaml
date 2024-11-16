@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents"
         mc:Ignorable="d"
-        Title="My Task" Height="500" Width="500" Icon="/Resources/Icon/logo001.png" MinWidth="500" MinHeight="500" MaxWidth="500" MaxHeight="500" Style="{StaticResource mainWindowStyle}">
+        Title="My Task" Height="400" Width="500" Icon="/Resources/Icon/logo001.png" MinWidth="500" MinHeight="400" MaxWidth="500" MaxHeight="500" Style="{StaticResource mainWindowStyle}">
     <Grid>
 
         <StackPanel>
@@ -17,15 +17,6 @@
 
             <TextBlock Style="{StaticResource txcNorm}" Text="Дата завершения:" Margin="0,10,0,0"/>
             <DatePicker x:Name="dpEndDate" Width="150" Margin="5"/>
-
-            <TextBlock Style="{StaticResource txcNorm}"  Text="Категория:" Margin="0,10,0,0"/>
-            <ComboBox x:Name="cmbCategory" Width="150" Margin="5">
-                <ComboBoxItem Content="Ежедневные"/>
-                <ComboBoxItem Content="Еженедельные"/>
-                <ComboBoxItem Content="Ежемесячные"/>
-                <ComboBoxItem Content="Квартальные"/>
-                <ComboBoxItem Content="Годовые"/>
-            </ComboBox>
 
             <TextBlock Style="{StaticResource txcNorm}" Text="Приоритет:" Margin="0,10,0,0"/>
             <ComboBox x:Name="cmbPriority" Width="150" Margin="5">
