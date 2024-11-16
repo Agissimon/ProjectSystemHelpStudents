@@ -68,6 +68,13 @@ namespace ProjectSystemHelpStudents.UsersContent
             StackPanelButtonPage _content = new StackPanelButtonPage();
             FrmClass.frmStackPanelButton.Content = _content;
         }
+        private void MyProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            MyProjectPage content = new MyProjectPage();
+            FrmClass.frmContentUser.Content = content;
+            StackPanelButtonPage _content = new StackPanelButtonPage();
+            FrmClass.frmStackPanelButton.Content = _content;
+        }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -79,6 +86,7 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void StudyButton_Click(object sender, RoutedEventArgs e)
         {
-        } 
+        }
+        
     }
 }

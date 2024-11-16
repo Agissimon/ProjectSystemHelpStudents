@@ -29,15 +29,12 @@ namespace ProjectSystemHelpStudents
 
         private void SaveTask_Click(object sender, RoutedEventArgs e)
         {
-            // Считываем данные из полей
             string title = txtTitle.Text;
             string description = txtDescription.Text;
             DateTime? endDate = dpEndDate.SelectedDate;
 
-            string categoryName = (cmbCategory.SelectedItem as ComboBoxItem)?.Content.ToString();
             string priorityName = (cmbPriority.SelectedItem as ComboBoxItem)?.Content.ToString();
 
-            // Проверка, что все обязательные поля заполнены
             if (string.IsNullOrWhiteSpace(title))
             {
                 MessageBox.Show("Пожалуйста, введите название задачи.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -51,28 +48,22 @@ namespace ProjectSystemHelpStudents
             }
             try
             {
-                // Находим категорию и приоритет по имени
-                var category = DBClass.entities.Category.FirstOrDefault(c => c.Name == categoryName);
                 var priority = DBClass.entities.Priority.FirstOrDefault(p => p.Name == priorityName);
 
-                // Создаем новую задачу
                 var newTask = new Task
                 {
                     Title = title,
                     Description = description,
                     EndDate = endDate.Value,
-                    StatusId = DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId ?? 1, // Устанавливаем статус по умолчанию
+                    StatusId = DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId ?? 1,
                     IdUser = UserSession.IdUser,
-                    CategoryId = (int)(category?.CategoryId),
                     PriorityId = (int)(priority?.PriorityId)
                 };
 
-                // Добавляем задачу в базу данных
                 DBClass.entities.Task.Add(newTask);
                 DBClass.entities.SaveChanges();
                 MessageBox.Show("Задача успешно добавлена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Закрываем окно после сохранения
                 this.Close();
             }
             catch (Exception ex)

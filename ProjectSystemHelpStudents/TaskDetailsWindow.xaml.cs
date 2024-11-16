@@ -2,94 +2,90 @@
 using System;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace ProjectSystemHelpStudents
 {
     public partial class TaskDetailsWindow : Window
     {
-        private TaskViewModel task;
+        private TaskViewModel _task;
+
+        public event Action TaskUpdated;
 
         public TaskDetailsWindow(TaskViewModel task)
         {
             InitializeComponent();
-            this.task = task;
-            DataContext = task;
+            _task = task;
+            DataContext = _task;
 
-            InitializeFields();
+            InitializeComboBoxes();
         }
 
-        private void InitializeFields()
+        private void InitializeComboBoxes()
         {
-            // Заполняем данные для ProjectComboBox и PriorityComboBox
-            ProjectComboBox.ItemsSource = DBClass.entities.Project.ToList();
-            PriorityComboBox.ItemsSource = DBClass.entities.Priority.ToList();
+            var projects = DBClass.entities.Project.ToList();
+            ProjectComboBox.ItemsSource = projects;
+            ProjectComboBox.SelectedValue = _task.ProjectId;
 
-            // Отображаем Name поля и привязываем идентификаторы
-            ProjectComboBox.DisplayMemberPath = "Name";
-            ProjectComboBox.SelectedValuePath = "ProjectId";
-            ProjectComboBox.SelectedValue = task.ProjectId;
-
-            PriorityComboBox.DisplayMemberPath = "Name";
-            PriorityComboBox.SelectedValuePath = "PriorityId";
-            PriorityComboBox.SelectedValue = task.PriorityId;
+            var priorities = DBClass.entities.Priority.ToList();
+            PriorityComboBox.ItemsSource = priorities;
+            PriorityComboBox.SelectedValue = _task.PriorityId;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Обновляем свойства task на основе введенных данных
-                task.Title = TitleTextBox.Text;
-                task.Description = DescriptionTextBox.Text;
-                task.EndDate = (DateTime)EndDatePicker.SelectedDate;
+                _task.Title = TitleTextBox.Text;
+                _task.Description = DescriptionTextBox.Text;
+                _task.EndDate = EndDatePicker.SelectedDate ?? DateTime.Now;
+                _task.ProjectId = (int?)ProjectComboBox.SelectedValue ?? 0;
+                _task.PriorityId = (int?)PriorityComboBox.SelectedValue ?? 0;
 
-                // Сохраняем выбор ProjectId и PriorityId
-                task.ProjectId = (int)(ProjectComboBox.SelectedValue ?? task.ProjectId);
-                task.PriorityId = (int)(PriorityComboBox.SelectedValue ?? task.PriorityId);
-
-                // Обновление задачи в базе данных
-                var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.IdTask == task.IdTask);
+                var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.IdTask == _task.IdTask);
                 if (dbTask != null)
                 {
-                    dbTask.Title = task.Title;
-                    dbTask.Description = task.Description;
-                    dbTask.EndDate = task.EndDate;
-                    dbTask.PriorityId = task.PriorityId;
-                    dbTask.ProjectId = task.ProjectId;
-
+                    dbTask.Title = _task.Title;
+                    dbTask.Description = _task.Description;
+                    dbTask.EndDate = _task.EndDate;
+                    dbTask.ProjectId = _task.ProjectId;
+                    dbTask.PriorityId = _task.PriorityId;
                     DBClass.entities.SaveChanges();
                 }
 
-                MessageBox.Show("Задача успешно сохранена.");
-                this.Close();
+                MessageBox.Show("Задача успешно сохранена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                TaskUpdated?.Invoke();
+
+                Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при сохранении задачи: " + ex.Message);
+                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void ToggleTaskStatus_Click(object sender, RoutedEventArgs e)
         {
-            var checkBox = sender as CheckBox;
-            var task = checkBox.DataContext as TaskViewModel;
-
-            if (task != null)
+            try
             {
-                var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.Title == task.Title);
+                var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.IdTask == _task.IdTask);
                 if (dbTask != null)
                 {
-                    dbTask.StatusId = (int)(checkBox.IsChecked == true ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId : DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId);
+                    dbTask.StatusId = IsCompletedCheckBox.IsChecked == true
+                        ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId ?? dbTask.StatusId
+                        : DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId ?? dbTask.StatusId;
                     DBClass.entities.SaveChanges();
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка обновления статуса: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Эта функция пока не работает");
+            MessageBox.Show("Добавление подзадач в разработке.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
-
     }
 }
