@@ -15,6 +15,8 @@ namespace ProjectSystemHelpStudents.Helper
         private DateTime _endDate;
         private bool _isCompleted;
         private string _Status;
+        public string FilePath { get; set; }
+
         public string EndDateFormatted { get; set; }
         public int IdTask { get; set; }
         public string Status
