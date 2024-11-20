@@ -1,4 +1,6 @@
 ﻿using ProjectSystemHelpStudents.Helper;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -11,8 +13,51 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             InitializeComponent();
             DataContext = this;
-            UserNameButton.Content = UserSession.NameUser;  
+            UserNameButton.Content = UserSession.NameUser;
+            GenerateProjectButtons();
         }
+
+        public List<Project> GetProjects()
+        {
+            using (var context = new TaskManagementEntities1())
+            {
+                return context.Project.ToList();
+            }
+        }
+
+        private void GenerateProjectButtons()
+        {
+            var projectStackPanel = new StackPanel();
+            var projects = GetProjects();
+
+            foreach (var project in projects)
+            {
+                Button projectButton = new Button // Добавить вывод иконки которую пользователь сможет добавить на этапе создании проекта
+                {
+                    Content = project.Name,
+                    Style = (Style)FindResource("btnTransparentStyle"),
+                    Margin = new Thickness(5),
+                    Tag = project.ProjectId
+                };
+
+                projectButton.Click += ProjectButton_Click;
+                projectStackPanel.Children.Add(projectButton);
+            }
+
+            ProjectStackPanel.Children.Add(projectStackPanel);
+        }
+
+        private void ProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            int projectId = (int)button.Tag;
+
+            ProjectDetailsPage content = new ProjectDetailsPage(projectId);
+            FrmClass.frmContentUser.Content = content;
+            StackPanelButtonPage _content = new StackPanelButtonPage();
+            FrmClass.frmStackPanelButton.Content = _content;
+        }
+
         private void UserNameButton_Click(object sender, RoutedEventArgs e)
         {
             int userId = UserSession.IdUser;
@@ -74,19 +119,6 @@ namespace ProjectSystemHelpStudents.UsersContent
             FrmClass.frmContentUser.Content = content;
             StackPanelButtonPage _content = new StackPanelButtonPage();
             FrmClass.frmStackPanelButton.Content = _content;
-        }
-
-        private void HomeButton_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void WorkButton_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void StudyButton_Click(object sender, RoutedEventArgs e)
-        {
-        }
-        
+        }     
     }
 }

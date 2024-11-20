@@ -1,9 +1,11 @@
 ﻿<Page x:Class="ProjectSystemHelpStudents.UsersContent.UserPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="UserPage">
+      Title="UserPage"  
+      Background="#222">
 
-    <Grid Margin="20">
+
+    <Grid Margin="0,0,0,10">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <TextBlock Text="Редактирование данных пользователя" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>

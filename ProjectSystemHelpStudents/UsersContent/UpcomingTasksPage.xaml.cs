@@ -90,6 +90,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                 MessageBox.Show("Ошибка при загрузке задач: " + ex.Message);
             }
         }
+
         private void UpdateTodayDateText()
         {
             string todayDate = DateTime.Today.ToString("dd MMMM");
