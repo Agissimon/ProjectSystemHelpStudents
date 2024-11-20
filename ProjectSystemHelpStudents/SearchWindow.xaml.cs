@@ -25,7 +25,7 @@ namespace ProjectSystemHelpStudents
         public SearchWindow()
         {
             InitializeComponent();
-            //this.PreviewKeyDown += new KeyEventHandler(MainWindow_KeyDown);
+            this.PreviewKeyDown += new KeyEventHandler(MainWindow_KeyDown);
         }
 
         private void txtSearchQuery_TextChanged(object sender, TextChangedEventArgs e)
@@ -54,7 +54,6 @@ namespace ProjectSystemHelpStudents
         {
             var results = new List<string>();
 
-            // Получение задач с TaskId и Title
             var taskResults = DBClass.entities.Task
                 .Where(t => t.Title.Contains(query) || t.Description.Contains(query))
                 .Select(t => new { t.IdTask, t.Title })
@@ -84,14 +83,26 @@ namespace ProjectSystemHelpStudents
         {
             if (lstSearchResults.SelectedItem is string selectedItem && selectedItem.StartsWith("Задача:"))
             {
-                string taskTitle = selectedItem.Replace("Задача: ", "");
-                var task = DBClass.entities.Task.FirstOrDefault(t => t.Title == taskTitle);
-
-                if (task != null)
+                // Извлечение ID задачи из строки
+                var idStartIndex = selectedItem.LastIndexOf("(ID: ") + 5;
+                var idEndIndex = selectedItem.LastIndexOf(")");
+                if (idStartIndex >= 0 && idEndIndex > idStartIndex)
                 {
-                    var taskViewModel = ConvertToTaskViewModel(task);
-                    var taskDetailsWindow = new TaskDetailsWindow(taskViewModel);
-                    taskDetailsWindow.ShowDialog();
+                    var taskIdString = selectedItem.Substring(idStartIndex, idEndIndex - idStartIndex);
+                    if (int.TryParse(taskIdString, out int taskId))
+                    {
+                        // Найти задачу в базе данных
+                        var task = DBClass.entities.Task.FirstOrDefault(t => t.IdTask == taskId);
+                        if (task != null)
+                        {
+                            // Преобразовать задачу в TaskViewModel
+                            var taskViewModel = ConvertToTaskViewModel(task);
+
+                            // Открыть окно с подробной информацией
+                            var taskDetailsWindow = new TaskDetailsWindow(taskViewModel);
+                            taskDetailsWindow.ShowDialog();
+                        }
+                    }
                 }
             }
         }
@@ -109,13 +120,14 @@ namespace ProjectSystemHelpStudents
             };
         }
 
-        //private void MainWindow_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
-        //    {
-        //        var searchWindow = new SearchWindow();
-        //        searchWindow.Show();
-        //    }
-        //}
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (sender is ListView listView && listView.SelectedItem is TaskViewModel selectedTask)
+            {
+                var detailsWindow = new TaskDetailsWindow(selectedTask);
+                detailsWindow.ShowDialog();
+                listView.SelectedItem = null;
+            }
+        }
     }
 }
