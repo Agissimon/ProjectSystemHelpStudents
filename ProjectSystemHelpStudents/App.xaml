@@ -6,6 +6,76 @@
     <Application.Resources>
         <ResourceDictionary>
             
+            <Style x:Key="comboBoxTransparentStyle" TargetType="ComboBox">
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="Margin" Value="0,5,0,5" />
+    <Setter Property="Padding" Value="5,0" />
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="ComboBox">
+                <Grid>
+                    <!-- Основной элемент отображения -->
+                    <ToggleButton 
+                        Name="ToggleButton"
+                        Grid.Column="2"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="0"
+                        Foreground="{TemplateBinding Foreground}">
+                        <ContentPresenter 
+                            Name="ContentSite"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Margin="5,0,0,0"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            Content="{TemplateBinding SelectionBoxItem}" />
+                    </ToggleButton>
+
+                    <!-- Всплывающее меню -->
+                    <Popup 
+                        Name="Popup"
+                        Placement="Bottom"
+                        IsOpen="{TemplateBinding IsDropDownOpen}"
+                        AllowsTransparency="True"
+                        Focusable="False"
+                        PopupAnimation="Slide">
+                        <Grid 
+                            Name="DropDown"
+                            Background="{TemplateBinding Background}"
+                            SnapsToDevicePixels="True"
+                            MinWidth="{TemplateBinding ActualWidth}">
+                            <Border 
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="0" />
+                            <ScrollViewer 
+                                Margin="4,6,4,6"
+                                SnapsToDevicePixels="True">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </Grid>
+                    </Popup>
+                </Grid>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Foreground" Value="#e74c3c" />
+                    </Trigger>
+                    <Trigger Property="IsFocused" Value="True">
+                        <Setter Property="BorderBrush" Value="#e74c3c" />
+                    </Trigger>
+                    <Trigger Property="HasItems" Value="False">
+                        <Setter TargetName="DropDown" Property="MinHeight" Value="0" />
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>
+
             <Style x:Key="listBoxTransparentStyle" TargetType="ListBox">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderBrush" Value="Transparent" />

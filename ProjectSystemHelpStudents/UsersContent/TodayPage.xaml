@@ -5,7 +5,7 @@
       Title="Сегодня"
       Background="#222">
 
-    <Grid Margin="20">
+    <Grid Margin="0,0,0,10">
         <StackPanel Margin="10">
             <TextBlock Text="Сегодня" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
             

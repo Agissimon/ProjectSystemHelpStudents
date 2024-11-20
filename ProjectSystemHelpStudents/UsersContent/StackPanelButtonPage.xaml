@@ -25,13 +25,9 @@
                 <Button Content=" Выполнено" Style="{StaticResource btnTransparentStyle}" Click="CompletedButton_Click" />
             </StackPanel>
 
-            <Button Content=" Мои проекты" Style="{StaticResource btnTransparentStyle}" Foreground="Gray" FontSize="14" Margin="0,20,0,10" FontWeight="Bold" Click="MyProjectButton_Click"/>
-            
-            <StackPanel>
-                <Button Content=" Дом 🏠" Style="{StaticResource btnTransparentStyle}" Click="HomeButton_Click" />
-                <Button Content=" Работа 💼" Style="{StaticResource btnTransparentStyle}" Click="WorkButton_Click" />
-                <Button Content=" Учеба 📚" Style="{StaticResource btnTransparentStyle}" Click="StudyButton_Click" />
-            </StackPanel>
+            <Button Content=" Мои проекты" Style="{StaticResource btnTransparentStyle}" Margin="0,15,0,10" FontWeight="Bold" Click="MyProjectButton_Click"/>
+
+            <StackPanel x:Name="ProjectStackPanel" />
         </StackPanel>
     </Grid>
 </Page>

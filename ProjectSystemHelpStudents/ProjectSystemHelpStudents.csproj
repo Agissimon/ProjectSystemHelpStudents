@@ -79,8 +79,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helper\ProjectViewModel.cs" />
     <Compile Include="SearchWindow.xaml.cs">
       <DependentUpon>SearchWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UsersContent\AddProjectWindow.xaml.cs">
+      <DependentUpon>AddProjectWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UsersContent\CompletedPage.xaml.cs">
       <DependentUpon>CompletedPage.xaml</DependentUpon>
@@ -93,6 +97,9 @@
     </Compile>
     <Compile Include="UsersContent\MyProjectPage.xaml.cs">
       <DependentUpon>MyProjectPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UsersContent\ProjectDetailsPage.xaml.cs">
+      <DependentUpon>ProjectDetailsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="UsersContent\TodayPage.xaml.cs">
       <DependentUpon>TodayPage.xaml</DependentUpon>
@@ -173,6 +180,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UsersContent\AddProjectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UsersContent\CompletedPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -186,6 +197,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UsersContent\MyProjectPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UsersContent\ProjectDetailsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

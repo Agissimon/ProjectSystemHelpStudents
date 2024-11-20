@@ -9,7 +9,7 @@
       Title="CompletedPage"  
       Background="#222">
 
-    <Grid Margin="20">
+    <Grid Margin="0,0,0,10">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="10">
                 <TextBlock Text="Выполнено" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
