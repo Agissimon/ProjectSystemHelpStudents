@@ -5,7 +5,7 @@
       Background="#222">
 
 
-    <Grid Margin="0,0,0,10">
+    <Grid Margin="10,0,0,10">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <TextBlock Text="Редактирование данных пользователя" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
