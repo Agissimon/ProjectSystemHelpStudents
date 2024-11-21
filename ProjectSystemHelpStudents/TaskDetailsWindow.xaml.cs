@@ -29,26 +29,26 @@ namespace ProjectSystemHelpStudents
         {
             var comments = DBClass.entities.Comment
                 .Where(c => c.IdTask == _task.IdTask)
-                .OrderByDescending(c => c.CreatedAt)
-                .ToList()
-                .Select(c => new
-                {
-                    c.Content,
-                    CreatedAt = c.CreatedAt.HasValue ? c.CreatedAt.Value.ToString("dd.MM.yyyy HH:mm") : "Не указано"
-                })
                 .ToList();
 
             CommentsListBox.ItemsSource = comments
-                .Select(c => $"{c.CreatedAt}: {c.Content}");
+                .OrderByDescending(c => c.CreatedAt)
+                .Select(c => new
+                {
+                    Content = c.Content,
+                    CreatedAt = c.CreatedAt.HasValue ? c.CreatedAt.Value.ToString("dd.MM.yyyy HH:mm") : "Не указано"
+                })
+                .ToList();
         }
 
         private void LoadTaskFiles()
         {
             var files = DBClass.entities.Files
                 .Where(f => f.TaskId == _task.IdTask)
+                .ToList()
                 .Select(f => new FileItem
                 {
-                    Id = f.Id,
+                    FileName = Path.GetFileName(f.FilePath),
                     FilePath = f.FilePath
                 })
                 .ToList();
@@ -197,13 +197,18 @@ namespace ProjectSystemHelpStudents
                 }
             }
         }
+
         private void FilesListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (FilesListBox.SelectedItem is FileItem selectedFile)
             {
                 try
                 {
-                    System.Diagnostics.Process.Start("explorer.exe", selectedFile.FilePath);
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = selectedFile.FilePath,
+                        UseShellExecute = true
+                    });
                 }
                 catch (Exception ex)
                 {

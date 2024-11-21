@@ -9,20 +9,16 @@
       Title="StackPanelButtonPage">
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-        </Grid.ColumnDefinitions>
-
         <StackPanel Background="#333333">
-            <Button x:Name="UserNameButton" FontSize="16" FontWeight="Bold" Style="{StaticResource btnTransparentStyle}" Content="{Binding NameUser}" Click="UserNameButton_Click"/>
+            <Button x:Name="UserNameButton" FontSize="16" FontWeight="Bold" Style="{StaticResource btnTransparentStyle}" Margin="5" Content="{Binding NameUser}" Click="UserNameButton_Click"/>
 
             <StackPanel>
-                <Button Content=" Поиск" Style="{StaticResource btnTransparentStyle}" Click="SearchButton_Click" />
-                <Button Content=" Входящие" Style="{StaticResource btnTransparentStyle}" Click="IncomingButton_Click" />
-                <Button Content=" Сегодня" Style="{StaticResource btnTransparentStyle}" Click="TodayButton_Click" />
-                <Button Content=" Предстоящее" Style="{StaticResource btnTransparentStyle}" Click="UpcomingButton_Click" />
-                <Button Content=" Фильтры и метки" Style="{StaticResource btnTransparentStyle}" Click="FiltersButton_Click" />
-                <Button Content=" Выполнено" Style="{StaticResource btnTransparentStyle}" Click="CompletedButton_Click" />
+                <Button Content="Поиск" Style="{StaticResource btnTransparentStyle}" Margin="5" Click="SearchButton_Click" />
+                <Button Content="Входящие" Style="{StaticResource btnTransparentStyle}" Margin="5" Click="IncomingButton_Click" />
+                <Button Content="Сегодня" Style="{StaticResource btnTransparentStyle}" Margin="5" Click="TodayButton_Click" />
+                <Button Content="Предстоящее" Style="{StaticResource btnTransparentStyle}" Margin="5" Click="UpcomingButton_Click" />
+                <Button Content="Фильтры и метки" Style="{StaticResource btnTransparentStyle}" Margin="5" Click="FiltersButton_Click" />
+                <Button Content="Выполнено" Style="{StaticResource btnTransparentStyle}" Margin="5" Click="CompletedButton_Click" />
             </StackPanel>
 
             <Button Content=" Мои проекты" Style="{StaticResource btnTransparentStyle}" Margin="0,15,0,10" FontWeight="Bold" Click="MyProjectButton_Click"/>

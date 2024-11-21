@@ -7,7 +7,7 @@
       Background="#222"
       Title="MyProjectPage">
 
-    <Grid Margin="0,0,0,10">
+    <Grid Margin="10,0,0,10">
         <StackPanel>
             <TextBlock Text="Мои проекты" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20" />
 
@@ -24,13 +24,11 @@
             <ListView Name="ProjectsListView" Background="Transparent" BorderThickness="0" Foreground="White">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="#333" Padding="10" Margin="0,0,0,5">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold" Foreground="White" />
-                                <TextBlock Text="{Binding Icon}" FontSize="16" Margin="10,0,0,0" Foreground="White" />
-                                <Button Content="..." Width="30" Height="30" HorizontalAlignment="Right" Background="Transparent" Foreground="White" Margin="10,0,0,0" Click="ProjectOptions_Click" />
-                            </StackPanel>
-                        </Border>
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,10" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                            <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold" Foreground="White" />
+                            <TextBlock Text="{Binding Icon}" FontSize="16" Margin="10,0,0,0" Foreground="White" />
+                            <Button Content="..." Width="30" Height="30" HorizontalAlignment="Right" Background="Transparent" Foreground="White" Margin="10,0,0,0" Click="ProjectOptions_Click" />
+                        </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
