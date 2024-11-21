@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents.UsersContent"
         mc:Ignorable="d"
-        Title="MyTask" Height="600" Width="420" MinHeight="600" MinWidth="420" Icon="/Resources/Icon/logo001.png" Style="{StaticResource mainWindowStyle}"  WindowStartupLocation="CenterScreen">
+        Title="MyTask" Height="500" Width="430" MinHeight="500" MinWidth="430" Icon="/Resources/Icon/logo001.png" Style="{StaticResource mainWindowStyle}"  WindowStartupLocation="CenterScreen">
 
     <Grid Margin="20">
         <StackPanel>
@@ -16,10 +16,10 @@
             <TextBox Name="DescriptionTextBox" Background="#333" Foreground="White" Padding="5" Margin="0,0,0,10" AcceptsReturn="True" />
             <TextBlock Text="Даты старта и завершения можно заполнить по желанию" Style="{StaticResource textBlockTransparentStyle}"/>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="Дата начала" Margin="0,0,10,10"/>
-                <DatePicker Name="StartDatePicker" Background="#333" Foreground="White" />
-                <TextBlock Text="Дата завершения" Margin="0,0,10,10"/>
-                <DatePicker Name="EndDatePicker" Background="#333" Foreground="White" />
+                <TextBlock Text="Дата начала" Margin="0,0,5,5"/>
+                <DatePicker Name="StartDatePicker" Background="#333" Foreground="White" Margin="1" />
+                <TextBlock Text="Дата завершения" Margin="0,0,5,5"/>
+                <DatePicker Name="EndDatePicker" Background="#333" Foreground="White" Margin="1" />
             </StackPanel>
 
             <Button Content="Добавить проект" Background="#333" Foreground="White" Height="40" Click="AddProjectButton_Click" />

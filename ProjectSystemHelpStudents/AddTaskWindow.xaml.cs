@@ -55,9 +55,11 @@ namespace ProjectSystemHelpStudents
                     Title = title,
                     Description = description,
                     EndDate = endDate.Value,
+                    CategoryId = 1,
                     StatusId = DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId ?? 1,
                     IdUser = UserSession.IdUser,
-                    PriorityId = (int)(priority?.PriorityId)
+                    PriorityId = (int)(priority?.PriorityId),
+                    ProjectId = 1
                 };
 
                 DBClass.entities.Task.Add(newTask);
