@@ -179,7 +179,6 @@ namespace ProjectSystemHelpStudents
 
                     File.Copy(selectedFilePath, destinationPath, true);
 
-                    // Добавление записи в таблицу Files
                     var newFile = new Files
                     {
                         FilePath = destinationPath,

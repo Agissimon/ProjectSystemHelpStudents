@@ -83,6 +83,8 @@ namespace ProjectSystemHelpStudents.UsersContent
                         }
                         group.Tasks.Add(task);
                     }
+
+                    TasksListView.ItemsSource = _groupedTasks;
                 }
             }
             catch (Exception ex)
@@ -126,10 +128,32 @@ namespace ProjectSystemHelpStudents.UsersContent
                     Margin = new Thickness(5),
                     Background = Brushes.Transparent,
                     BorderThickness = new Thickness(1),
-                    IsEnabled = true
+                    IsEnabled = true,
+                    Tag = day
                 };
 
+                dayButton.Click += DayButton_Click;
+
                 WeekDaysTimeline.Items.Add(dayButton);
+            }
+        }
+
+        private void DayButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is DateTime selectedDate)
+            {
+                var filteredGroups = _groupedTasks
+                    .Where(group => group.Tasks.Any(task => task.EndDate.Date == selectedDate.Date))
+                    .Select(group => new TaskGroupViewModel
+                    {
+                        DateHeader = group.DateHeader,
+                        Tasks = new ObservableCollection<TaskViewModel>(
+                            group.Tasks.Where(task => task.EndDate.Date == selectedDate.Date)
+                        )
+                    })
+                    .ToList();
+
+                TasksListView.ItemsSource = new ObservableCollection<TaskGroupViewModel>(filteredGroups);
             }
         }
 
