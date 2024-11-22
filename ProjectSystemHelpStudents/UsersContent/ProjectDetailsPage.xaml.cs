@@ -45,7 +45,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                         Description = t.Description,
                         Status = t.Status.Name,
                         EndDate = t.EndDate,
-                        IsCompleted = true
+                        IsCompleted = false
                     })
                     .ToList();
 

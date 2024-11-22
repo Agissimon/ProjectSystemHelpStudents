@@ -16,12 +16,8 @@
                 <StackPanel Margin="0,10,0,10">
                     <ListView Name="TasksListView" BorderThickness="0,0,0,1" 
                             SelectionChanged="TaskListView_SelectionChanged"
-                            Background="#333"
-                            Foreground="White"
-                            BorderBrush="Transparent"
-                            SelectionMode="Single"
-                            Margin="0,10,0,10">
-                        <ListView.ItemTemplate>
+                            Style="{StaticResource DarkListBoxStyle}">
+                    <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted, Mode=TwoWay}" Click="ToggleTaskStatus_Click">

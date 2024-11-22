@@ -18,13 +18,21 @@ namespace ProjectSystemHelpStudents
         public TaskDetailsWindow(TaskViewModel task)
         {
             InitializeComponent();
+
+            if (task.ProjectId == 0)
+                task.ProjectId = DBClass.entities.Project.FirstOrDefault()?.ProjectId ?? 0;
+
+            if (task.PriorityId == 0)
+                task.PriorityId = DBClass.entities.Priority.FirstOrDefault()?.PriorityId ?? 0;
+
             _task = task;
+            InitializeComboBoxes();
             DataContext = _task;
 
-            InitializeComboBoxes();
             LoadTaskFiles();
             LoadComments();
         }
+
         private void LoadComments()
         {
             var comments = DBClass.entities.Comment
@@ -65,6 +73,9 @@ namespace ProjectSystemHelpStudents
             var priorities = DBClass.entities.Priority.ToList();
             PriorityComboBox.ItemsSource = priorities;
             PriorityComboBox.SelectedValue = _task.PriorityId;
+
+            ProjectComboBox.GetBindingExpression(ComboBox.SelectedValueProperty)?.UpdateTarget();
+            PriorityComboBox.GetBindingExpression(ComboBox.SelectedValueProperty)?.UpdateTarget();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
