@@ -18,12 +18,7 @@
 
                 <TextBlock Text="Добавить комментарий" Style="{StaticResource textBlockTransparentStyle}" Margin="0,10,0,5"/>
 
-                <ListBox x:Name="CommentsListBox"
-                     Background="#333"
-                     Foreground="White"
-                     BorderBrush="Transparent"
-                     SelectionMode="Single"
-                     Margin="0,10,0,10">
+                <ListBox x:Name="CommentsListBox" Style="{StaticResource DarkListBoxStyle}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
@@ -44,13 +39,7 @@
 
                 <StackPanel Orientation="Vertical" Margin="10">
                     <TextBlock Text="Список файлов" Style="{StaticResource textBlockTransparentStyle}" Margin="0,10,0,5"/>
-                    <ListBox x:Name="FilesListBox"
-                        Background="#333"
-                        Foreground="White"
-                        BorderBrush="Transparent"
-                        SelectionMode="Single"
-                        Margin="0,10,0,10"
-                        MouseDoubleClick="FilesListBox_MouseDoubleClick">
+                    <ListBox x:Name="FilesListBox" Style="{StaticResource DarkListBoxStyle}" MouseDoubleClick="FilesListBox_MouseDoubleClick">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>
@@ -66,34 +55,23 @@
             <StackPanel Orientation="Vertical" Width="177">
                 <TextBlock Text="Проект" Style="{StaticResource textBlockTransparentStyle}" Margin="0,10,0,5"/>
                 <ComboBox x:Name="ProjectComboBox"
-                      Width="150"
-                      Foreground="Black"
-                      Background="#333"
-                      BorderBrush="Transparent"
-                      FontSize="14"
+                      Style="{StaticResource cmbDarkStyle}"
                       DisplayMemberPath="Name"
                       SelectedValuePath="ProjectId"
                       SelectedValue="{Binding ProjectId, Mode=TwoWay}"/>
 
                 <TextBlock Text="Срок выполнения" Style="{StaticResource textBlockTransparentStyle}" Margin="0,10,0,5"/>
-                <DatePicker x:Name="EndDatePicker" SelectedDate="{Binding EndDate}" Margin="10,0,0,5" Foreground="White" Background="#333" BorderBrush="Transparent"/>
+                <DatePicker x:Name="EndDatePicker" SelectedDate="{Binding EndDate}" Margin="10,0,0,5" Foreground="Black" Background="#333" BorderBrush="Transparent"/>
 
                 <TextBlock Text="Приоритет" Style="{StaticResource textBlockTransparentStyle}" Margin="0,10,0,5"/>
                 <ComboBox x:Name="PriorityComboBox"
-                      Width="151"
-                      Foreground="Black"
-                      Background="#333"
-                      BorderBrush="Transparent"
-                      FontSize="14"
+                      Style="{StaticResource cmbDarkStyle}"
                       DisplayMemberPath="Name"
                       SelectedValuePath="PriorityId"
                       SelectedValue="{Binding PriorityId, Mode=TwoWay}"/>
                 <TextBlock Style="{StaticResource textBlockTransparentStyle}" Text="Метки" Margin="0,10,0,5"/>
-                <ComboBox x:Name="TagsComboBox" Width="151"
-                    Foreground="Black"
-                    Background="#333"
-                    BorderBrush="Transparent"
-                    FontSize="14"
+                <ComboBox x:Name="TagsComboBox"
+                      Style="{StaticResource cmbDarkStyle}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="TagsId"
                     SelectedValue="{Binding TagsId, Mode=TwoWay}"/>
