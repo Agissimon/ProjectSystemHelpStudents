@@ -112,7 +112,7 @@
                     </ListView.Resources>
                 </ListView>
 
-                <Button Content="+ Добавить задачу" HorizontalAlignment="Left" Margin="0,20,0,0" Width="200" Background="#333" Foreground="White" Click="AddTask_Click"/>
+                <Button Content="+ Добавить задачу" Style="{StaticResource btnAddTaskStyle}" Click="AddTask_Click"/>
             </StackPanel>
         </Grid>
     </ScrollViewer>

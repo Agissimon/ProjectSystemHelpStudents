@@ -79,7 +79,7 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <Button Content="+ Добавить задачу" HorizontalAlignment="Left" Margin="0,20,0,0" Width="200" Click="Button_Click"/>
+            <Button Content="+ Добавить задачу" Style="{StaticResource btnAddTaskStyle}" Click="Button_Click"/>
         </StackPanel>
     </Grid>
 </Page>

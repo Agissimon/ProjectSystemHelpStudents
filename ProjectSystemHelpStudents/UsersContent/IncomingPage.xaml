@@ -47,7 +47,7 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <Button Content="+ Добавить задачу" HorizontalAlignment="Left" Margin="0,20,0,0" Width="200" Click="ButtonCreateTask_Click"/>
+                <Button Content="+ Добавить задачу" Style="{StaticResource btnAddTaskStyle}" Click="ButtonCreateTask_Click"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
