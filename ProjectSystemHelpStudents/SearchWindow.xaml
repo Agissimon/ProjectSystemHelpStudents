@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents"
         mc:Ignorable="d"
-        Title="MyTask" Height="550" Width="400" Icon="/Resources/Icon/logo001.png" MinWidth="400" MinHeight="550" MaxWidth="400" MaxHeight="550" Style="{StaticResource mainWindowStyle}"  WindowStartupLocation="CenterScreen">
+        Title="MyTask" Icon="/Resources/Icon/logo001.png" Style="{StaticResource windowSearchStyle}" WindowStartupLocation="CenterScreen">
     
     <Grid>
         <StackPanel>

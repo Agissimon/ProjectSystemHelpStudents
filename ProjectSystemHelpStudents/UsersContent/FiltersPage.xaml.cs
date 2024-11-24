@@ -1,28 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
-    /// <summary>
-    /// Логика взаимодействия для FiltersPage.xaml
-    /// </summary>
     public partial class FiltersPage : Page
     {
-        public FiltersPage()
-        {
-            InitializeComponent();
-        }
+        //// Пример данных
+        //public FiltersPage()
+        //{
+        //    InitializeComponent();
+        //    LoadFilters();
+        //    LoadLabels();
+        //}
+
+        //private void LoadFilters()
+        //{
+        //    // Загрузка фильтров из БД
+        //    using (var context = new TaskManagementEntities1())
+        //    {
+        //        var filters = context.Filters.ToList();
+        //        FiltersList.ItemsSource = filters;
+        //    }
+        //}
+
+        //private void LoadLabels()
+        //{
+        //    // Загрузка меток из БД
+        //    using (var context = new TaskManagementEntities1())
+        //    {
+        //        var labels = context.Labels.ToList();
+        //        LabelsList.ItemsSource = labels;
+        //    }
+        //}
+
+        //private void AddFilter_Click(object sender, RoutedEventArgs e)
+        //{
+        //    // Логика добавления нового фильтра
+        //}
+
+        //private void AddLabel_Click(object sender, RoutedEventArgs e)
+        //{
+        //    // Логика добавления новой метки
+        //}
     }
 }
