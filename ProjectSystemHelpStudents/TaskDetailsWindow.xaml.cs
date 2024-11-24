@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using ProjectSystemHelpStudents.Helper;
 using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -35,18 +37,21 @@ namespace ProjectSystemHelpStudents
 
         private void LoadComments()
         {
-            var comments = DBClass.entities.Comment
-                .Where(c => c.IdTask == _task.IdTask)
-                .ToList();
+            try
+            {
+                var comments = new ObservableCollection<Comment>(
+                    DBClass.entities.Comment
+                        .Where(c => c.IdTask == _task.IdTask)
+                        .OrderByDescending(c => c.CreatedAt)
+                        .ToList()
+                );
 
-            CommentsListBox.ItemsSource = comments
-                .OrderByDescending(c => c.CreatedAt)
-                .Select(c => new
-                {
-                    Content = c.Content,
-                    CreatedAt = c.CreatedAt.HasValue ? c.CreatedAt.Value.ToString("dd.MM.yyyy HH:mm") : "Не указано"
-                })
-                .ToList();
+                CommentsListBox.ItemsSource = comments;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки комментариев: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LoadTaskFiles()
@@ -223,6 +228,60 @@ namespace ProjectSystemHelpStudents
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void DeleteCommentButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Получаем кнопку, вызвавшую событие
+            if (sender is Button deleteButton)
+            {
+                // Получаем связанный объект комментария
+                if (deleteButton.DataContext is Comment commentToDelete)
+                {
+                    // Удаляем из ObservableCollection для обновления интерфейса
+                    var comments = CommentsListBox.ItemsSource as ObservableCollection<Comment>;
+                    if (comments != null)
+                    {
+                        if (comments.Contains(commentToDelete))
+                        {
+                            comments.Remove(commentToDelete);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Комментарий не найден в списке.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+
+                    // Удаляем из базы данных
+                    try
+                    {
+                        using (var context = new TaskManagementEntities1())
+                        {
+                            var comment = context.Comment.FirstOrDefault(c => c.Id == commentToDelete.Id);
+                            if (comment != null)
+                            {
+                                context.Comment.Remove(comment);
+                                context.SaveChanges();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Комментарий не найден в базе данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
+
+                        MessageBox.Show("Комментарий успешно удален!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при удалении из базы данных: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Не удалось определить комментарий для удаления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
         }

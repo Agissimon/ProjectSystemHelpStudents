@@ -6,6 +6,13 @@
     <Application.Resources>
         <ResourceDictionary>
 
+            <Style x:Name="toolTipStyle" TargetType="ToolTip">
+                <Setter Property="Background" Value="#333" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Padding" Value="5" />
+            </Style>
+
             <Style x:Key="cmbDarkStyle" TargetType="ComboBox">
                 <Setter Property="Width" Value="150"/>
                 <Setter Property="Foreground" Value="Black"/>
@@ -151,12 +158,38 @@
             </Setter>
         </Style>
 
-        <Style TargetType="Window" x:Key="mainWindowStyle">
+        <Style x:Key="windowSearchStyle" TargetType="Window">
             <Setter Property="Background" Value="#333"/>
             <Setter Property="Foreground" Value="White"/>
-        </Style>
+            <Setter Property="Height" Value="550"/>
+            <Setter Property="Width" Value="400"/>
+            <Setter Property="MinHeight" Value="500"/>
+            <Setter Property="MinWidth" Value="400"/>
+            <Setter Property="MaxHeight" Value="500"/>
+            <Setter Property="MaxWidth" Value="400"/>
+            </Style>
 
-        <Style x:Key="navButtonStyle" TargetType="Button">
+        <Style x:Key="windowMainStyle" TargetType="Window">
+            <Setter Property="Background" Value="#333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Height" Value="600"/>
+            <Setter Property="Width" Value="800"/>
+            <Setter Property="MinHeight" Value="600"/>
+            <Setter Property="MinWidth" Value="800"/>
+            </Style>
+
+        <Style x:Key="windowSmallStyle" TargetType="Window">
+            <Setter Property="Background" Value="#333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Height" Value="600"/>
+            <Setter Property="Width" Value="800"/>
+            <Setter Property="MinHeight" Value="600"/>
+            <Setter Property="MinWidth" Value="800"/>
+            <Setter Property="MaxHeight" Value="600"/>
+            <Setter Property="MaxWidth" Value="800"/>
+            </Style>
+
+            <Style x:Key="navButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderBrush" Value="Transparent"/>

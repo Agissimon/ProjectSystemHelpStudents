@@ -75,10 +75,8 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                             if (mainWindow != null)
                             {
-                                // Clear the frame content
                                 mainWindow.frmAuth.Content = null;
 
-                                // Optionally, navigate to another page
                                 mainWindow.frmContentUser.Navigate(new UpcomingTasksPage());
                                 mainWindow.frmStackPanelButton.Navigate(new StackPanelButtonPage());
                             }

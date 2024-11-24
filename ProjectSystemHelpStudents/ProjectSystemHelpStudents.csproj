@@ -79,6 +79,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helper\Comment.cs" />
     <Compile Include="Helper\FileItem.cs" />
     <Compile Include="Helper\ProjectViewModel.cs" />
     <Compile Include="SearchWindow.xaml.cs">
