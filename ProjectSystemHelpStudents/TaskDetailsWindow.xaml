@@ -1,6 +1,7 @@
 ﻿<Window x:Class="ProjectSystemHelpStudents.TaskDetailsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ProjectSystemHelpStudents.Helper"
         Title="MyTask" Icon="/Resources/Icon/logo001.png" MinWidth="700" Width="700" Style="{StaticResource windowSmallStyle}"  WindowStartupLocation="CenterScreen">
     
     <Grid Margin="10">
@@ -22,7 +23,7 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <DockPanel LastChildFill="True">
-                                <Button Content="Х"
+                                <Button Content="✖"
                                         Click="DeleteCommentButton_Click"
                                         Style="{StaticResource btnTransparentStyle}"
                                         Width="20"
@@ -83,13 +84,20 @@
                       DisplayMemberPath="Name"
                       SelectedValuePath="PriorityId"
                       SelectedValue="{Binding PriorityId, Mode=TwoWay}"/>
-                
-                <TextBlock Style="{StaticResource textBlockTransparentStyle}" Text="Метки" Margin="0,10,0,5"/>
-                <ComboBox x:Name="TagsComboBox"
-                      Style="{StaticResource cmbDarkStyle}"
-                    DisplayMemberPath="Name"
-                    SelectedValuePath="TagsId"
-                    SelectedValue="{Binding TagsId, Mode=TwoWay}"/>
+
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Метки" Style="{StaticResource textBlockTransparentStyle}" Margin="0,10,0,5"/>
+                    <ListBox x:Name="LabelsListBox" 
+                         Style="{StaticResource DarkListBoxStyle}" 
+                         ItemsSource="{Binding AvailableLabels}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Foreground="White" Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                </StackPanel>
                 <Button Content="Сохранить" Click="SaveButton_Click" Style="{StaticResource btnTransparentStyle}" HorizontalAlignment="Center" Margin="0,10,0,5"/>
             </StackPanel>
         </StackPanel>

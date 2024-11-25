@@ -56,6 +56,7 @@
                                         <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
                                         <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
                                         <TextBlock Text="{Binding EndDate, StringFormat=\{0:dd MMMM yyyy\}}" Foreground="Red" FontSize="12"/>
+                                        <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12" />
                                     </StackPanel>
                                 </StackPanel>
                             </DataTemplate>
@@ -93,7 +94,7 @@
                                                 <StackPanel Margin="10,0,0,0">
                                                     <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
                                                     <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
-                                                    <TextBlock Text="{Binding EndDateFormatted}" Foreground="LightGray" FontSize="12"/>
+                                                    <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12" />
                                                 </StackPanel>
                                             </StackPanel>
                                         </DataTemplate>

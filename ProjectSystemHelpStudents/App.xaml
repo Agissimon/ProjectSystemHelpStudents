@@ -158,6 +158,11 @@
             </Setter>
         </Style>
 
+        <Style  x:Key="window" TargetType="Window" >
+            <Setter Property="Background" Value="#333"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
         <Style x:Key="windowSearchStyle" TargetType="Window">
             <Setter Property="Background" Value="#333"/>
             <Setter Property="Foreground" Value="White"/>

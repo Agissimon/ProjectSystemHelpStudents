@@ -3,11 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 namespace ProjectSystemHelpStudents.Helper
 {
     public class TaskViewModel : INotifyPropertyChanged
     {
+        public ObservableCollection<LabelViewModel> AvailableLabels { get; set; }
+        public string LabelsFormatted => AvailableLabels != null
+        ? string.Join(", ", AvailableLabels.Select(l => l.Name))
+        : string.Empty;
         private int _priorityId;
         private int _projectId;
         private string _title;
@@ -15,8 +20,23 @@ namespace ProjectSystemHelpStudents.Helper
         private DateTime _endDate;
         private bool _isCompleted;
         private string _Status;
+        private int _IdLabel;
         public string EndDateFormatted { get; set; }
         public int IdTask { get; set; }
+
+        public int Id
+        {
+            get => _IdLabel;
+            set
+            {
+                if (_IdLabel != value)
+                {
+                    _IdLabel = value;
+                    OnPropertyChanged(nameof(Id));
+                }
+            }
+        }
+
         public string Status
         {
             get => _Status;
@@ -29,6 +49,7 @@ namespace ProjectSystemHelpStudents.Helper
                 }
             }
         }
+
         public int PriorityId
         {
             get => _priorityId;
@@ -114,6 +135,7 @@ namespace ProjectSystemHelpStudents.Helper
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
 
     public class TaskGroupViewModel
     {

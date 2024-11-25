@@ -45,7 +45,8 @@ namespace ProjectSystemHelpStudents.UsersContent
                             t.Title,
                             t.Description,
                             StatusName = t.Status != null ? t.Status.Name : "Без статуса",
-                            t.EndDate
+                            t.EndDate,
+                            Labels = t.TaskLabels.Select(tl => tl.Labels.Name).ToList()
                         })
                         .ToList();
 
@@ -58,6 +59,8 @@ namespace ProjectSystemHelpStudents.UsersContent
                             Status = t.StatusName,
                             EndDate = t.EndDate,
                             IsCompleted = t.StatusName == "Завершено",
+                            AvailableLabels = new ObservableCollection<LabelViewModel>(
+                                t.Labels.Select(label => new LabelViewModel { Name = label })), 
                             EndDateFormatted = t.EndDate.Date == DateTime.Today ? "Сегодня" :
                                                t.EndDate.Date == DateTime.Today.AddDays(1) ? "Завтра" :
                                                $"{t.EndDate:dd MMMM yyyy} - {t.EndDate:dddd}"

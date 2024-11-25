@@ -34,5 +34,8 @@ namespace ProjectSystemHelpStudents
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<Task> Task { get; set; }
         public virtual DbSet<Users> Users { get; set; }
+        public virtual DbSet<Filters> Filters { get; set; }
+        public virtual DbSet<Labels> Labels { get; set; }
+        public virtual DbSet<TaskLabels> TaskLabels { get; set; }
     }
 }
