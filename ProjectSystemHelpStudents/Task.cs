@@ -19,6 +19,7 @@ namespace ProjectSystemHelpStudents
         {
             this.Comment = new HashSet<Comment>();
             this.Files = new HashSet<Files>();
+            this.TaskLabels = new HashSet<TaskLabels>();
         }
     
         public int IdTask { get; set; }
@@ -40,5 +41,7 @@ namespace ProjectSystemHelpStudents
         public virtual Project Project { get; set; }
         public virtual Status Status { get; set; }
         public virtual Users Users { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<TaskLabels> TaskLabels { get; set; }
     }
 }

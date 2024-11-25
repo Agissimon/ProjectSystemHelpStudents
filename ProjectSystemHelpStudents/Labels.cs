@@ -12,30 +12,19 @@ namespace ProjectSystemHelpStudents
     using System;
     using System.Collections.Generic;
     
-    public partial class Users
+    public partial class Labels
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Users()
+        public Labels()
         {
-            this.Comment = new HashSet<Comment>();
-            this.Task = new HashSet<Task>();
-            this.Filters = new HashSet<Filters>();
+            this.TaskLabels = new HashSet<TaskLabels>();
         }
     
-        public int IdUser { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Login { get; set; }
-        public string Password { get; set; }
-        public string Patronymic { get; set; }
-        public int RoleUser { get; set; }
-        public string Mail { get; set; }
+        public string Color { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Comment> Comment { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Task> Task { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Filters> Filters { get; set; }
+        public virtual ICollection<TaskLabels> TaskLabels { get; set; }
     }
 }

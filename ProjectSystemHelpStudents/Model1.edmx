@@ -31,6 +31,23 @@
           <Property Name="FileType" Type="nvarchar" MaxLength="50" />
           <Property Name="TaskId" Type="int" />
         </EntityType>
+        <EntityType Name="Filters">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Query" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="UserId" Type="int" />
+        </EntityType>
+        <EntityType Name="Labels">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Color" Type="nvarchar" MaxLength="10" />
+        </EntityType>
         <EntityType Name="Priority">
           <Key>
             <PropertyRef Name="PriorityId" />
@@ -79,6 +96,14 @@
           <Property Name="IdUser" Type="int" Nullable="false" />
           <Property Name="ProjectId" Type="int" />
         </EntityType>
+        <EntityType Name="TaskLabels">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TaskId" Type="int" Nullable="false" />
+          <Property Name="LabelId" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="Users">
           <Key>
             <PropertyRef Name="IdUser" />
@@ -92,6 +117,18 @@
           <Property Name="RoleUser" Type="int" Nullable="false" />
           <Property Name="Mail" Type="varchar" MaxLength="100" Nullable="false" />
         </EntityType>
+        <Association Name="FK__Filters__UserId__41EDCAC5">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Filters" Type="Self.Filters" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="Filters">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__Task__CategoryId__534D60F1">
           <End Role="Category" Type="Self.Category" Multiplicity="1" />
           <End Role="Task" Type="Self.Task" Multiplicity="*" />
@@ -137,6 +174,30 @@
             </Principal>
             <Dependent Role="Task">
               <PropertyRef Name="IdUser" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskLabel__Label__3F115E1A">
+          <End Role="Labels" Type="Self.Labels" Multiplicity="1" />
+          <End Role="TaskLabels" Type="Self.TaskLabels" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Labels">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="TaskLabels">
+              <PropertyRef Name="LabelId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskLabel__TaskI__3E1D39E1">
+          <End Role="Task" Type="Self.Task" Multiplicity="1" />
+          <End Role="TaskLabels" Type="Self.TaskLabels" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Task">
+              <PropertyRef Name="IdTask" />
+            </Principal>
+            <Dependent Role="TaskLabels">
+              <PropertyRef Name="TaskId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -194,12 +255,19 @@
           <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Comment" EntityType="Self.Comment" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Files" EntityType="Self.Files" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Filters" EntityType="Self.Filters" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Labels" EntityType="Self.Labels" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Priority" EntityType="Self.Priority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Project" EntityType="Self.Project" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Status" EntityType="Self.Status" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Task" EntityType="Self.Task" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TaskLabels" EntityType="Self.TaskLabels" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Filters__UserId__41EDCAC5" Association="Self.FK__Filters__UserId__41EDCAC5">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Filters" EntitySet="Filters" />
+          </AssociationSet>
           <AssociationSet Name="FK__Task__CategoryId__534D60F1" Association="Self.FK__Task__CategoryId__534D60F1">
             <End Role="Category" EntitySet="Category" />
             <End Role="Task" EntitySet="Task" />
@@ -215,6 +283,14 @@
           <AssociationSet Name="FK__Task__UserId__5629CD9C" Association="Self.FK__Task__UserId__5629CD9C">
             <End Role="Users" EntitySet="Users" />
             <End Role="Task" EntitySet="Task" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskLabel__Label__3F115E1A" Association="Self.FK__TaskLabel__Label__3F115E1A">
+            <End Role="Labels" EntitySet="Labels" />
+            <End Role="TaskLabels" EntitySet="TaskLabels" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskLabel__TaskI__3E1D39E1" Association="Self.FK__TaskLabel__TaskI__3E1D39E1">
+            <End Role="Task" EntitySet="Task" />
+            <End Role="TaskLabels" EntitySet="TaskLabels" />
           </AssociationSet>
           <AssociationSet Name="FK_Comment_Task" Association="Self.FK_Comment_Task">
             <End Role="Task" EntitySet="Task" />
@@ -324,6 +400,7 @@
           <NavigationProperty Name="Project" Relationship="Self.FK_Task_Project" FromRole="Task" ToRole="Project" />
           <NavigationProperty Name="Status" Relationship="Self.FK__Task__StatusId__5535A963" FromRole="Task" ToRole="Status" />
           <NavigationProperty Name="Users" Relationship="Self.FK__Task__UserId__5629CD9C" FromRole="Task" ToRole="Users" />
+          <NavigationProperty Name="TaskLabels" Relationship="TaskManagementModel.FK__TaskLabel__TaskI__3E1D39E1" FromRole="Task" ToRole="TaskLabels" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
@@ -339,6 +416,7 @@
           <Property Name="Mail" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="Comment" Relationship="Self.FK_Comment_User" FromRole="Users" ToRole="Comment" />
           <NavigationProperty Name="Task" Relationship="Self.FK__Task__UserId__5629CD9C" FromRole="Users" ToRole="Task" />
+          <NavigationProperty Name="Filters" Relationship="TaskManagementModel.FK__Filters__UserId__41EDCAC5" FromRole="Users" ToRole="Filters" />
         </EntityType>
         <Association Name="FK__Task__CategoryId__534D60F1">
           <End Role="Category" Type="Self.Category" Multiplicity="1" />
@@ -480,7 +558,87 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="Task" EntitySet="Task" />
           </AssociationSet>
+          <EntitySet Name="Filters" EntityType="TaskManagementModel.Filters" />
+          <EntitySet Name="Labels" EntityType="TaskManagementModel.Labels" />
+          <EntitySet Name="TaskLabels" EntityType="TaskManagementModel.TaskLabels" />
+          <AssociationSet Name="FK__Filters__UserId__41EDCAC5" Association="TaskManagementModel.FK__Filters__UserId__41EDCAC5">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Filters" EntitySet="Filters" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskLabel__Label__3F115E1A" Association="TaskManagementModel.FK__TaskLabel__Label__3F115E1A">
+            <End Role="Labels" EntitySet="Labels" />
+            <End Role="TaskLabels" EntitySet="TaskLabels" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskLabel__TaskI__3E1D39E1" Association="TaskManagementModel.FK__TaskLabel__TaskI__3E1D39E1">
+            <End Role="Task" EntitySet="Task" />
+            <End Role="TaskLabels" EntitySet="TaskLabels" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Filters">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Query" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="UserId" Type="Int32" />
+          <NavigationProperty Name="Users" Relationship="TaskManagementModel.FK__Filters__UserId__41EDCAC5" FromRole="Filters" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Labels">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Color" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="TaskLabels" Relationship="TaskManagementModel.FK__TaskLabel__Label__3F115E1A" FromRole="Labels" ToRole="TaskLabels" />
+        </EntityType>
+        <EntityType Name="TaskLabels">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TaskId" Type="Int32" Nullable="false" />
+          <Property Name="LabelId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Labels" Relationship="TaskManagementModel.FK__TaskLabel__Label__3F115E1A" FromRole="TaskLabels" ToRole="Labels" />
+          <NavigationProperty Name="Task" Relationship="TaskManagementModel.FK__TaskLabel__TaskI__3E1D39E1" FromRole="TaskLabels" ToRole="Task" />
+        </EntityType>
+        <Association Name="FK__Filters__UserId__41EDCAC5">
+          <End Type="TaskManagementModel.Users" Role="Users" Multiplicity="0..1" />
+          <End Type="TaskManagementModel.Filters" Role="Filters" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="Filters">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskLabel__Label__3F115E1A">
+          <End Type="TaskManagementModel.Labels" Role="Labels" Multiplicity="1" />
+          <End Type="TaskManagementModel.TaskLabels" Role="TaskLabels" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Labels">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="TaskLabels">
+              <PropertyRef Name="LabelId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskLabel__TaskI__3E1D39E1">
+          <End Type="TaskManagementModel.Task" Role="Task" Multiplicity="1" />
+          <End Type="TaskManagementModel.TaskLabels" Role="TaskLabels" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Task">
+              <PropertyRef Name="IdTask" />
+            </Principal>
+            <Dependent Role="TaskLabels">
+              <PropertyRef Name="TaskId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -580,6 +738,34 @@
                 <ScalarProperty Name="Patronymic" ColumnName="Patronymic" />
                 <ScalarProperty Name="RoleUser" ColumnName="RoleUser" />
                 <ScalarProperty Name="Mail" ColumnName="Mail" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Filters">
+            <EntityTypeMapping TypeName="TaskManagementModel.Filters">
+              <MappingFragment StoreEntitySet="Filters">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Query" ColumnName="Query" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Labels">
+            <EntityTypeMapping TypeName="TaskManagementModel.Labels">
+              <MappingFragment StoreEntitySet="Labels">
+                <ScalarProperty Name="Color" ColumnName="Color" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TaskLabels">
+            <EntityTypeMapping TypeName="TaskManagementModel.TaskLabels">
+              <MappingFragment StoreEntitySet="TaskLabels">
+                <ScalarProperty Name="LabelId" ColumnName="LabelId" />
+                <ScalarProperty Name="TaskId" ColumnName="TaskId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

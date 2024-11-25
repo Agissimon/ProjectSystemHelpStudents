@@ -22,6 +22,12 @@
         <AssociationConnector Association="TaskManagementModel.FK_Task_Project" ManuallyRouted="false" />
         <AssociationConnector Association="TaskManagementModel.FK__Task__StatusId__5535A963" ManuallyRouted="false" />
         <AssociationConnector Association="TaskManagementModel.FK__Task__UserId__5629CD9C" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="TaskManagementModel.Filters" Width="1.5" PointX="3" PointY="18.75" />
+        <EntityTypeShape EntityType="TaskManagementModel.Labels" Width="1.5" PointX="6" PointY="0.75" />
+        <EntityTypeShape EntityType="TaskManagementModel.TaskLabels" Width="1.5" PointX="8.25" PointY="1.625" />
+        <AssociationConnector Association="TaskManagementModel.FK__Filters__UserId__41EDCAC5" />
+        <AssociationConnector Association="TaskManagementModel.FK__TaskLabel__Label__3F115E1A" />
+        <AssociationConnector Association="TaskManagementModel.FK__TaskLabel__TaskI__3E1D39E1" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -27,12 +27,30 @@ namespace ProjectSystemHelpStudents
             if (task.PriorityId == 0)
                 task.PriorityId = DBClass.entities.Priority.FirstOrDefault()?.PriorityId ?? 0;
 
+            if (task.Id == 0)
+                task.Id = DBClass.entities.Labels.FirstOrDefault()?.Id ?? 0;
+
             _task = task;
             InitializeComboBoxes();
             DataContext = _task;
 
             LoadTaskFiles();
             LoadComments();
+            LoadLabels();
+        }
+
+        private void LoadLabels()
+        {
+            var labels = DBClass.entities.Labels.ToList();
+            _task.AvailableLabels = new ObservableCollection<LabelViewModel>(
+                labels.Select(label => new LabelViewModel
+                {
+                    Id = label.Id,
+                    Name = label.Name,
+                    IsSelected = DBClass.entities.TaskLabels
+                        .Any(tl => tl.TaskId == _task.IdTask && tl.LabelId == label.Id)
+                })
+            );
         }
 
         private void LoadComments()
@@ -101,13 +119,24 @@ namespace ProjectSystemHelpStudents
                     dbTask.EndDate = _task.EndDate;
                     dbTask.ProjectId = _task.ProjectId;
                     dbTask.PriorityId = _task.PriorityId;
+
+                    var currentLabels = DBClass.entities.TaskLabels.Where(tl => tl.TaskId == _task.IdTask).ToList();
+                    DBClass.entities.TaskLabels.RemoveRange(currentLabels);
+
+                    foreach (var label in _task.AvailableLabels.Where(l => l.IsSelected))
+                    {
+                        DBClass.entities.TaskLabels.Add(new TaskLabels
+                        {
+                            TaskId = _task.IdTask,
+                            LabelId = label.Id
+                        });
+                    }
+
                     DBClass.entities.SaveChanges();
                 }
 
                 MessageBox.Show("Задача успешно сохранена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-
                 TaskUpdated?.Invoke();
-
                 Close();
             }
             catch (Exception ex)
@@ -234,13 +263,10 @@ namespace ProjectSystemHelpStudents
 
         private void DeleteCommentButton_Click(object sender, RoutedEventArgs e)
         {
-            // Получаем кнопку, вызвавшую событие
             if (sender is Button deleteButton)
             {
-                // Получаем связанный объект комментария
                 if (deleteButton.DataContext is Comment commentToDelete)
                 {
-                    // Удаляем из ObservableCollection для обновления интерфейса
                     var comments = CommentsListBox.ItemsSource as ObservableCollection<Comment>;
                     if (comments != null)
                     {
@@ -255,7 +281,6 @@ namespace ProjectSystemHelpStudents
                         }
                     }
 
-                    // Удаляем из базы данных
                     try
                     {
                         using (var context = new TaskManagementEntities1())
