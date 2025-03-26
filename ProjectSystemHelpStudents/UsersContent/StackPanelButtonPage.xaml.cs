@@ -14,15 +14,22 @@ namespace ProjectSystemHelpStudents.UsersContent
             InitializeComponent();
             DataContext = this;
             UserNameButton.Content = UserSession.NameUser;
+
+            // Генерируем кнопки проектов при загрузке страницы
             GenerateProjectButtons();
+
+            // Подписываемся на событие добавления проекта
+            SubscribeToProjectAddedEvent();
         }
 
-        public List<Project> GetProjects()
+        private void SubscribeToProjectAddedEvent()
         {
-            using (var context = new TaskManagementEntities1())
+            // Создаем экземпляр AddProjectWindow для подписки на событие
+            var addProjectWindow = new AddProjectWindow();
+            addProjectWindow.ProjectAdded += (newProject) =>
             {
-                return context.Project.ToList();
-            }
+                Dispatcher.Invoke(() => GenerateProjectButtons()); // Обновляем кнопки проектов
+            };
         }
 
         private void GenerateProjectButtons()
@@ -32,10 +39,10 @@ namespace ProjectSystemHelpStudents.UsersContent
 
             foreach (var project in projects)
             {
-                Button projectButton = new Button // Добавить вывод иконки которую пользователь сможет добавить на этапе создании проекта
+                Button projectButton = new Button
                 {
                     Content = project.Name,
-                    Style = (Style)FindResource("btnTransparentStyle"),
+                    Style = (Style)FindResource("TransparentButtonStyle"),
                     Margin = new Thickness(5),
                     Tag = project.ProjectId
                 };
@@ -44,7 +51,17 @@ namespace ProjectSystemHelpStudents.UsersContent
                 projectStackPanel.Children.Add(projectButton);
             }
 
+            // Очищаем старые кнопки и добавляем новые
+            ProjectStackPanel.Children.Clear();
             ProjectStackPanel.Children.Add(projectStackPanel);
+        }
+
+        private List<Project> GetProjects()
+        {
+            using (var context = new TaskManagementEntities1())
+            {
+                return context.Project.ToList();
+            }
         }
 
         private void ProjectButton_Click(object sender, RoutedEventArgs e)

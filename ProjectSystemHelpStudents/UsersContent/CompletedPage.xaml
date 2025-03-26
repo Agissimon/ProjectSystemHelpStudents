@@ -47,7 +47,7 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <Button Content="Очистить всю историю" Style="{StaticResource btnlow}" HorizontalAlignment="Left" Click="DeleteHistory_Click" Foreground="Red" Margin="5" />
+                <Button Content="Очистить всю историю" Style="{StaticResource SmallButtonStyle}" HorizontalAlignment="Left" Click="DeleteHistory_Click" Foreground="Red" Margin="5" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

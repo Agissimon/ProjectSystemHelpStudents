@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents"
         mc:Ignorable="d"
-        Title="MyTask" Icon="/Resources/Icon/logo001.png" Style="{StaticResource windowMainStyle}"  WindowStartupLocation="CenterScreen">
+        Title="MyTask" Icon="/Resources/Icon/logo001.png" Style="{StaticResource MainWindowStyle}"  WindowStartupLocation="CenterScreen" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>

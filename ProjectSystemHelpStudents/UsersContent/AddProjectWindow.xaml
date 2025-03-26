@@ -5,16 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents.UsersContent"
         mc:Ignorable="d"
-        Title="MyTask" Height="500" Width="430" MinHeight="500" MinWidth="430" Icon="/Resources/Icon/logo001.png" Style="{StaticResource windowSmallStyle}"  WindowStartupLocation="CenterScreen">
+        Title="MyTask" Height="500" Width="430" MinHeight="500" MinWidth="430" Icon="/Resources/Icon/logo001.png" Style="{StaticResource SmallWindowStyle}"  WindowStartupLocation="CenterScreen">
 
     <Grid Margin="20">
         <StackPanel>
             <TextBlock Text="Добавить новый проект" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,20" />
-            <TextBlock Text="Название проекта" Style="{StaticResource textBlockTransparentStyle}"/>
+            <TextBlock Text="Название проекта" Style="{StaticResource TransparentTextBlockStyle}"/>
             <TextBox Name="NameTextBox" Background="#333" Foreground="White" Padding="5" Margin="0,0,0,10" />
-            <TextBlock Text="Описание проекта" Style="{StaticResource textBlockTransparentStyle}"/>
+            <TextBlock Text="Описание проекта" Style="{StaticResource TransparentTextBlockStyle}"/>
             <TextBox Name="DescriptionTextBox" Background="#333" Foreground="White" Padding="5" Margin="0,0,0,10" AcceptsReturn="True" />
-            <TextBlock Text="Даты старта и завершения можно заполнить по желанию" Style="{StaticResource textBlockTransparentStyle}"/>
+            <TextBlock Text="Даты старта и завершения можно заполнить по желанию" Style="{StaticResource TransparentTextBlockStyle}"/>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                 <TextBlock Text="Дата начала" Margin="0,0,5,5"/>
                 <DatePicker Name="StartDatePicker" Background="#333" Foreground="White" Margin="1" />

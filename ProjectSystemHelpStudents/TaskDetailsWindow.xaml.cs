@@ -84,7 +84,7 @@ namespace ProjectSystemHelpStudents
                 })
                 .ToList();
 
-            FilesListBox.ItemsSource = files;
+            FilesListBox.ItemsSource = new ObservableCollection<FileItem>(files);
         }
 
         private void InitializeComboBoxes()
@@ -257,6 +257,42 @@ namespace ProjectSystemHelpStudents
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void DeleteFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button deleteButton && deleteButton.DataContext is FileItem fileToDelete)
+            {
+                try
+                {
+                    var file = DBClass.entities.Files.FirstOrDefault(f => f.FilePath == fileToDelete.FilePath);
+                    if (file != null)
+                    {
+                        DBClass.entities.Files.Remove(file);
+                        DBClass.entities.SaveChanges();
+
+                        if (FilesListBox.ItemsSource is ObservableCollection<FileItem> filesCollection)
+                        {
+                            filesCollection.Remove(fileToDelete);
+                        }
+
+                        if (File.Exists(fileToDelete.FilePath))
+                        {
+                            File.Delete(fileToDelete.FilePath);
+                        }
+
+                        MessageBox.Show("Файл успешно удален!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Файл не найден в базе данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при удалении файла: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

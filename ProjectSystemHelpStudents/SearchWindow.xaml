@@ -5,20 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents"
         mc:Ignorable="d"
-        Title="MyTask" Icon="/Resources/Icon/logo001.png" Style="{StaticResource windowSearchStyle}" WindowStartupLocation="CenterScreen">
+        Title="MyTask" Icon="/Resources/Icon/logo001.png" Style="{StaticResource SearchWindowStyle}" WindowStartupLocation="CenterScreen">
     
     <Grid>
         <StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
-                <TextBox x:Name="txtSearchQuery" Width="310" Height="30" Style="{StaticResource textBoxStyle}" HorizontalContentAlignment="Left" />
-                <Button Content="Поиск" Width="60" Height="30" Margin="5,0,0,0" Style="{StaticResource btnTransparentStyle}" Click="SearchButton_Click" />
+                <TextBox x:Name="txtSearchQuery" Width="310" Height="30" Style="{StaticResource InputFieldStyle}" HorizontalContentAlignment="Left" />
+                <Button Content="Поиск" Width="60" Height="30" Margin="5,0,0,0" Style="{StaticResource TransparentButtonStyle}" Click="SearchButton_Click" />
             </StackPanel>
 
-            <TextBlock Text="История поиска:" Margin="10,20,0,10" Style="{StaticResource textBlockTransparentStyle}" />
-            <ListBox x:Name="lstSearchHistory" Margin="10" Style="{StaticResource listBoxTransparentStyle}" />
+            <TextBlock Text="История поиска:" Margin="10,20,0,10" Style="{StaticResource TransparentTextBlockStyle}" />
+            <ListBox x:Name="lstSearchHistory" Margin="10" Style="{StaticResource ListBoxStyle}" />
 
-            <TextBlock Text="Результаты поиска:" Margin="10,20,0,10" Style="{StaticResource textBlockTransparentStyle}" />
-            <ListBox x:Name="lstSearchResults" Margin="10" Style="{StaticResource listBoxTransparentStyle}" SelectionChanged="lstSearchResults_SelectionChanged" />
+            <TextBlock Text="Результаты поиска:" Margin="10,20,0,10" Style="{StaticResource TransparentTextBlockStyle}" />
+            <ListBox x:Name="lstSearchResults" Margin="10" Style="{StaticResource ListBoxStyle}" SelectionChanged="lstSearchResults_SelectionChanged" />
         </StackPanel>
     </Grid>
 

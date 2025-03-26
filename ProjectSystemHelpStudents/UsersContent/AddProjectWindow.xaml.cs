@@ -9,6 +9,9 @@ namespace ProjectSystemHelpStudents.UsersContent
     {
         public bool IsProjectAdded { get; private set; } = false;
 
+        // Событие для уведомления о добавлении нового проекта
+        public event Action<Project> ProjectAdded;
+
         public AddProjectWindow()
         {
             InitializeComponent();
@@ -39,9 +42,9 @@ namespace ProjectSystemHelpStudents.UsersContent
                     var newProject = new Project
                     {
                         Name = name,
-                        //Description = description,
-                        //StartDate = startDate.Value,
-                        //EndDate = endDate.Value
+                        Description = description,
+                        StartDate = startDate ?? DateTime.Now,
+                        EndDate = endDate ?? DateTime.Now.AddYears(1) // Пример даты завершения
                     };
 
                     var currentUser = context.Users.FirstOrDefault(u => u.IdUser == UserSession.IdUser);
@@ -52,15 +55,16 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                         IsProjectAdded = true;
 
+                        // Уведомляем подписчиков о новом проекте
+                        ProjectAdded?.Invoke(newProject);
+
                         MessageBox.Show("Проект успешно добавлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         this.Close();
-                        
                     }
                     else
                     {
                         MessageBox.Show("Не удалось определить текущего пользователя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
-                    
                 }
             }
             catch (Exception ex)

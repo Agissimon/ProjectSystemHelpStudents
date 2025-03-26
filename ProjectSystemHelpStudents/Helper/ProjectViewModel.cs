@@ -8,6 +8,7 @@ namespace ProjectSystemHelpStudents.Helper
 {
     public class ProjectViewModel
     {
+        public int ProjectId { get; set; }
         public string Name { get; set; }
         public string Icon { get; set; }
     }

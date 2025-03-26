@@ -15,9 +15,9 @@
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
                     <Button Content="&lt; Сегодня" Click="Today_Click" Margin="5" Background="Transparent" Foreground="White"/>
-                    <Button Content="&lt; Предыдущая неделя" Style="{StaticResource btnlow}" Click="PreviousWeek_Click" Foreground="White" Margin="5"/>
-                    <TextBlock Name="CurrentWeekText" Style="{StaticResource txcLow}" Text="Октябрь 2024" FontSize="18" Foreground="White" Margin="5,0"/>
-                    <Button Content="Следующая неделя &gt;" Style="{StaticResource btnlow}" Click="NextWeek_Click" Foreground="White" Margin="5"/>
+                    <Button Content="&lt; Предыдущая неделя" Style="{StaticResource SmallButtonStyle}" Click="PreviousWeek_Click" Foreground="White" Margin="5"/>
+                    <TextBlock Name="CurrentWeekText" Style="{StaticResource TransparentTextBlockStyle}" Text="Октябрь 2024" FontSize="18" Foreground="White" Margin="5"/>
+                    <Button Content="Следующая неделя &gt;" Style="{StaticResource SmallButtonStyle}" Click="NextWeek_Click" Foreground="White" Margin="5"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
@@ -33,7 +33,7 @@
                 <Expander Header="Просрочено" IsExpanded="True" FontSize="18" Foreground="Red" Margin="0,10">
                     <ListView Name="OverdueTasksListView" 
                               SelectionChanged="TaskListView_SelectionChanged" 
-                              Style="{StaticResource DarkListBoxStyle}">
+                              Style="{StaticResource TransparentListViewStyle}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -66,8 +66,8 @@
 
                 <TextBlock Name="TodayDateTextBlock" FontSize="18" Foreground="White" Margin="0,20"/>
                 <ListView Name="TasksListView" 
-                          SelectionChanged="TaskListView_SelectionChanged" 
-                          Style="{StaticResource DarkListBoxStyle}">
+          SelectionChanged="TaskListView_SelectionChanged" 
+          Style="{StaticResource TransparentListViewStyle}">
                     <ListView.Resources>
                         <DataTemplate DataType="{x:Type local:TaskGroupViewModel}">
                             <StackPanel>
@@ -105,7 +105,7 @@
                     </ListView.Resources>
                 </ListView>
 
-                <Button Content="+ Добавить задачу" Style="{StaticResource btnAddTaskStyle}" Click="AddTask_Click"/>
+                <Button Content="+ Добавить задачу" Style="{StaticResource AddTaskButtonStyle}" Click="AddTask_Click"/>
             </StackPanel>
         </Grid>
     </ScrollViewer>

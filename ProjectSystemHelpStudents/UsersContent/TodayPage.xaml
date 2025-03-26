@@ -11,6 +11,7 @@
             
             <Expander Header="Просрочено" IsExpanded="True" FontSize="18" Foreground="Red" Margin="0,10">
                 <ListView Name="OverdueTasksListView" SelectionChanged="TaskListView_SelectionChanged" BorderThickness="0,0,0,1" Background="#333"
+                        Style="{StaticResource TransparentListViewStyle}"
                         Foreground="White"
                         BorderBrush="Transparent"
                         SelectionMode="Single"
@@ -46,6 +47,7 @@
 
             <TextBlock Name="TodayDateTextBlock" FontSize="18" Foreground="White" Margin="0,20"/>
             <ListView Name="TasksListView" BorderThickness="0,0,0,1" SelectionChanged="TaskListView_SelectionChanged"
+                    Style="{StaticResource DarkListViewStyle}"
                     Background="#333"
                     Foreground="White"
                     BorderBrush="Transparent"
@@ -79,7 +81,7 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <Button Content="+ Добавить задачу" Style="{StaticResource btnAddTaskStyle}" Click="Button_Click"/>
+            <Button Content="+ Добавить задачу" Style="{StaticResource AddTaskButtonStyle}" Click="Button_Click"/>
         </StackPanel>
     </Grid>
 </Page>

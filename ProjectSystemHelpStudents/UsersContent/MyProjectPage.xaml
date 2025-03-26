@@ -8,30 +8,66 @@
       Title="MyProjectPage">
 
     <Grid Margin="10,0,0,10">
-        <StackPanel>
-            <TextBlock Text="Мои проекты" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="Мои проекты" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20" />
 
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,20">
-                <TextBox Text="Поиск" Name="SearchBox" Width="297" Height="30" Background="#333" Foreground="White" BorderThickness="0" Padding="5" Margin="10,0,0,0" />
-                <!--<ComboBox Name="FilterComboBox" Width="150" Height="30" Margin="10,0,0,0" Background="Transparent" Foreground="Black">
-                    <ComboBoxItem Content="Активные проекты" IsSelected="True" />
-                    <ComboBoxItem Content="Завершенные проекты" />
-                </ComboBox>-->
-                <Button Content="+" Width="30" Height="30" Margin="10,0,10,0" Background="#333" Foreground="White" Click="AddProject_Click"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,20">
+                    <TextBox Text="Поиск" Name="SearchBox" Width="297" Height="30" Background="#333" Foreground="White" BorderThickness="0" Padding="5" Margin="10,0,0,0" />
+                    <!--<ComboBox Name="FilterComboBox" Width="150" Height="30" Margin="10,0,0,0" Background="Transparent" Foreground="Black">
+                        <ComboBoxItem Content="Активные проекты" IsSelected="True" />
+                        <ComboBoxItem Content="Завершенные проекты" />
+                    </ComboBox>-->
+                    <Button Content="+" Width="30" Height="30" Margin="10,0,10,0" Background="#333" Foreground="White" Click="AddProject_Click"/>
+                </StackPanel>
+
+                <TextBlock Text="{Binding ProjectCountText}" FontSize="18" Foreground="#AAAAAA" Margin="0,10,0,10" />
+                <ListView Name="ProjectsListView" Background="Transparent" BorderThickness="0" Foreground="White">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,10" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold" Foreground="White" />
+                                <TextBlock Text="{Binding Icon}" FontSize="16" Margin="10,0,0,0" Foreground="White" />
+                                <Button Style="{StaticResource ButtonOptionsStyle}" Tag="{Binding}" IsEnabled="True" Click="OpenContextMenu_Click">
+                                    <TextBlock Text="..." FontSize="16" Foreground="White"/>
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <!--Style="{StaticResource CustomContextMenuStyle}"-->
+                                            <!--<MenuItem Style="{StaticResource CustomMenuItemStyle}" Header="Добавить проект выше" Click="AddProjectAbove_Click">
+                                                <MenuItem.Icon>
+                                                    <Image Source="path_to_up_arrow_icon.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Style="{StaticResource CustomMenuItemStyle}" Header="Добавить проект ниже" Click="AddProjectBelow_Click"/>
+                                            -->
+                                            <!--<MenuItem Header="Изменить" Click="EditProject_Click"/>-->
+                                            <!--
+                                            <MenuItem Header="Добавить в избранное" Click="AddToFavorites_Click"/>
+                                            <MenuItem Header="Дублировать" Click="DuplicateProject_Click"/>
+                                            <MenuItem Header="Общий доступ" Click="ShareProject_Click"/>
+                                            <MenuItem Header="Скопировать ссылку на проект" Click="CopyProjectLink_Click"/>
+                                            <MenuItem Header="Сохранить как шаблон" Click="SaveAsTemplate_Click"/>
+                                            <MenuItem Header="Посмотреть шаблоны" Click="ViewTemplates_Click"/>
+                                            <MenuItem Header="Импорт из CSV" Click="ImportFromCSV_Click"/>
+                                            <MenuItem Header="Экспорт CSV" Click="ExportToCSV_Click"/>
+                                            <MenuItem Header="Добавлять задачи по Email" Click="AddTasksByEmail_Click"/>
+                                            <MenuItem Header="Календарная лента проекта" Click="ShowProjectCalendar_Click"/>
+                                            <MenuItem Header="Журнал действий" Click="ShowActivityLog_Click"/>
+                                            <MenuItem Header="Добавить расширение..." Click="AddExtension_Click"/>
+                                            <MenuItem Header="Архивировать" Click="ArchiveProject_Click"/>-->
+                                            <MenuItem Header="Удалить" Click="DeleteProject_Click" Tag="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Icon/red_trash_can.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </StackPanel>
-
-            <TextBlock Text="{Binding ProjectCountText}" FontSize="18" Foreground="#AAAAAA" Margin="0,10,0,10" />
-            <ListView Name="ProjectsListView" Background="Transparent" BorderThickness="0" Foreground="White">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="0,10,0,10" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                            <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold" Foreground="White" />
-                            <TextBlock Text="{Binding Icon}" FontSize="16" Margin="10,0,0,0" Foreground="White" />
-                            <Button Content="..." Width="30" Height="30" HorizontalAlignment="Right" Background="Transparent" Foreground="White" Margin="10,0,0,0" Click="ProjectOptions_Click" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

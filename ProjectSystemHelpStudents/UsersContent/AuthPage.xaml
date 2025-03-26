@@ -10,16 +10,16 @@
 
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="Вход в систему" Style="{StaticResource txcTitle1}" HorizontalAlignment="Center"/>
-            <TextBlock Text="Введите логин :" Style="{StaticResource txcNorm}"/>
-            <TextBox x:Name="txbLogin" Style="{StaticResource txbNorm}"/>
-            <TextBlock Text="Введите пароль:" Style="{StaticResource txcNorm}"/>
-            <TextBox x:Name="txbPassword" Style="{StaticResource txbNorm}" Visibility="Collapsed"/>
-            <PasswordBox x:Name="psbPassword" Style="{StaticResource psbNorm}" Visibility="Visible"/>
-            <CheckBox x:Name="chkShowPassword" Content="Показать пароль" Style="{StaticResource chbNorm}" Checked="chkShowPassword_Checked" Unchecked="chkShowPassword_Unchecked"/>
-            <Button x:Name="btnLogIn" Content="Войти" Style="{StaticResource btnNorm}" Click="btnLogIn_Click"/>
-            <Button x:Name="btnReg" Content="Зарегистрироваться" Style="{StaticResource btnlow}" Click="btnReg_Click"/>
-            <Button x:Name="btnForget" Content="Забыл пароль" Style="{StaticResource btnlow}" Click="btnFogot_Click"/>
+            <TextBlock Text="Вход в систему" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center"/>
+            <TextBlock Text="Введите логин :" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox x:Name="txbLogin" Style="{StaticResource InputFieldStyle}"/>
+            <TextBlock Text="Введите пароль:" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox x:Name="txbPassword" Style="{StaticResource InputFieldStyle}" Visibility="Collapsed"/>
+            <PasswordBox x:Name="psbPassword" Style="{StaticResource PasswordInputFieldStyle}" Visibility="Visible"/>
+            <CheckBox x:Name="chkShowPassword" Content="Показать пароль" Style="{StaticResource CheckboxStyle}" Checked="chkShowPassword_Checked" Unchecked="chkShowPassword_Unchecked"/>
+            <Button x:Name="btnLogIn" Content="Войти" Style="{StaticResource LoginButtonStyle}" IsDefault="True" Click="btnLogIn_Click"/>
+            <Button x:Name="btnReg" Content="Зарегистрироваться" Style="{StaticResource NavigationButtonStyle}" Click="btnReg_Click"/>
+            <Button x:Name="btnForget" Content="Забыл пароль" Style="{StaticResource NavigationButtonStyle}" Click="btnFogot_Click"/>
         </StackPanel>
     </Grid>
 </Page>
