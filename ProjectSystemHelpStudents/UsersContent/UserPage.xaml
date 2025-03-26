@@ -10,19 +10,19 @@
             <StackPanel>
                 <TextBlock Text="Редактирование данных пользователя" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
 
-                <TextBlock Text="Имя:" Style="{StaticResource textBlockTransparentStyle}"/>
-                <TextBox x:Name="UserNameTextBox" Style="{StaticResource textBoxTransparentStyle}"/>
+                <TextBlock Text="Имя:" Style="{StaticResource TransparentTextBlockStyle}"/>
+                <TextBox x:Name="UserNameTextBox" Style="{StaticResource TransparentTextBoxStyle}"/>
 
-                <TextBlock Text="Фамилия:" Style="{StaticResource textBlockTransparentStyle}"/>
-                <TextBox x:Name="UserSurnameTextBox" Style="{StaticResource textBoxTransparentStyle}"/>
+                <TextBlock Text="Фамилия:" Style="{StaticResource TransparentTextBlockStyle}"/>
+                <TextBox x:Name="UserSurnameTextBox" Style="{StaticResource TransparentTextBoxStyle}"/>
 
-                <TextBlock Text="Отчество:" Style="{StaticResource textBlockTransparentStyle}"/>
-                <TextBox x:Name="UserPatronymicTextBox" Style="{StaticResource textBoxTransparentStyle}"/>
+                <TextBlock Text="Отчество:" Style="{StaticResource TransparentTextBlockStyle}"/>
+                <TextBox x:Name="UserPatronymicTextBox" Style="{StaticResource TransparentTextBoxStyle}"/>
 
-                <TextBlock Text="Email:" Style="{StaticResource textBlockTransparentStyle}"/>
-                <TextBox x:Name="UserEmailTextBox" Style="{StaticResource textBoxTransparentStyle}"/>
+                <TextBlock Text="Email:" Style="{StaticResource TransparentTextBlockStyle}"/>
+                <TextBox x:Name="UserEmailTextBox" Style="{StaticResource TransparentTextBoxStyle}"/>
 
-                <Button Content="Сохранить" Style="{StaticResource btnTransparentStyle}" Click="SaveButton_Click"/>
+                <Button Content="Сохранить" Style="{StaticResource NavigationButtonStyle}" Click="SaveButton_Click"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

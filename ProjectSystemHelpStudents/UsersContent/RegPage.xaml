@@ -9,20 +9,20 @@
       Title="RegPage">
 
     <Grid>
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Height="384" Margin="320,25,320,41">
-            <TextBlock Text="Вход в систему" Style="{StaticResource txcTitle1}" HorizontalAlignment="Center"/>
-            <TextBlock Text="Введите логин:" Style="{StaticResource txcNorm}"/>
-            <TextBox x:Name="txbLogin" Style="{StaticResource txbNorm}" TextChanged="txbLogin_TextChanged" />
-            <TextBlock Text="Введите пароль:" Style="{StaticResource txcNorm}"/>
-            <TextBox x:Name="txbPassword" Style="{StaticResource txbNorm}" Visibility="Collapsed"/>
-            <PasswordBox x:Name="psbPassword" Style="{StaticResource psbNorm}" Visibility="Visible"/>
-            <CheckBox x:Name="chkShowPassword" Content="Показать пароль" Style="{StaticResource chbNorm}" Checked="chkShowPassword_Checked" Unchecked="chkShowPassword_Unchecked"/>
-            <TextBlock Text="Введите ФИО:" Style="{StaticResource txcNorm}"/>
-            <TextBox x:Name="txbName" Style="{StaticResource txbNorm}" TextChanged="txbName_TextChanged" />
-            <TextBlock Text="Введите почту:" Style="{StaticResource txcNorm}"/>
-            <TextBox x:Name="txbMail" Style="{StaticResource txbNorm}" TextChanged="txbMail_TextChanged" />
-            <Button x:Name="btnLogIn" Content="Зарегистрироваться" Style="{StaticResource btnNorm}" Click="btnLogIn_Click"/>
-            <Button x:Name="btnBack" Content="Назад" Style="{StaticResource btnlow}" Click="btnBack_Click"/>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Вход в систему" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center"/>
+            <TextBlock Text="Введите логин:" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox x:Name="txbLogin" Style="{StaticResource InputFieldStyle}" TextChanged="txbLogin_TextChanged" />
+            <TextBlock Text="Введите пароль:" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox x:Name="txbPassword" Style="{StaticResource InputFieldStyle}" Visibility="Collapsed"/>
+            <PasswordBox x:Name="psbPassword" Style="{StaticResource PasswordInputFieldStyle}" Visibility="Visible"/>
+            <CheckBox x:Name="chkShowPassword" Content="Показать пароль" Style="{StaticResource CheckboxStyle}" Checked="chkShowPassword_Checked" Unchecked="chkShowPassword_Unchecked"/>
+            <TextBlock Text="Введите ФИО:" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox x:Name="txbName" Style="{StaticResource InputFieldStyle}" TextChanged="txbName_TextChanged" />
+            <TextBlock Text="Введите почту:" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox x:Name="txbMail" Style="{StaticResource InputFieldStyle}" TextChanged="txbMail_TextChanged" />
+            <Button x:Name="btnLogIn" Content="Зарегистрироваться" Style="{StaticResource LoginButtonStyle}" Click="btnLogIn_Click"/>
+            <Button x:Name="btnBack" Content="Назад" Style="{StaticResource NavigationButtonStyle}" Click="btnBack_Click"/>
         </StackPanel>
     </Grid>
 </Page>

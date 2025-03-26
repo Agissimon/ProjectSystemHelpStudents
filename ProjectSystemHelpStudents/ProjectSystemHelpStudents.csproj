@@ -358,6 +358,15 @@
       <DependentUpon>Model1.edmx</DependentUpon>
       <LastGenOutput>Model1.cs</LastGenOutput>
     </Content>
+    <Resource Include="Resources\Icon\calendar.png" />
+    <Resource Include="Resources\Icon\check-circle.png" />
+    <Resource Include="Resources\Icon\duration-alt.png" />
+    <Resource Include="Resources\Icon\filter.png" />
+    <Resource Include="Resources\Icon\inbox.png" />
+    <Resource Include="Resources\Icon\search.png" />
+    <Resource Include="Resources\Icon\red_trash_can.png" />
+    <Resource Include="Resources\Icon\delete.png" />
+    <Resource Include="Resources\Icon\path_to_up_arrow_icon.png" />
     <Resource Include="Resources\Icon\iconscrepki.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
