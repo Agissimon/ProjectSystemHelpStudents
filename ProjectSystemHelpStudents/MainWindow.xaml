@@ -7,14 +7,14 @@
         mc:Ignorable="d"
         Title="MyTask" Icon="/Resources/Icon/logo001.png" Style="{StaticResource MainWindowStyle}"  WindowStartupLocation="CenterScreen" >
     <Grid>
-        <Grid.RowDefinitions>
+        <!--<Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        </Grid.RowDefinitions>-->
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0">
+        <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0">
             <Image Source="/Resources/Icon/logo2.png" Height="40"/>
-        </StackPanel>
+        </StackPanel>-->
 
         <Frame x:Name="frmStackPanelButton" NavigationUIVisibility="Hidden" Grid.Row="1" Width="200" HorizontalAlignment="Left"/>
         <Frame x:Name="frmAuth" NavigationUIVisibility="Hidden" Grid.Row="1"/>

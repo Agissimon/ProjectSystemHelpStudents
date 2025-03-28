@@ -60,10 +60,12 @@ namespace ProjectSystemHelpStudents.UsersContent
                             EndDate = t.EndDate,
                             IsCompleted = t.StatusName == "Завершено",
                             AvailableLabels = new ObservableCollection<LabelViewModel>(
-                                t.Labels.Select(label => new LabelViewModel { Name = label })), 
-                            EndDateFormatted = t.EndDate.Date == DateTime.Today ? "Сегодня" :
-                                               t.EndDate.Date == DateTime.Today.AddDays(1) ? "Завтра" :
-                                               $"{t.EndDate:dd MMMM yyyy} - {t.EndDate:dddd}"
+                                t.Labels.Select(label => new LabelViewModel { Name = label })),
+                            EndDateFormatted = t.EndDate.Date == DateTime.Today
+                                ? $"{DateTime.Today:dd MMMM} ‧ Сегодня ‧ {DateTime.Today:dddd}"
+                                : t.EndDate.Date == DateTime.Today.AddDays(1)
+                                ? $"{DateTime.Today.AddDays(1):dd MMMM} ‧ Завтра ‧ {DateTime.Today.AddDays(1):dddd}"
+                                : $"{t.EndDate:dd MMMM} ‧ {t.EndDate:dddd}"
                         })
                         .OrderBy(t => t.EndDate)
                         .ToList();
@@ -100,7 +102,7 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             string todayDate = DateTime.Today.ToString("dd MMMM");
             string dayOfWeek = DateTime.Today.ToString("dddd");
-            TodayDateTextBlock.Text = $"{todayDate} - Сегодня - {dayOfWeek}";
+            //TodayDateTextBlock.Text = $"{todayDate} - Сегодня - {dayOfWeek}";
         }
 
         private void UpdateWeekText()

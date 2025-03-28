@@ -15,10 +15,10 @@
             </StackPanel>
 
             <TextBlock Text="История поиска:" Margin="10,20,0,10" Style="{StaticResource TransparentTextBlockStyle}" />
-            <ListBox x:Name="lstSearchHistory" Margin="10" Style="{StaticResource ListBoxStyle}" />
+            <ListBox x:Name="lstSearchHistory" Margin="10" Style="{StaticResource DarkListBoxStyle}" />
 
             <TextBlock Text="Результаты поиска:" Margin="10,20,0,10" Style="{StaticResource TransparentTextBlockStyle}" />
-            <ListBox x:Name="lstSearchResults" Margin="10" Style="{StaticResource ListBoxStyle}" SelectionChanged="lstSearchResults_SelectionChanged" />
+            <ListBox x:Name="lstSearchResults" Margin="10" Style="{StaticResource DarkListBoxStyle}" SelectionChanged="lstSearchResults_SelectionChanged" />
         </StackPanel>
     </Grid>
 

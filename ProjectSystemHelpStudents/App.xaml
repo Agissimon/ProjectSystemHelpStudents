@@ -126,7 +126,6 @@
                 </Setter>
             </Style>
 
-            <!-- Стиль кнопки прозрачного фона -->
             <Style x:Key="TransparentButtonStyle" TargetType="Button">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -151,7 +150,6 @@
                 </Setter>
             </Style>
 
-            <!-- Стиль поля ввода -->
             <Style x:Key="InputFieldStyle" TargetType="TextBox">
                 <Setter Property="Background" Value="#333"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -163,22 +161,17 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TextBox">
-                            <!-- Добавляем CornerRadius к Border -->
                             <Border 
                     Background="{TemplateBinding Background}" 
                     BorderBrush="{TemplateBinding BorderBrush}" 
                     BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="8">
-                                <!-- Значение CornerRadius -->
                                 <ScrollViewer x:Name="PART_ContentHost" />
                             </Border>
                             <ControlTemplate.Triggers>
-                                <!-- Анимация при фокусировке -->
                                 <Trigger Property="IsFocused" Value="True">
                                     <Setter Property="BorderBrush" Value="#4444"/>
-                                    <!-- Акцентный цвет -->
                                 </Trigger>
-                                <!-- Анимация при наведении -->
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="BorderBrush" Value="#555"/>
                                 </Trigger>
@@ -188,7 +181,6 @@
                 </Setter>
             </Style>
 
-            <!-- Стиль контекстного меню -->
             <Style x:Key="CustomContextMenuStyle" TargetType="ContextMenu">
                 <Setter Property="Background" Value="#222"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -196,7 +188,6 @@
                 <Setter Property="BorderThickness" Value="1"/>
             </Style>
 
-            <!-- Стиль пункта контекстного меню -->
             <Style x:Key="CustomMenuItemStyle" TargetType="MenuItem">
                 <Setter Property="Background" Value="#222"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -227,7 +218,6 @@
                 </Setter>
             </Style>
 
-            <!-- Стиль окна -->
             <Style x:Key="WindowStyle" TargetType="Window">
                 <Setter Property="Background" Value="#222"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -235,7 +225,6 @@
                 <Setter Property="FontSize" Value="14"/>
             </Style>
 
-            <!-- Стиль окна поиска -->
             <Style x:Key="SearchWindowStyle" TargetType="Window">
                 <Setter Property="Background" Value="#222"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -247,7 +236,6 @@
                 <Setter Property="MaxWidth" Value="400"/>
             </Style>
 
-            <!-- Стиль окна главного интерфейса -->
             <Style x:Key="MainWindowStyle" TargetType="Window">
                 <Setter Property="Background" Value="#222"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -257,7 +245,6 @@
                 <Setter Property="MinWidth" Value="800"/>
             </Style>
 
-            <!-- Стиль окна маленького размера -->
             <Style x:Key="SmallWindowStyle" TargetType="Window">
                 <Setter Property="Background" Value="#222"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -269,7 +256,6 @@
                 <Setter Property="MaxWidth" Value="800"/>
             </Style>
 
-            <!-- Стиль комбобокса -->
             <Style x:Key="ComboBoxStyle" TargetType="ComboBox">
                 <Setter Property="Background" Value="#333"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -281,7 +267,6 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="ComboBox">
                             <Grid>
-                                <!-- Основная часть ComboBox -->
                                 <ToggleButton x:Name="DropDownToggle"
                                   Background="{TemplateBinding Background}"
                                   BorderBrush="{TemplateBinding BorderBrush}"
@@ -304,7 +289,6 @@
                                     </ToggleButton.Template>
                                 </ToggleButton>
 
-                                <!-- Стрелка раскрывающегося списка -->
                                 <Path x:Name="Arrow"
                           Grid.Column="1"
                           HorizontalAlignment="Right"
@@ -315,7 +299,6 @@
                           Height="4"
                           Margin="5"/>
 
-                                <!-- Всплывающее меню -->
                                 <Popup x:Name="PART_Popup"
                            Placement="Bottom"
                            IsOpen="{TemplateBinding IsDropDownOpen}"
@@ -334,11 +317,9 @@
                                 </Popup>
                             </Grid>
                             <ControlTemplate.Triggers>
-                                <!-- Триггер для наведения мыши -->
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter TargetName="DropDownToggle" Property="Background" Value="#444"/>
                                 </Trigger>
-                                <!-- Триггер для открытия выпадающего списка -->
                                 <Trigger Property="IsDropDownOpen" Value="True">
                                     <Setter TargetName="DropDownToggle" Property="Background" Value="#444"/>
                                 </Trigger>
@@ -379,7 +360,7 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="TransparentListViewStyle" TargetType="ListView">
+            <Style x:Key="TransparentListViewStyle" TargetType="ListBox">
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="BorderBrush" Value="Transparent"/>
@@ -390,7 +371,7 @@
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="ItemContainerStyle">
                     <Setter.Value>
-                        <Style TargetType="ListViewItem">
+                        <Style TargetType="ListBoxItem">
                             <Setter Property="Foreground" Value="White"/>
                             <Setter Property="Background" Value="Transparent"/>
                             <Setter Property="BorderBrush" Value="Transparent"/>
@@ -398,15 +379,46 @@
                             <Setter Property="Padding" Value="5"/>
                             <Setter Property="Template">
                                 <Setter.Value>
-                                    <ControlTemplate TargetType="ListViewItem">
+                                    <ControlTemplate TargetType="ListBoxItem">
                                         <Border Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="0">
-                                            <!-- Убираем границы -->
-                                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                            <ContentPresenter/>
                                         </Border>
-                                        <!--<ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="TransparentNestedListViewStyle" TargetType="ListBox">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="SelectionMode" Value="Single"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderBrush" Value="Transparent"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="5"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="0">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
                                             <Trigger Property="IsSelected" Value="True">
                                                 <Setter Property="Background" Value="#444"/>
                                                 <Setter Property="Foreground" Value="White"/>
@@ -415,7 +427,7 @@
                                                 <Setter Property="Background" Value="#555"/>
                                                 <Setter Property="Foreground" Value="White"/>
                                             </Trigger>
-                                        </ControlTemplate.Triggers>-->
+                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
@@ -560,7 +572,6 @@
                 <Setter Property="Padding" Value="5"/>
             </Style>
 
-            <!-- Стиль кнопки добавления задачи -->
             <Style x:Key="AddTaskButtonStyle" TargetType="Button">
                 <Setter Property="HorizontalAlignment" Value="Left"/>
                 <Setter Property="Margin" Value="0,20,0,0"/>
@@ -596,7 +607,6 @@
                 <Setter Property="Margin" Value="0,5,0,5"/>
             </Style>
 
-            <!-- Стиль прозрачного TextBox -->
             <Style x:Key="TransparentTextBoxStyle" TargetType="TextBox">
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="Background" Value="Transparent"/>
@@ -623,7 +633,37 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-
+            
+            <Style x:Key="SidebarButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="FontFamily" Value="Candara"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="Padding" Value="5,10"/>
+                <Setter Property="Margin" Value="7"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="#444444"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Foreground" Value="#444444"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
             <Style x:Key="NavigationButtonStyle" TargetType="Button">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -633,6 +673,7 @@
                 <Setter Property="Padding" Value="5,10"/>
                 <Setter Property="Margin" Value="7"/>
                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="VerticalContentAlignment" Value="Bottom"/>
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Template">
                     <Setter.Value>
