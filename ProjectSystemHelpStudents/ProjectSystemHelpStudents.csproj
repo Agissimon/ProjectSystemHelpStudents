@@ -358,6 +358,9 @@
       <DependentUpon>Model1.edmx</DependentUpon>
       <LastGenOutput>Model1.cs</LastGenOutput>
     </Content>
+    <Resource Include="Resources\Icon\master-plan.png" />
+    <Resource Include="Resources\Icon\user.png" />
+    <Resource Include="Resources\Icon\daily-calendar.png" />
     <Resource Include="Resources\Icon\calendar.png" />
     <Resource Include="Resources\Icon\check-circle.png" />
     <Resource Include="Resources\Icon\duration-alt.png" />
