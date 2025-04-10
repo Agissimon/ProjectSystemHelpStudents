@@ -20,7 +20,7 @@
                                 Click="AddFilter_Click"/>
                     </DockPanel>
                 </Expander.Header>
-                <ListBox x:Name="FiltersList" Style="{StaticResource ListBoxStyle}">
+                <ListBox x:Name="FiltersList" Style="{StaticResource DarkListBoxStyle}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="5">
@@ -44,7 +44,7 @@
                                 Click="AddLabel_Click"/>
                     </DockPanel>
                 </Expander.Header>
-                <ListBox x:Name="LabelsList" Style="{StaticResource ListBoxStyle}" BorderThickness="0">
+                <ListBox x:Name="LabelsList" Style="{StaticResource DarkListBoxStyle}" BorderThickness="0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="5">

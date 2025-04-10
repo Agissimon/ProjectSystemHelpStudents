@@ -358,6 +358,8 @@
       <DependentUpon>Model1.edmx</DependentUpon>
       <LastGenOutput>Model1.cs</LastGenOutput>
     </Content>
+    <Resource Include="Resources\Icon\settings-sliders.png" />
+    <Resource Include="Resources\Icon\sidebar.png" />
     <Resource Include="Resources\Icon\master-plan.png" />
     <Resource Include="Resources\Icon\user.png" />
     <Resource Include="Resources\Icon\daily-calendar.png" />
