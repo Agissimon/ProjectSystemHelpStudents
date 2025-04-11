@@ -129,12 +129,10 @@ namespace YourApp.Views
             stack.Children.Add(completeCheckBox);
             border.Child = stack;
 
-            // Обработка клика по задаче — открытие окна деталей
             border.MouseLeftButtonUp += (s, e) =>
             {
                 var detailsWindow = new TaskDetailsWindow(task);
                 detailsWindow.ShowDialog();
-                // При необходимости здесь можно обновить список задач после закрытия
             };
 
             return border;
