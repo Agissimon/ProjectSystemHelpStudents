@@ -9,171 +9,192 @@
       Background="#222">
 
     <Grid>
-      
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <Grid Margin="10,0,0,10">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0">
+            <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" >
+                <TextBlock Text="Предстоящее" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                <Button x:Name="DisplayOptionsButton" Style="{StaticResource DisplayOptionsButtonStyle}" Click="DisplayOptionsButton_Click">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Предстоящее" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
+                        <Image Source="/Resources/Icon/settings-sliders.png" Width="20" Height="20" Margin="0,0,5,0"/>
+                        <TextBlock Text="Отображение" VerticalAlignment="Center" Foreground="White"/>
+                    </StackPanel>
+                </Button>
 
-                        <Button x:Name="DisplayOptionsButton" Style="{StaticResource DisplayOptionsButtonStyle}" Click="DisplayOptionsButton_Click">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="/Resources/Icon/settings-sliders.png" Width="20" Height="20" Margin="0,0,5,0"/>
-                                <TextBlock Text="Отображение" VerticalAlignment="Center" Foreground="White"/>
+                <Popup x:Name="DisplayOptionsMenu" PlacementTarget="{Binding ElementName=DisplayOptionsButton}" Placement="Bottom">
+                    <Border Background="#222" Padding="15" CornerRadius="10" BorderThickness="1" BorderBrush="#444">
+                        <StackPanel>
+                            <TextBlock Text="Отображение" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <StackPanel Orientation="Horizontal" Background="#333">
+                                <Button Content="Список" Style="{StaticResource TabStyle}" Click="ListTab_Click" Width="80"/>
+                                <Button Content="Доска" Style="{StaticResource TabStyle}" Click="BoardTab_Click" Width="80"/>
+                                <Button Content="Календарь" Style="{StaticResource TabStyle}" Click="CalendarTab_Click" Width="80"/>
                             </StackPanel>
-                        </Button>
 
-                        <Popup x:Name="DisplayOptionsMenu" PlacementTarget="{Binding ElementName=DisplayOptionsButton}" Placement="Bottom">
-                            <Border Background="#222" Padding="15" CornerRadius="10" BorderThickness="1" BorderBrush="#444">
-                                <StackPanel>
-                                    <TextBlock Text="Отображение" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
-                                    <StackPanel Orientation="Horizontal" Background="#333">
-                                        <Button Content="Список" Style="{StaticResource TabStyle}" Click="ListTab_Click" Width="80"/>
-                                        <Button Content="Доска" Style="{StaticResource TabStyle}" Click="BoardTab_Click" Width="80"/>
-                                        <Button Content="Календарь" Style="{StaticResource TabStyle}" Click="CalendarTab_Click" Width="80"/>
-                                    </StackPanel>
+                            <TextBlock Text="Сортировка" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
+                            <ComboBox x:Name="SortComboBox" SelectionChanged="SortComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
+                                <ComboBoxItem>Умная (по умолчанию)</ComboBoxItem>
+                                <ComboBoxItem>Дата</ComboBoxItem>
+                                <ComboBoxItem>Приоритет</ComboBoxItem>
+                            </ComboBox>
 
-                                    <TextBlock Text="Сортировка" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
-                                    <ComboBox x:Name="SortComboBox" SelectionChanged="SortComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
-                                        <ComboBoxItem>Умная (по умолчанию)</ComboBoxItem>
-                                        <ComboBoxItem>Дата</ComboBoxItem>
-                                        <ComboBoxItem>Приоритет</ComboBoxItem>
-                                    </ComboBox>
+                            <TextBlock Text="Фильтр" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
+                            <TextBlock Text="Исполнитель" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
+                            <ComboBox x:Name="ExecutorComboBox" SelectionChanged="ExecutorComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
+                                <ComboBoxItem>По умолчанию</ComboBoxItem>
+                                <ComboBoxItem>Выбранный</ComboBoxItem>
+                            </ComboBox>
 
-                                    <TextBlock Text="Фильтр" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
-                                    <TextBlock Text="Исполнитель" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
-                                    <ComboBox x:Name="ExecutorComboBox" SelectionChanged="ExecutorComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
-                                        <ComboBoxItem>По умолчанию</ComboBoxItem>
-                                        <ComboBoxItem>Выбранный</ComboBoxItem>
-                                    </ComboBox>
+                            <TextBlock Text="Приоритет" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
+                            <ComboBox x:Name="PriorityComboBox" SelectionChanged="PriorityComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
+                                <ComboBoxItem>Все (по умолчанию)</ComboBoxItem>
+                                <ComboBoxItem>Высокий</ComboBoxItem>
+                                <ComboBoxItem>Средний</ComboBoxItem>
+                                <ComboBoxItem>Низкий</ComboBoxItem>
+                            </ComboBox>
 
-                                    <TextBlock Text="Приоритет" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
-                                    <ComboBox x:Name="PriorityComboBox" SelectionChanged="PriorityComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
-                                        <ComboBoxItem>Все (по умолчанию)</ComboBoxItem>
-                                        <ComboBoxItem>Высокий</ComboBoxItem>
-                                        <ComboBoxItem>Средний</ComboBoxItem>
-                                        <ComboBoxItem>Низкий</ComboBoxItem>
-                                    </ComboBox>
+                            <TextBlock Text="Метка" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
+                            <ComboBox x:Name="LabelComboBox" SelectionChanged="LabelComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
+                                <ComboBoxItem>Все (по умолчанию)</ComboBoxItem>
+                                <ComboBoxItem>Красная</ComboBoxItem>
+                                <ComboBoxItem>Синяя</ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+            </StackPanel>
+        </Grid>
 
-                                    <TextBlock Text="Метка" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
-                                    <ComboBox x:Name="LabelComboBox" SelectionChanged="LabelComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
-                                        <ComboBoxItem>Все (по умолчанию)</ComboBoxItem>
-                                        <ComboBoxItem>Красная</ComboBoxItem>
-                                        <ComboBoxItem>Синяя</ComboBoxItem>
-                                    </ComboBox>
-                                </StackPanel>
-                            </Border>
-                        </Popup>
+        <Grid Grid.Row="1">
+            <Grid x:Name="ListViewSection">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="10,0,0,10">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
 
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
-                        <Button Content="&lt; Сегодня" Click="Today_Click" Style="{StaticResource SmallButtonStyle}" Margin="0,0,0,0" Background="Transparent" Foreground="White"/>
-                        <Button Content="&lt; Предыдущая неделя" Style="{StaticResource SmallButtonStyle}" Click="PreviousWeek_Click" Foreground="White" Margin="5"/>
-                        <TextBlock Name="CurrentWeekText" Style="{StaticResource TransparentTextBlockStyle}" Text="Октябрь 2024" FontSize="18" Foreground="White" Margin="5"/>
-                        <Button Content="Следующая неделя &gt;" Style="{StaticResource SmallButtonStyle}" Click="NextWeek_Click" Foreground="White" Margin="5"/>
-                    </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                                <Button Content="&lt; Сегодня" Click="Today_Click" Style="{StaticResource SmallButtonStyle}" Margin="0,0,0,0" Background="Transparent" Foreground="White"/>
+                                <Button Content="&lt; Предыдущая неделя" Style="{StaticResource SmallButtonStyle}" Click="PreviousWeek_Click" Foreground="White" Margin="5"/>
+                                <TextBlock Name="CurrentWeekText" Style="{StaticResource TransparentTextBlockStyle}" Text="Октябрь 2024" FontSize="18" Foreground="White" Margin="5"/>
+                                <Button Content="Следующая неделя &gt;" Style="{StaticResource SmallButtonStyle}" Click="NextWeek_Click" Foreground="White" Margin="5"/>
+                            </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-                        <ItemsControl Name="WeekDaysTimeline" Margin="5">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                                <ItemsControl Name="WeekDaysTimeline" Margin="5">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </StackPanel>
 
-                    <Expander Header="Просрочено" IsExpanded="True" FontSize="18" Foreground="Red" Margin="0,10">
-                        <ListView x:Name="OverdueTasksListView"
+                            <Expander Header="Просрочено" IsExpanded="True" FontSize="18" Foreground="Red" Margin="0,10">
+                                <ListView x:Name="OverdueTasksListView"
                               ItemsSource="{Binding OverdueTasks}"
                               SelectionChanged="TaskListView_SelectionChanged" 
                               Style="{StaticResource DarkListViewStyle}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted}" Click="ToggleTaskStatus_Click">
-                                            <CheckBox.Style>
-                                                <Style TargetType="CheckBox">
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="CheckBox">
-                                                                <Border Width="20" Height="20" CornerRadius="10" BorderBrush="Gray" BorderThickness="2" Background="{TemplateBinding Background}">
-                                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                </Border>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style>
-                                            </CheckBox.Style>
-                                        </CheckBox>
-                                        <StackPanel Margin="10,0,0,0">
-                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
-                                            <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
-                                            <TextBlock Text="{Binding EndDate, StringFormat=\{0:dd MMMM yyyy\}}" Foreground="Red" FontSize="12"/>
-                                            <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </Expander>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted}" Click="ToggleTaskStatus_Click">
+                                                    <CheckBox.Style>
+                                                        <Style TargetType="CheckBox">
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="CheckBox">
+                                                                        <Border Width="20" Height="20" CornerRadius="10" BorderBrush="Gray" BorderThickness="2" Background="{TemplateBinding Background}">
+                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        </Border>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </CheckBox.Style>
+                                                </CheckBox>
+                                                <StackPanel Margin="10,0,0,0">
+                                                    <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                                    <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
+                                                    <TextBlock Text="{Binding EndDate, StringFormat=\{0:dd MMMM yyyy\}}" Foreground="Red" FontSize="12"/>
+                                                    <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </Expander>
 
-                    <!--<TextBlock Name="TodayDateTextBlock" FontSize="18" Foreground="White" Margin="0,20"/>-->
+                            <!--<TextBlock Name="TodayDateTextBlock" FontSize="18" Foreground="White" Margin="0,20"/>-->
 
-                    <ListView x:Name="TasksListView"
+                            <ListView x:Name="TasksListView"
                           SelectionChanged="TaskListView_SelectionChanged"
                           Style="{StaticResource TransparentListViewStyle}">
-                        <ListView.Resources>
-                            <DataTemplate DataType="{x:Type local:TaskGroupViewModel}">
-                                <StackPanel>
+                                <ListView.Resources>
+                                    <DataTemplate DataType="{x:Type local:TaskGroupViewModel}">
+                                        <StackPanel>
 
-                                    <TextBlock Text="{Binding DateHeader}" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,10,0,5"/>
+                                            <TextBlock Text="{Binding DateHeader}" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,10,0,5"/>
 
-                                    <Separator Height="1" Background="Gray" Margin="0,0,0,10"/>
+                                            <Separator Height="1" Background="Gray" Margin="0,0,0,10"/>
 
-                                    <ListView ItemsSource="{Binding Tasks}"
+                                            <ListView ItemsSource="{Binding Tasks}"
                                           Background="Transparent"
                                           SelectionChanged="TaskListView_SelectionChanged"
                                           Style="{StaticResource TransparentNestedListViewStyle}">
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate>
-                                                <StackPanel>
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted}" Click="ToggleTaskStatus_Click">
-                                                            <CheckBox.Style>
-                                                                <Style TargetType="CheckBox">
-                                                                    <Setter Property="Template">
-                                                                        <Setter.Value>
-                                                                            <ControlTemplate TargetType="CheckBox">
-                                                                                <Border Width="20" Height="20" CornerRadius="10" BorderBrush="Gray" BorderThickness="2" Background="{TemplateBinding Background}">
-                                                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                                </Border>
-                                                                            </ControlTemplate>
-                                                                        </Setter.Value>
-                                                                    </Setter>
-                                                                </Style>
-                                                            </CheckBox.Style>
-                                                        </CheckBox>
-                                                        <StackPanel Margin="10,0,0,0">
-                                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
-                                                            <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
-                                                            <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12" />
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted}" Click="ToggleTaskStatus_Click">
+                                                                    <CheckBox.Style>
+                                                                        <Style TargetType="CheckBox">
+                                                                            <Setter Property="Template">
+                                                                                <Setter.Value>
+                                                                                    <ControlTemplate TargetType="CheckBox">
+                                                                                        <Border Width="20" Height="20" CornerRadius="10" BorderBrush="Gray" BorderThickness="2" Background="{TemplateBinding Background}">
+                                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Setter.Value>
+                                                                            </Setter>
+                                                                        </Style>
+                                                                    </CheckBox.Style>
+                                                                </CheckBox>
+                                                                <StackPanel Margin="10,0,0,0">
+                                                                    <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                                                    <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
+                                                                    <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12" />
+                                                                </StackPanel>
+                                                            </StackPanel>
+
+                                                            <Separator Height="1" Background="Gray" Margin="0,10,0,10"/>
                                                         </StackPanel>
-                                                    </StackPanel>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.Resources>
+                            </ListView>
 
-                                                    <Separator Height="1" Background="Gray" Margin="0,10,0,10"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                    </ListView>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.Resources>
-                    </ListView>
-
-                    <Button Content="+ Добавить задачу" Style="{StaticResource AddTaskButtonStyle}" Click="AddTask_Click"/>
-                </StackPanel>
+                            <Button Content="+ Добавить задачу" Style="{StaticResource AddTaskButtonStyle}" Click="AddTask_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
             </Grid>
-        </ScrollViewer>
+
+            <Grid x:Name="CalendarViewSection" Visibility="Collapsed">
+                <TextBlock Text="Здесь будет календарь" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+
+            <Grid x:Name="BoardViewSection" Visibility="Collapsed">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="BoardColumnsPanel" Orientation="Horizontal" Margin="10"/>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
     </Grid>
 </Page>

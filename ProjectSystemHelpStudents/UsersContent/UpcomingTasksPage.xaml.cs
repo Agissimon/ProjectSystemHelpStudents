@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using YourApp.Views;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -15,6 +16,8 @@ namespace ProjectSystemHelpStudents.UsersContent
         private DateTime _startOfWeek;
         private ObservableCollection<TaskGroupViewModel> _groupedTasks;
         private bool _isRefreshingTasks = false;
+        private Grid _boardView;
+        private Grid _calendarView;
 
         public UpcomingTasksPage()
         {
@@ -22,6 +25,11 @@ namespace ProjectSystemHelpStudents.UsersContent
             _groupedTasks = new ObservableCollection<TaskGroupViewModel>();
             TasksListView.ItemsSource = _groupedTasks;
             _startOfWeek = DateTime.Today;
+            Loaded += UpcomingTasksPage_Loaded;
+        }
+
+        private void UpcomingTasksPage_Loaded(object sender, RoutedEventArgs e)
+        {
             RefreshPage();
         }
 
@@ -40,6 +48,22 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void RefreshTasks()
         {
+            switch (Properties.Settings.Default.LastViewMode)
+            {
+                case "List":
+                    ShowListView();
+                    break;
+                case "Calendar":
+                    ShowCalendarView();
+                    break;
+                case "Board":
+                    ShowBoardView();
+                    break;
+                default:
+                    ShowListView(); // по умолчанию
+                    break;
+            }
+
             if (_groupedTasks == null)
                 _groupedTasks = new ObservableCollection<TaskGroupViewModel>();
 
@@ -116,6 +140,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                     foreach (var t in tasksFromDb)
                     {
                         string formattedDate;
+
                         if (t.EndDate.Date == DateTime.Today)
                         {
                             formattedDate = string.Format("{0:dd MMMM} ‧ Сегодня ‧ {1:dddd}", DateTime.Today, DateTime.Today);
@@ -165,6 +190,21 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                     if (TasksListView != null)
                         TasksListView.ItemsSource = _groupedTasks;
+
+                    _boardView = TaskBoardView.CreateBoardView(allTasks);
+                    _calendarView = TaskCalendarView.CreateCalendarView(allTasks);
+
+                    if (BoardViewSection != null)
+                    {
+                        BoardViewSection.Children.Clear();
+                        BoardViewSection.Children.Add(_boardView);
+                    }
+                    if (CalendarViewSection != null)
+                    {
+                        CalendarViewSection.Children.Clear();
+                        CalendarViewSection.Children.Add(_calendarView);
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -369,19 +409,59 @@ namespace ProjectSystemHelpStudents.UsersContent
             _isRefreshingTasks = false;
         }
 
-        private void ListTab_Click(object sender, RoutedEventArgs e)
+        private void ShowListView()
         {
-            // Вкладка Список
+            if (ListViewSection == null || CalendarViewSection == null || BoardViewSection == null)
+                return;
+
+            ListViewSection.Visibility = Visibility.Visible;
+            CalendarViewSection.Visibility = Visibility.Collapsed;
+            BoardViewSection.Visibility = Visibility.Collapsed;;
         }
 
-        private void BoardTab_Click(object sender, RoutedEventArgs e)
+
+
+        private void ShowCalendarView()
         {
-            // Вкладка Доска
+            if (ListViewSection == null || CalendarViewSection == null || BoardViewSection == null)
+                return;
+
+            ListViewSection.Visibility = Visibility.Collapsed;
+            CalendarViewSection.Visibility = Visibility.Visible;
+            BoardViewSection.Visibility = Visibility.Collapsed;
+        }
+
+        private void ShowBoardView()
+        {
+            if (ListViewSection == null || CalendarViewSection == null || BoardViewSection == null)
+                return;
+
+            ListViewSection.Visibility = Visibility.Collapsed;
+            CalendarViewSection.Visibility = Visibility.Collapsed;
+            BoardViewSection.Visibility = Visibility.Visible;
+            // Продолжение следует) 
+        }
+
+        private void ListTab_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.LastViewMode = "List";
+            Properties.Settings.Default.Save();
+            ShowListView();
         }
 
         private void CalendarTab_Click(object sender, RoutedEventArgs e)
         {
-            // Вкладка Календарь
+            Properties.Settings.Default.LastViewMode = "Calendar";
+            Properties.Settings.Default.Save();
+            ShowCalendarView();
         }
+
+        private void BoardTab_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.LastViewMode = "Board";
+            Properties.Settings.Default.Save();
+            ShowBoardView();
+        }
+
     }
 }

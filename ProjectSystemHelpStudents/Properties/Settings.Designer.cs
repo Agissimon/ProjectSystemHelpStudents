@@ -70,5 +70,17 @@ namespace ProjectSystemHelpStudents.Properties {
                 this["LabelFilter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("List")]
+        public string LastViewMode {
+            get {
+                return ((string)(this["LastViewMode"]));
+            }
+            set {
+                this["LastViewMode"] = value;
+            }
+        }
     }
 }
