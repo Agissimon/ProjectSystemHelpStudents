@@ -22,9 +22,22 @@ namespace ProjectSystemHelpStudents
     /// </summary>
     public partial class AddTaskWindow : Window
     {
+        private DateTime? _preselectedDate;
+
         public AddTaskWindow()
         {
             InitializeComponent();
+        }
+
+        public void SetPreselectedDate(DateTime date)
+        {
+            dpEndDate.SelectedDate = date;
+        }
+
+        public AddTaskWindow(DateTime preselectedDate) : this()
+        {
+            _preselectedDate = preselectedDate;
+            dpEndDate.SelectedDate = preselectedDate;
         }
 
         private void SaveTask_Click(object sender, RoutedEventArgs e)
@@ -46,6 +59,7 @@ namespace ProjectSystemHelpStudents
                 MessageBox.Show("Пожалуйста, выберите дату завершения.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+
             try
             {
                 var priority = DBClass.entities.Priority.FirstOrDefault(p => p.Name == priorityName);
@@ -66,6 +80,7 @@ namespace ProjectSystemHelpStudents
                 DBClass.entities.SaveChanges();
                 MessageBox.Show("Задача успешно добавлена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
+                this.DialogResult = true; // <-- ВАЖНО: чтобы вызывающий код знал, что задача была добавлена
                 this.Close();
             }
             catch (Exception ex)

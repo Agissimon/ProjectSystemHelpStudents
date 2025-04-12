@@ -5,7 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents.UsersContent"
         mc:Ignorable="d"
-        Title="MyTask" Height="500" Width="430" MinHeight="500" MinWidth="430" Icon="/Resources/Icon/logo001.png" Style="{StaticResource SmallWindowStyle}"  WindowStartupLocation="CenterScreen">
+        Title="MyTask" 
+        Height="500" 
+        Width="430" 
+        MinHeight="500" 
+        MinWidth="430" 
+        Icon="/Resources/Icon/logo001.png" 
+        Style="{StaticResource SmallWindowStyle}"  
+        WindowStartupLocation="CenterScreen">
 
     <Grid Margin="20">
         <StackPanel>

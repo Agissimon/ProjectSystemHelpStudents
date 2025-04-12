@@ -15,10 +15,8 @@ namespace ProjectSystemHelpStudents.UsersContent
             DataContext = this;
             UserNameButton.Content = UserSession.NameUser;
 
-            // Генерируем кнопки проектов при загрузке страницы
             GenerateProjectButtons();
 
-            // Подписываемся на событие добавления проекта
             SubscribeToProjectAddedEvent();
         }
 
@@ -28,7 +26,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             var addProjectWindow = new AddProjectWindow();
             addProjectWindow.ProjectAdded += (newProject) =>
             {
-                Dispatcher.Invoke(() => GenerateProjectButtons()); // Обновляем кнопки проектов
+                Dispatcher.Invoke(() => GenerateProjectButtons());
             };
         }
 

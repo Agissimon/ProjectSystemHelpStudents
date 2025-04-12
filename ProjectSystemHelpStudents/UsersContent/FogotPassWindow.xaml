@@ -5,7 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents.UsersContent"
         mc:Ignorable="d"
-       Title="Забыл пароль" Height="180" Width="230" Icon="/Resources/Icon/logo001.png" Style="{StaticResource SmallWindowStyle}">
+        Title="Забыл пароль" 
+        Height="180" 
+        Width="230" 
+        Icon="/Resources/Icon/logo001.png" 
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource SmallWindowStyle}">
+    
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Text="Введите e-mail:" Style="{StaticResource NormalTextBlockStyle}"/>
