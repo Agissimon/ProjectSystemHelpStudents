@@ -5,9 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents"
         mc:Ignorable="d"
-        Title="My Task" Height="400" Width="500" Icon="/Resources/Icon/logo001.png" MinWidth="500" MinHeight="400" MaxWidth="500" MaxHeight="500" Style="{StaticResource SmallWindowStyle}">
-    <Grid>
+        Title="My Task" 
+        Height="400" 
+        Width="500" 
+        Icon="/Resources/Icon/logo001.png" 
+        MinWidth="500" 
+        MinHeight="400" 
+        MaxWidth="500" 
+        MaxHeight="500" 
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource SmallWindowStyle}">
 
+    <Grid>
         <StackPanel>
             <TextBlock Style="{StaticResource NormalTextBlockStyle}" Text="Название задачи:"/>
             <TextBox Style="{StaticResource InputFieldStyle}" x:Name="txtTitle" Width="300" Margin="5"/>
@@ -27,5 +36,5 @@
 
             <Button Style="{StaticResource NormalButtonStyle}" Content="Сохранить" Click="SaveTask_Click" HorizontalAlignment="Center"/>
         </StackPanel>
-        </Grid>
+    </Grid>
 </Window>

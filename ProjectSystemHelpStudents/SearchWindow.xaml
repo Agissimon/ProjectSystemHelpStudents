@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents"
         mc:Ignorable="d"
-        Title="MyTask" Icon="/Resources/Icon/logo001.png" Style="{StaticResource SearchWindowStyle}" WindowStartupLocation="CenterScreen">
+        Title="MyTask" 
+        Icon="/Resources/Icon/logo001.png" 
+        Style="{StaticResource SearchWindowStyle}" 
+        WindowStartupLocation="CenterScreen">
     
     <Grid>
         <StackPanel>

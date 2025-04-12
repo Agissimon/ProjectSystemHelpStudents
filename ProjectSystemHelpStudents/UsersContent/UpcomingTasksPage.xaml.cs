@@ -5,9 +5,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using YourApp.Views;
+using ProjectSystemHelpStudents.Views;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -16,8 +15,10 @@ namespace ProjectSystemHelpStudents.UsersContent
         private DateTime _startOfWeek;
         private ObservableCollection<TaskGroupViewModel> _groupedTasks;
         private bool _isRefreshingTasks = false;
-        private Grid _boardView;
-        private Grid _calendarView;
+        // Мы больше не храним старые ссылки на доску и календарь,
+        // т.к. они будут создаваться заново каждый раз.
+        // private Grid _boardView;
+        // private Grid _calendarView;
 
         public UpcomingTasksPage()
         {
@@ -48,21 +49,9 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void RefreshTasks()
         {
-            switch (Properties.Settings.Default.LastViewMode)
-            {
-                case "List":
-                    ShowListView();
-                    break;
-                case "Calendar":
-                    ShowCalendarView();
-                    break;
-                case "Board":
-                    ShowBoardView();
-                    break;
-                default:
-                    ShowListView(); // по умолчанию
-                    break;
-            }
+            // Выбираем активный режим отображения до загрузки данных,
+            // чтобы при обновлении (например, после добавления) сразу отобразился нужный контейнер.
+            string currentMode = Properties.Settings.Default.LastViewMode;
 
             if (_groupedTasks == null)
                 _groupedTasks = new ObservableCollection<TaskGroupViewModel>();
@@ -79,7 +68,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                     var query = context.Task
                         .Where(t => t.Status.Name != "Завершено" && t.IdUser == UserSession.IdUser);
 
-                    // Фильтр по приоритету (если выбран не "Все")
+                    // Фильтр по приоритету
                     if (selectedPriority > 0)
                     {
                         var selectedPriorityName = context.Priority
@@ -109,13 +98,13 @@ namespace ProjectSystemHelpStudents.UsersContent
                         }
                     }
 
-                    // Фильтр по исполнителю
+                    // Фильтр по исполнителю (если требуется, раскомментируй)
                     if (selectedExecutorIndex > 0)
                     {
                         var selectedExecutorItem = (ComboBoxItem)ExecutorComboBox.Items[selectedExecutorIndex];
                         if (selectedExecutorItem?.Tag is int executorId)
                         {
-                            //query = query.Where(t => t.ExecutorId == executorId);
+                            // query = query.Where(t => t.ExecutorId == executorId);
                         }
                     }
 
@@ -134,13 +123,11 @@ namespace ProjectSystemHelpStudents.UsersContent
                     }
 
                     var tasksFromDb = query.ToList();
-
                     List<TaskViewModel> allTasks = new List<TaskViewModel>();
 
                     foreach (var t in tasksFromDb)
                     {
                         string formattedDate;
-
                         if (t.EndDate.Date == DateTime.Today)
                         {
                             formattedDate = string.Format("{0:dd MMMM} ‧ Сегодня ‧ {1:dddd}", DateTime.Today, DateTime.Today);
@@ -165,17 +152,12 @@ namespace ProjectSystemHelpStudents.UsersContent
                             AvailableLabels = new ObservableCollection<LabelViewModel>(
                                 t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
                             EndDateFormatted = formattedDate,
-                            //ExecutorId = t.ExecutorId,
-                            //ExecutorName = t.Executor?.Name
+                            // Если нужно, добавь поля исполнителя и др.
                         });
                     }
 
-                    var overdueTasks = allTasks.Where(t => t.EndDate < DateTime.Today).ToList();
-                    if (OverdueTasksListView != null)
-                        OverdueTasksListView.ItemsSource = overdueTasks;
-
+                    // Обновляем список для ListView (группировка задач)
                     _groupedTasks.Clear();
-
                     var upcomingTasks = allTasks.Where(t => t.EndDate >= DateTime.Today).ToList();
                     foreach (var task in upcomingTasks)
                     {
@@ -191,20 +173,43 @@ namespace ProjectSystemHelpStudents.UsersContent
                     if (TasksListView != null)
                         TasksListView.ItemsSource = _groupedTasks;
 
-                    _boardView = TaskBoardView.CreateBoardView(allTasks);
-                    _calendarView = TaskCalendarView.CreateCalendarView(allTasks);
+                    if (OverdueTasksListView != null)
+                        OverdueTasksListView.ItemsSource = allTasks.Where(t => t.EndDate < DateTime.Today).ToList();
 
+                    // Пересоздаем доску и календарь из полного списка задач
+                    Grid newBoard = TaskBoardView.CreateBoardView(allTasks);
+                    newBoard.Tag = allTasks;
+                    Grid newCalendar = TaskCalendarView.CreateCalendarView(allTasks);
+                    newCalendar.Tag = allTasks;
+
+                    // Обновляем контейнеры (очищаем и вставляем новые представления)
                     if (BoardViewSection != null)
                     {
                         BoardViewSection.Children.Clear();
-                        BoardViewSection.Children.Add(_boardView);
+                        BoardViewSection.Children.Add(newBoard);
                     }
                     if (CalendarViewSection != null)
                     {
                         CalendarViewSection.Children.Clear();
-                        CalendarViewSection.Children.Add(_calendarView);
+                        CalendarViewSection.Children.Add(newCalendar);
                     }
 
+                    // Переключаем вид согласно выбранному режиму
+                    switch (currentMode)
+                    {
+                        case "List":
+                            ShowListView();
+                            break;
+                        case "Calendar":
+                            ShowCalendarView();
+                            break;
+                        case "Board":
+                            ShowBoardView();
+                            break;
+                        default:
+                            ShowListView();
+                            break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -215,6 +220,7 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void UpdateTodayDateText()
         {
+            // Если нужно, можно обновить какие-либо надписи в интерфейсе
             string todayDate = DateTime.Today.ToString("dd MMMM");
             string dayOfWeek = DateTime.Today.ToString("dddd");
         }
@@ -257,19 +263,16 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void DayButton_Click(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button;
-            if (button != null && button.Tag is DateTime)
+            if (sender is Button button && button.Tag is DateTime selectedDate)
             {
-                DateTime selectedDate = (DateTime)button.Tag;
                 var filteredGroups = new ObservableCollection<TaskGroupViewModel>();
-
                 foreach (var group in _groupedTasks)
                 {
                     var matchingTasks = group.Tasks
                         .Where(task => task.EndDate.Date == selectedDate.Date)
                         .ToList();
 
-                    if (matchingTasks.Count > 0)
+                    if (matchingTasks.Any())
                     {
                         filteredGroups.Add(new TaskGroupViewModel
                         {
@@ -278,7 +281,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                         });
                     }
                 }
-
                 TasksListView.ItemsSource = filteredGroups;
             }
         }
@@ -303,10 +305,8 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ListView listView = sender as ListView;
-            if (listView != null && listView.SelectedItem is TaskViewModel)
+            if (sender is ListView listView && listView.SelectedItem is TaskViewModel task)
             {
-                TaskViewModel task = (TaskViewModel)listView.SelectedItem;
                 var detailsWindow = new TaskDetailsWindow(task);
                 detailsWindow.TaskUpdated += () => RefreshTasks();
                 detailsWindow.ShowDialog();
@@ -316,10 +316,8 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void ToggleTaskStatus_Click(object sender, RoutedEventArgs e)
         {
-            CheckBox checkBox = sender as CheckBox;
-            if (checkBox != null && checkBox.DataContext is TaskViewModel)
+            if (sender is CheckBox checkBox && checkBox.DataContext is TaskViewModel task)
             {
-                TaskViewModel task = (TaskViewModel)checkBox.DataContext;
                 try
                 {
                     var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.IdTask == task.IdTask);
@@ -337,7 +335,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                             if (notCompletedStatus != null)
                                 dbTask.StatusId = notCompletedStatus.StatusId;
                         }
-
                         DBClass.entities.SaveChanges();
                         RefreshTasks();
                     }
@@ -352,8 +349,8 @@ namespace ProjectSystemHelpStudents.UsersContent
         private void AddTask_Click(object sender, RoutedEventArgs e)
         {
             var addTaskWindow = new AddTaskWindow();
-            addTaskWindow.ShowDialog();
-            RefreshTasks();
+            addTaskWindow.ShowDialog(); // при закрытии окна данные сохранятся в БД
+            RefreshTasks(); // сразу обновляем страницу — все представления пересоздаются
         }
 
         private void DisplayOptionsButton_Click(object sender, RoutedEventArgs e)
@@ -365,11 +362,9 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             if (_isRefreshingTasks) return;
             _isRefreshingTasks = true;
-
             Properties.Settings.Default.SortOption = SortComboBox.SelectedIndex;
             Properties.Settings.Default.Save();
             RefreshTasks();
-
             _isRefreshingTasks = false;
         }
 
@@ -377,11 +372,9 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             if (_isRefreshingTasks) return;
             _isRefreshingTasks = true;
-
             Properties.Settings.Default.ExecutorFilter = ExecutorComboBox.SelectedIndex;
             Properties.Settings.Default.Save();
             RefreshTasks();
-
             _isRefreshingTasks = false;
         }
 
@@ -389,11 +382,9 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             if (_isRefreshingTasks) return;
             _isRefreshingTasks = true;
-
             Properties.Settings.Default.PriorityFilter = PriorityComboBox.SelectedIndex;
             Properties.Settings.Default.Save();
             RefreshTasks();
-
             _isRefreshingTasks = false;
         }
 
@@ -401,11 +392,9 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             if (_isRefreshingTasks) return;
             _isRefreshingTasks = true;
-
             Properties.Settings.Default.LabelFilter = LabelComboBox.SelectedIndex;
             Properties.Settings.Default.Save();
             RefreshTasks();
-
             _isRefreshingTasks = false;
         }
 
@@ -413,19 +402,15 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             if (ListViewSection == null || CalendarViewSection == null || BoardViewSection == null)
                 return;
-
             ListViewSection.Visibility = Visibility.Visible;
             CalendarViewSection.Visibility = Visibility.Collapsed;
-            BoardViewSection.Visibility = Visibility.Collapsed;;
+            BoardViewSection.Visibility = Visibility.Collapsed;
         }
-
-
 
         private void ShowCalendarView()
         {
             if (ListViewSection == null || CalendarViewSection == null || BoardViewSection == null)
                 return;
-
             ListViewSection.Visibility = Visibility.Collapsed;
             CalendarViewSection.Visibility = Visibility.Visible;
             BoardViewSection.Visibility = Visibility.Collapsed;
@@ -435,11 +420,9 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             if (ListViewSection == null || CalendarViewSection == null || BoardViewSection == null)
                 return;
-
             ListViewSection.Visibility = Visibility.Collapsed;
             CalendarViewSection.Visibility = Visibility.Collapsed;
             BoardViewSection.Visibility = Visibility.Visible;
-            // Продолжение следует) 
         }
 
         private void ListTab_Click(object sender, RoutedEventArgs e)
@@ -462,6 +445,5 @@ namespace ProjectSystemHelpStudents.UsersContent
             Properties.Settings.Default.Save();
             ShowBoardView();
         }
-
     }
 }

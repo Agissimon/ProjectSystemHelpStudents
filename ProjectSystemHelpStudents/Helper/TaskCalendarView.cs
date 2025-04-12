@@ -2,6 +2,7 @@
 using ProjectSystemHelpStudents.Helper;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace YourApp.Views
+namespace ProjectSystemHelpStudents.Views
 {
     public class TaskCalendarView
     {
@@ -20,7 +21,6 @@ namespace YourApp.Views
             for (int i = 0; i < 7; i++)
                 calendarGrid.ColumnDefinitions.Add(new ColumnDefinition());
 
-            // Максимум 6 строк (недель)
             for (int i = 0; i < 6; i++)
                 calendarGrid.RowDefinitions.Add(new RowDefinition());
 
@@ -45,6 +45,7 @@ namespace YourApp.Views
                 int row = cellIndex / 7;
                 int col = cellIndex % 7;
 
+                // Выбираем только невыполненные задачи для данного дня
                 var dayTasks = allTasks
                     .Where(t => !t.IsCompleted && t.EndDate.Date == currentDate.Date)
                     .ToList();
@@ -72,10 +73,11 @@ namespace YourApp.Views
 
                 foreach (var task in dayTasks)
                 {
+                    // Создаем представление задачи и добавляем его в ячейку
                     var taskPanel = new StackPanel
                     {
                         Orientation = Orientation.Horizontal,
-                        Margin = new Thickness(0, 6, 0, 0) // отступ между задачами
+                        Margin = new Thickness(0, 0, 0, 0)
                     };
 
                     var circle = new Ellipse
@@ -103,7 +105,9 @@ namespace YourApp.Views
                     {
                         CornerRadius = new CornerRadius(6),
                         Background = new SolidColorBrush(Color.FromRgb(45, 45, 45)),
-                        Margin = new Thickness(0),
+                        Margin = new Thickness(0, 4, 0, 0),
+                        BorderThickness = new Thickness(1),
+                        BorderBrush = new SolidColorBrush(Color.FromRgb(80, 80, 80)),
                         Child = taskPanel,
                         Cursor = Cursors.Hand
                     };
@@ -111,21 +115,70 @@ namespace YourApp.Views
                     taskPanel.Children.Add(circle);
                     taskPanel.Children.Add(taskText);
 
-                    // Обработчик завершения задачи
+                    // Обработчик завершения задачи – клик по кружочку
                     circle.MouseLeftButtonUp += (s, e) =>
                     {
-                        task.IsCompleted = true;
-                        DBClass.entities.SaveChanges();
-                        RefreshCalendar(grid, (IEnumerable<TaskViewModel>)grid.Tag);
+                        var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.IdTask == task.IdTask);
+                        if (dbTask != null)
+                        {
+                            var completedStatus = DBClass.entities.Status.FirstOrDefault(sos => sos.Name == "Завершено");
+                            if (completedStatus != null)
+                                dbTask.StatusId = completedStatus.StatusId;
+
+                            DBClass.entities.SaveChanges();
+
+                            var updatedTasks = DBClass.entities.Task
+                                .Where(t => t.Status.Name != "Завершено")
+                                .ToList()
+                                .Select(t => new TaskViewModel
+                                {
+                                    IdTask = t.IdTask,
+                                    Title = t.Title,
+                                    Description = t.Description,
+                                    EndDate = t.EndDate,
+                                    Status = t.Status?.Name,
+                                    IsCompleted = t.Status?.Name == "Завершено",
+                                    AvailableLabels = new System.Collections.ObjectModel.ObservableCollection<LabelViewModel>(
+                                                            t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
+                                    EndDateFormatted = t.EndDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
+                                })
+                                .ToList();
+
+                            grid.Tag = updatedTasks;
+                            RefreshCalendar(grid, updatedTasks);
+                        }
                         e.Handled = true;
                     };
 
-                    // Открытие окна с деталями задачи
+                    // Обработчик открытия окна с деталями задачи
                     taskBorder.MouseLeftButtonUp += (s, e) =>
                     {
-                        if (e.OriginalSource is Ellipse) return;
-                        new TaskDetailsWindow(task).ShowDialog();
-                        RefreshCalendar(grid, (IEnumerable<TaskViewModel>)grid.Tag);
+                        if (e.OriginalSource is Ellipse)
+                            return;
+
+                        var detailsWindow = new TaskDetailsWindow(task);
+                        if (detailsWindow.ShowDialog() == true)
+                        {
+                            var updatedTasks = DBClass.entities.Task
+                                .Where(t => t.Status.Name != "Завершено")
+                                .ToList()
+                                .Select(t => new TaskViewModel
+                                {
+                                    IdTask = t.IdTask,
+                                    Title = t.Title,
+                                    Description = t.Description,
+                                    EndDate = t.EndDate,
+                                    Status = t.Status?.Name,
+                                    IsCompleted = t.Status?.Name == "Завершено",
+                                    AvailableLabels = new System.Collections.ObjectModel.ObservableCollection<LabelViewModel>(
+                                                            t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
+                                    EndDateFormatted = t.EndDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
+                                })
+                                .ToList();
+
+                            grid.Tag = updatedTasks;
+                            RefreshCalendar(grid, updatedTasks);
+                        }
                         e.Handled = true;
                     };
 
@@ -134,20 +187,35 @@ namespace YourApp.Views
 
                 dayCell.Child = dayStack;
 
-                // Клик по пустой ячейке -> создать задачу
+                // Обработчик создания новой задачи по клику по пустой ячейке
                 dayCell.MouseLeftButtonUp += (s, e) =>
                 {
-                    // если клик был по задаче — не реагируем
-                    if (e.OriginalSource is Ellipse || e.OriginalSource is TextBlock text && !char.IsDigit(text.Text.FirstOrDefault()))
+                    if (e.OriginalSource is Ellipse ||
+                        (e.OriginalSource is TextBlock text && !char.IsDigit(text.Text.FirstOrDefault())))
                         return;
 
                     var cell = (Border)s;
                     var date = (DateTime)cell.Tag;
-                    var addWindow = new AddTaskWindow();
+                    var addWindow = new AddTaskWindow(date);
                     if (addWindow.ShowDialog() == true)
                     {
-                        // Заново загружаем задачи и обновляем
-                        var updatedTasks = DBClass.entities.Task.ToList().Select(t => new TaskViewModel());
+                        var updatedTasks = DBClass.entities.Task
+                            .Where(t => t.Status.Name != "Завершено")
+                            .ToList()
+                            .Select(t => new TaskViewModel
+                            {
+                                IdTask = t.IdTask,
+                                Title = t.Title,
+                                Description = t.Description,
+                                EndDate = t.EndDate,
+                                Status = t.Status?.Name,
+                                IsCompleted = t.Status?.Name == "Завершено",
+                                AvailableLabels = new System.Collections.ObjectModel.ObservableCollection<LabelViewModel>(
+                                                            t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
+                                EndDateFormatted = t.EndDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
+                            })
+                            .ToList();
+
                         grid.Tag = updatedTasks;
                         RefreshCalendar(grid, updatedTasks);
                     }

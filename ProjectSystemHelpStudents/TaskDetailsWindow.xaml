@@ -2,7 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents.Helper"
-        Title="MyTask" Icon="/Resources/Icon/logo001.png" MinWidth="700" Width="700" Style="{StaticResource SmallWindowStyle}"  WindowStartupLocation="CenterScreen">
+        Title="MyTask" 
+        Icon="/Resources/Icon/logo001.png" 
+        MinWidth="700" 
+        Width="700" 
+        Style="{StaticResource SmallWindowStyle}"  
+        WindowStartupLocation="CenterScreen">
     
     <Grid Margin="10">
         <StackPanel Orientation="Horizontal">
