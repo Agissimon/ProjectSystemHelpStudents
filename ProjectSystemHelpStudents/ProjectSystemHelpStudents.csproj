@@ -95,6 +95,7 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Helper\Comment.cs" />
+    <Compile Include="Helper\ExpanderStateManager.cs" />
     <Compile Include="Helper\FileItem.cs" />
     <Compile Include="Helper\LabelViewModel.cs" />
     <Compile Include="Helper\ProjectViewModel.cs" />

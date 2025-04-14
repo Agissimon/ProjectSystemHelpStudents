@@ -8,7 +8,7 @@
       d:DesignHeight="450" d:DesignWidth="200"
       Title="StackPanelButtonPage">
 
-    <Grid>
+    <Grid Margin="10,10,0,10">
         <StackPanel>
 
             <Button x:Name="UserNameButton" FontSize="16" FontWeight="Bold" Style="{StaticResource TransparentButtonStyle}" Click="UserNameButton_Click">
