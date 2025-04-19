@@ -8,22 +8,36 @@
       Title="UpcomingTasksPage"
       Background="#222">
 
-    <Grid>
+    <Grid Margin="0,10,10,30">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
         <Grid Grid.Row="0">
-            <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" >
-                <TextBlock Text="Предстоящее" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
+            <!-- Главный контейнер -->
+            <StackPanel Orientation="Vertical">
 
-                <Button x:Name="DisplayOptionsButton" Style="{StaticResource DisplayOptionsButtonStyle}" Click="DisplayOptionsButton_Click">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="/Resources/Icon/settings-sliders.png" Width="20" Height="20" Margin="0,0,5,0"/>
-                        <TextBlock Text="Отображение" VerticalAlignment="Center" Foreground="White"/>
-                    </StackPanel>
-                </Button>
+                <!-- Верхний ряд: заголовок и кнопка "Отображение" справа -->
+                <DockPanel Margin="0" VerticalAlignment="Center" Width="Auto" MaxWidth="1000">
+                    <TextBlock Text="Предстоящее"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               VerticalAlignment="Center"
+                               DockPanel.Dock="Left"/>
+
+                    <Button x:Name="DisplayOptionsButton"
+                            Style="{StaticResource DisplayOptionsButtonStyle}"
+                            Click="DisplayOptionsButton_Click"
+                            HorizontalAlignment="Right"
+                            DockPanel.Dock="Right">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/Icon/settings-sliders.png" Width="20" Height="20" Margin="0,0,5,0"/>
+                            <TextBlock Text="Отображение" VerticalAlignment="Center" Foreground="White"/>
+                        </StackPanel>
+                    </Button>
+                </DockPanel>
 
                 <Popup x:Name="DisplayOptionsMenu" PlacementTarget="{Binding ElementName=DisplayOptionsButton}" Placement="Bottom">
                     <Border Background="#222" Padding="15" CornerRadius="10" BorderThickness="1" BorderBrush="#444">
@@ -71,32 +85,78 @@
 
         <Grid Grid.Row="1">
             <Grid x:Name="ListViewSection">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Верхняя панель -->
+                    <RowDefinition Height="*"/>
+                    <!-- Контент с задачами -->
+                </Grid.RowDefinitions>
+
+                <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+                <Grid Grid.Row="0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0">
+                        <Button x:Name="MonthPickerButton"
+                        Click="MonthPickerButton_Click"
+                        Background="Transparent"
+                        BorderBrush="{x:Null}"
+                        Cursor="Hand"
+                        VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock x:Name="MonthTextBlock"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               FontSize="14"
+                               VerticalAlignment="Center"
+                               Margin="0,0,5,0"/>
+                                <Path Data="M 0 0 L 4 4 L 8 0 Z"
+                          Fill="White"
+                          Width="8" Height="4"
+                          VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <DatePicker x:Name="MonthDayPicker"
+                        SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                        DisplayDateStart="2020-01-01"
+                        DisplayDateEnd="2040-12-31"
+                        Opacity="0"
+                        Width="0"
+                        Height="0"
+                        SelectedDateChanged="MonthDayPicker_SelectedDateChanged"
+                        CalendarClosed="MonthDayPicker_CalendarClosed"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                            <Button Content="&lt;" Click="PreviousWeek_Click"
+                        Style="{StaticResource SmallButtonStyle}" Width="30" Margin="0,0,5,0"/>
+                            <Button Content="Сегодня" Click="Today_Click"
+                        Style="{StaticResource SmallButtonStyle}" Width="75" Margin="0,0,5,0"/>
+                            <Button Content="&gt;" Click="NextWeek_Click"
+                        Style="{StaticResource SmallButtonStyle}" Width="30"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <ItemsControl Name="WeekDaysTimeline" HorizontalAlignment="Center" Margin="0,60,0,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Grid>
+
+                <!-- ОСНОВНОЙ КОНТЕНТ -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <Grid Margin="10,0,0,10">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
 
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
-                                <Button Content="&lt; Сегодня" Click="Today_Click" Style="{StaticResource SmallButtonStyle}" Margin="0,0,0,0" Background="Transparent" Foreground="White"/>
-                                <Button Content="&lt; Предыдущая неделя" Style="{StaticResource SmallButtonStyle}" Click="PreviousWeek_Click" Foreground="White" Margin="5"/>
-                                <TextBlock Name="CurrentWeekText" Style="{StaticResource TransparentTextBlockStyle}" Text="Октябрь 2024" FontSize="18" Foreground="White" Margin="5"/>
-                                <Button Content="Следующая неделя &gt;" Style="{StaticResource SmallButtonStyle}" Click="NextWeek_Click" Foreground="White" Margin="5"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-                                <ItemsControl Name="WeekDaysTimeline" Margin="5">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </StackPanel>
-
-                            <Expander Header="Просрочено" IsExpanded="True" FontSize="18" Foreground="Red" Margin="0,10">
+                            <Expander x:Name="OverdueTasksExpander" Header="Просрочено" IsExpanded="True" FontSize="18" Foreground="Red" 
+                                      Margin="0,10" 
+                                      Expanded="Expander_ExpandedCollapsed" Collapsed="Expander_ExpandedCollapsed">
                                 <ListView x:Name="OverdueTasksListView"
-                              ItemsSource="{Binding OverdueTasks}"
-                              SelectionChanged="TaskListView_SelectionChanged" 
-                              Style="{StaticResource DarkListViewStyle}">
+                                ItemsSource="{Binding OverdueTasks}"
+                                SelectionChanged="TaskListView_SelectionChanged"
+                                Style="{StaticResource DarkListViewStyle}"
+                                MinWidth="800">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -119,7 +179,7 @@
                                                     <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
                                                     <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
                                                     <TextBlock Text="{Binding EndDate, StringFormat=\{0:dd MMMM yyyy\}}" Foreground="Red" FontSize="12"/>
-                                                    <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12" />
+                                                    <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </DataTemplate>
@@ -127,23 +187,20 @@
                                 </ListView>
                             </Expander>
 
-                            <!--<TextBlock Name="TodayDateTextBlock" FontSize="18" Foreground="White" Margin="0,20"/>-->
-
                             <ListView x:Name="TasksListView"
-                          SelectionChanged="TaskListView_SelectionChanged"
-                          Style="{StaticResource TransparentListViewStyle}">
+                            SelectionChanged="TaskListView_SelectionChanged"
+                            Style="{StaticResource TransparentListViewStyle}"
+                            MinWidth="800">
                                 <ListView.Resources>
                                     <DataTemplate DataType="{x:Type local:TaskGroupViewModel}">
                                         <StackPanel>
-
                                             <TextBlock Text="{Binding DateHeader}" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,10,0,5"/>
-
                                             <Separator Height="1" Background="Gray" Margin="0,0,0,10"/>
 
                                             <ListView ItemsSource="{Binding Tasks}"
-                                          Background="Transparent"
-                                          SelectionChanged="TaskListView_SelectionChanged"
-                                          Style="{StaticResource TransparentNestedListViewStyle}">
+                                            Background="Transparent"
+                                            SelectionChanged="TaskListView_SelectionChanged"
+                                            Style="{StaticResource TransparentNestedListViewStyle}">
                                                 <ListView.ItemTemplate>
                                                     <DataTemplate>
                                                         <StackPanel>
@@ -166,7 +223,7 @@
                                                                 <StackPanel Margin="10,0,0,0">
                                                                     <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
                                                                     <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
-                                                                    <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12" />
+                                                                    <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12"/>
                                                                 </StackPanel>
                                                             </StackPanel>
 
@@ -180,7 +237,9 @@
                                 </ListView.Resources>
                             </ListView>
 
-                            <Button Content="+ Добавить задачу" Style="{StaticResource AddTaskButtonStyle}" Click="AddTask_Click"/>
+                            <Button Content="+ Добавить задачу"
+                        Style="{StaticResource AddTaskButtonStyle}"
+                        Click="AddTask_Click"/>
                         </StackPanel>
                     </Grid>
                 </ScrollViewer>

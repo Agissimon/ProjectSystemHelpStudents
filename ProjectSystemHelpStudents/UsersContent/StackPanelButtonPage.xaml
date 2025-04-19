@@ -8,10 +8,10 @@
       d:DesignHeight="450" d:DesignWidth="200"
       Title="StackPanelButtonPage">
 
-    <Grid>
-        <StackPanel>
+    <Grid Margin="0,0,10,0">
+        <StackPanel Background="#444">
 
-            <Button x:Name="UserNameButton" FontSize="16" FontWeight="Bold" Style="{StaticResource TransparentButtonStyle}" Click="UserNameButton_Click">
+            <Button x:Name="UserNameButton" FontSize="18" FontWeight="Bold" Style="{StaticResource TransparentButtonStyle}" Click="UserNameButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Resources/Icon/user.png" Width="20" Height="20" Margin="0,0,10,0"/>
                     <TextBlock Text="{Binding NameUser}" VerticalAlignment="Center"/>

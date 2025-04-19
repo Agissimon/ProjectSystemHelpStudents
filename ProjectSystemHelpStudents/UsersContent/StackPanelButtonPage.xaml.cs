@@ -1,4 +1,5 @@
 ﻿using ProjectSystemHelpStudents.Helper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -9,6 +10,7 @@ namespace ProjectSystemHelpStudents.UsersContent
 {
     public partial class StackPanelButtonPage : Page
     {
+        public static Action RefreshProjectStackPanel;
         public StackPanelButtonPage()
         {
             InitializeComponent();
@@ -16,13 +18,14 @@ namespace ProjectSystemHelpStudents.UsersContent
             UserNameButton.Content = UserSession.NameUser;
 
             GenerateProjectButtons();
+            RefreshProjectStackPanel = GenerateProjectButtons;
 
             SubscribeToProjectAddedEvent();
         }
 
+
         private void SubscribeToProjectAddedEvent()
         {
-            // Создаем экземпляр AddProjectWindow для подписки на событие
             var addProjectWindow = new AddProjectWindow();
             addProjectWindow.ProjectAdded += (newProject) =>
             {
@@ -35,8 +38,17 @@ namespace ProjectSystemHelpStudents.UsersContent
             var projectStackPanel = new StackPanel();
             var projects = GetProjects();
 
+            // Получаем список откреплённых ID
+            var detachedProjects = UserSettingsHelper.GetDetachedProjects();
+
             foreach (var project in projects)
             {
+                if (detachedProjects.Contains(project.ProjectId))
+                    continue; // Пропускаем откреплённые
+
+                StackPanel projectPanel = new StackPanel { Orientation = Orientation.Horizontal };
+
+                // Кнопка проекта
                 Button projectButton = new Button
                 {
                     Content = project.Name,
@@ -44,14 +56,37 @@ namespace ProjectSystemHelpStudents.UsersContent
                     Margin = new Thickness(5),
                     Tag = project.ProjectId
                 };
-
                 projectButton.Click += ProjectButton_Click;
-                projectStackPanel.Children.Add(projectButton);
+
+                // Кнопка открепить
+                Button detachButton = new Button
+                {
+                    Content = "⨉",
+                    Width = 25,
+                    Height = 25,
+                    Margin = new Thickness(5, 0, 0, 0),
+                    Tag = project.ProjectId,
+                    Style = (Style)FindResource("TransparentButtonStyle")
+                };
+                detachButton.Click += DetachButton_Click;
+
+                projectPanel.Children.Add(projectButton);
+                projectPanel.Children.Add(detachButton);
+
+                projectStackPanel.Children.Add(projectPanel);
             }
 
-            // Очищаем старые кнопки и добавляем новые
             ProjectStackPanel.Children.Clear();
             ProjectStackPanel.Children.Add(projectStackPanel);
+        }
+
+        private void DetachButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is int projectId)
+            {
+                UserSettingsHelper.AddDetachedProject(projectId);
+                GenerateProjectButtons();
+            }
         }
 
         private List<Project> GetProjects()

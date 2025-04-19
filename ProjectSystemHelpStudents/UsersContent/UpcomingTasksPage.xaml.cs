@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using ProjectSystemHelpStudents.Views;
+using System.Globalization;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -15,10 +16,7 @@ namespace ProjectSystemHelpStudents.UsersContent
         private DateTime _startOfWeek;
         private ObservableCollection<TaskGroupViewModel> _groupedTasks;
         private bool _isRefreshingTasks = false;
-        // Мы больше не храним старые ссылки на доску и календарь,
-        // т.к. они будут создаваться заново каждый раз.
-        // private Grid _boardView;
-        // private Grid _calendarView;
+        private bool _isDateManuallyChanged = false;
 
         public UpcomingTasksPage()
         {
@@ -28,10 +26,30 @@ namespace ProjectSystemHelpStudents.UsersContent
             _startOfWeek = DateTime.Today;
             Loaded += UpcomingTasksPage_Loaded;
         }
+        private void MonthDayPicker_CalendarClosed(object sender, RoutedEventArgs e)
+        {
+            _isDateManuallyChanged = true;
+        }
 
         private void UpcomingTasksPage_Loaded(object sender, RoutedEventArgs e)
         {
-            RefreshPage();
+            if (TasksListView != null)
+            {
+                RefreshPage();
+
+                // Восстанавливаем состояние экспандеров
+                RestoreExpandersState();
+
+                if (MonthDayPicker.SelectedDate.HasValue)
+                {
+                    UpdateMonthText(MonthDayPicker.SelectedDate.Value);
+                }
+                else
+                {
+                    MonthDayPicker.SelectedDate = DateTime.Today;
+                    UpdateMonthText(DateTime.Today);
+                }
+            }
         }
 
         private void RefreshPage()
@@ -42,9 +60,11 @@ namespace ProjectSystemHelpStudents.UsersContent
             LabelComboBox.SelectedIndex = Properties.Settings.Default.LabelFilter;
 
             UpdateTodayDateText();
-            UpdateWeekText();
+            //UpdateWeekText();
             RefreshTasks();
             LoadWeekTimeline();
+
+            RestoreExpandersState();
         }
 
         private void RefreshTasks()
@@ -171,7 +191,14 @@ namespace ProjectSystemHelpStudents.UsersContent
                     }
 
                     if (TasksListView != null)
+                    {
                         TasksListView.ItemsSource = _groupedTasks;
+                        // Вызываем восстановление состояния здесь
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            RestoreExpandersState();
+                        }), System.Windows.Threading.DispatcherPriority.Background);
+                    }
 
                     if (OverdueTasksListView != null)
                         OverdueTasksListView.ItemsSource = allTasks.Where(t => t.EndDate < DateTime.Today).ToList();
@@ -218,18 +245,69 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
         }
 
+        private void UpdateMonthText(DateTime date)
+        {
+            // Русский формат месяца и год, например: Апрель 2025
+            string monthYear = date.ToString("MMMM yyyy", new CultureInfo("ru-RU"));
+            // Первая буква заглавная
+            MonthTextBlock.Text = char.ToUpper(monthYear[0]) + monthYear.Substring(1);
+        }
+
+        private void MonthPickerButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Перед открытием устанавливаем фокус и открываем выпадающий список
+            MonthDayPicker.Focus();
+            MonthDayPicker.IsDropDownOpen = true;
+        }
+
+        private void MonthDayPicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_isDateManuallyChanged)
+                return;
+
+            if (MonthDayPicker.SelectedDate is DateTime selectedDate)
+            {
+                _startOfWeek = StartOfWeek(selectedDate);
+                RefreshPage();
+
+                // Отображаем только задачи за выбранную дату
+                var filteredGroups = new ObservableCollection<TaskGroupViewModel>();
+                foreach (var group in _groupedTasks)
+                {
+                    var matchingTasks = group.Tasks
+                        .Where(task => task.EndDate.Date == selectedDate.Date)
+                        .ToList();
+
+                    if (matchingTasks.Any())
+                    {
+                        filteredGroups.Add(new TaskGroupViewModel
+                        {
+                            DateHeader = group.DateHeader,
+                            Tasks = new ObservableCollection<TaskViewModel>(matchingTasks)
+                        });
+                    }
+                }
+                TasksListView.ItemsSource = filteredGroups;
+            }
+        }
+
+        private DateTime StartOfWeek(DateTime date)
+        {
+            int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+            return date.AddDays(-1 * diff).Date;
+        }
+
         private void UpdateTodayDateText()
         {
-            // Если нужно, можно обновить какие-либо надписи в интерфейсе
             string todayDate = DateTime.Today.ToString("dd MMMM");
             string dayOfWeek = DateTime.Today.ToString("dddd");
         }
 
-        private void UpdateWeekText()
-        {
-            var endOfWeek = _startOfWeek.AddDays(6);
-            CurrentWeekText.Text = string.Format("{0:dd MMMM} - {1:dd MMMM}", _startOfWeek, endOfWeek);
-        }
+        //private void UpdateWeekText()
+        //{
+        //    var endOfWeek = _startOfWeek.AddDays(6);
+        //    CurrentWeekText.Text = string.Format("{0:dd MMMM} - {1:dd MMMM}", _startOfWeek, endOfWeek);
+        //}
 
         private void LoadWeekTimeline()
         {
@@ -444,6 +522,71 @@ namespace ProjectSystemHelpStudents.UsersContent
             Properties.Settings.Default.LastViewMode = "Board";
             Properties.Settings.Default.Save();
             ShowBoardView();
+        }
+
+        private void Expander_ExpandedCollapsed(object sender, RoutedEventArgs e)
+        {
+            SaveExpandedGroupsState();
+        }
+
+        private void SaveExpandedGroupsState()
+        {
+            // Проверка на null для TasksListView
+            if (TasksListView == null)
+            {
+                // Можно добавить логирование или вывод сообщения об ошибке
+                Console.WriteLine("TasksListView is null!");
+                return;
+            }
+
+            var expanded = new List<string>();
+
+            // Перебираем все элементы в TasksListView, чтобы сохранить состояние экспандеров
+            foreach (var item in TasksListView.Items)
+            {
+                if (item is Expander expander && expander.IsExpanded)
+                {
+                    expanded.Add(expander.Header.ToString());
+                }
+            }
+
+            // Сохраняем заголовки развернутых групп в настройки
+            Properties.Settings.Default.ExpandersState = string.Join(";", expanded);
+            Properties.Settings.Default.Save();
+        }
+
+        private bool IsGroupExpanded(string header)
+        {
+            if (header == null) return false;
+
+            string saved = Properties.Settings.Default.ExpandersState;
+            if (string.IsNullOrEmpty(saved)) return false;
+
+            var list = saved.Split(';');
+            return list.Contains(header);
+        }
+
+        private void RestoreExpandersState()
+        {
+            string savedState = Properties.Settings.Default.ExpandersState;
+            if (!string.IsNullOrEmpty(savedState))
+            {
+                var expandedHeaders = savedState.Split(';');
+
+                // Отдельная обработка для OverdueTasksExpander
+                if (OverdueTasksExpander != null)
+                {
+                    OverdueTasksExpander.IsExpanded = expandedHeaders.Contains("Просрочено");
+                }
+
+                foreach (var item in TasksListView.Items)
+                {
+                    if (item is Expander expander && expander.Header != null)
+                    {
+                        expander.IsExpanded = expandedHeaders.Contains(expander.Header.ToString());
+                    }
+                }
+            }
         }
     }
 }

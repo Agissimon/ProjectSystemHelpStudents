@@ -11,5 +11,6 @@ namespace ProjectSystemHelpStudents.Helper
         public int ProjectId { get; set; }
         public string Name { get; set; }
         public string Icon { get; set; }
+        public bool IsDetached { get; internal set; }
     }
 }

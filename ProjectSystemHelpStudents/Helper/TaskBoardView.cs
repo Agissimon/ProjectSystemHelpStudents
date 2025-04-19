@@ -63,6 +63,23 @@ namespace ProjectSystemHelpStudents.Views
                     Foreground = Brushes.White
                 });
 
+                // Создание Expander для колонки
+                var expander = new Expander
+                {
+                    Header = headerText,  // Заголовок для каждой группы задач
+                    IsExpanded = ExpanderStateManager.GetState(headerText), // Восстановление состояния
+                    Margin = new Thickness(0, 0, 0, 10)
+                };
+
+                // Добавление задач в Expander
+                foreach (var task in columnTasks.OrderBy(t => t.EndDate))
+                {
+                    expander.Content = CreateTaskCard(task, boardGrid); // Добавляем задачи внутрь Expander
+                }
+
+                columnStack.Children.Add(expander); // Добавляем Expander в колонку
+
+
                 // Добавляем карточки задач для данной колонки
                 foreach (var task in columnTasks.OrderBy(t => t.EndDate))
                 {

@@ -82,5 +82,29 @@ namespace ProjectSystemHelpStudents.Properties {
                 this["LastViewMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ExpandersState {
+            get {
+                return ((string)(this["ExpandersState"]));
+            }
+            set {
+                this["ExpandersState"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DetachedProjects {
+            get {
+                return ((string)(this["DetachedProjects"]));
+            }
+            set {
+                this["DetachedProjects"] = value;
+            }
+        }
     }
 }
