@@ -37,5 +37,6 @@ namespace ProjectSystemHelpStudents
         public virtual DbSet<Filters> Filters { get; set; }
         public virtual DbSet<Labels> Labels { get; set; }
         public virtual DbSet<TaskLabels> TaskLabels { get; set; }
+        public virtual DbSet<Section> Section { get; set; }
     }
 }

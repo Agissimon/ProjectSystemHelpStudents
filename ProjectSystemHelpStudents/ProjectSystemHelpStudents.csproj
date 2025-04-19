@@ -94,50 +94,21 @@
     <Compile Include="Filters.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Helper\Comment.cs" />
     <Compile Include="Helper\ExpanderStateManager.cs" />
     <Compile Include="Helper\FileItem.cs" />
-    <Compile Include="Helper\LabelViewModel.cs" />
-    <Compile Include="Helper\ProjectViewModel.cs" />
-    <Compile Include="Helper\TaskBoardView.cs" />
-    <Compile Include="Helper\TaskCalendarView.cs" />
     <Compile Include="Helper\TaskLabel.cs" />
-    <Compile Include="Helper\UserSettingsHelper.cs" />
     <Compile Include="Labels.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="SearchWindow.xaml.cs">
-      <DependentUpon>SearchWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="TaskLabels.cs">
+    <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\User.cs" />
+    <Compile Include="Section.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="UsersContent\AddProjectWindow.xaml.cs">
-      <DependentUpon>AddProjectWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UsersContent\CompletedPage.xaml.cs">
-      <DependentUpon>CompletedPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UsersContent\FiltersPage.xaml.cs">
-      <DependentUpon>FiltersPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UsersContent\IncomingPage.xaml.cs">
-      <DependentUpon>IncomingPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UsersContent\InputDialogWindow.xaml.cs">
-      <DependentUpon>InputDialogWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UsersContent\MyProjectPage.xaml.cs">
-      <DependentUpon>MyProjectPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UsersContent\ProjectDetailsPage.xaml.cs">
-      <DependentUpon>ProjectDetailsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UsersContent\TodayPage.xaml.cs">
-      <DependentUpon>TodayPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="AddTaskWindow.xaml.cs">
-      <DependentUpon>AddTaskWindow.xaml</DependentUpon>
+    <Compile Include="Services\UserSession.cs" />
+    <Compile Include="Services\UserSettingsHelper.cs" />
+    <Compile Include="TaskLabels.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Category.cs">
       <DependentUpon>Model1.tt</DependentUpon>
@@ -151,9 +122,6 @@
     <Compile Include="Helper\ConvertorsColors.cs" />
     <Compile Include="Helper\DBClass.cs" />
     <Compile Include="Helper\FrmClass.cs" />
-    <Compile Include="Helper\TaskViewModel.cs" />
-    <Compile Include="Helper\User.cs" />
-    <Compile Include="Helper\UserSession.cs" />
     <Compile Include="Model1.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -184,70 +152,67 @@
     <Compile Include="Task.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="TaskDetailsWindow.xaml.cs">
-      <DependentUpon>TaskDetailsWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Users.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="UsersContent\AuthPage.xaml.cs">
-      <DependentUpon>AuthPage.xaml</DependentUpon>
+    <Compile Include="ViewModels\LabelViewModel.cs" />
+    <Compile Include="ViewModels\ProjectViewModel.cs" />
+    <Compile Include="ViewModels\SectionTaskGroupViewModel.cs" />
+    <Compile Include="ViewModels\SectionViewModel.cs" />
+    <Compile Include="ViewModels\TaskBoardView.cs" />
+    <Compile Include="ViewModels\TaskCalendarView.cs" />
+    <Compile Include="ViewModels\TaskViewModel.cs" />
+    <Compile Include="Views\ProjectPages\AddProjectWindow.xaml.cs">
+      <DependentUpon>AddProjectWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UsersContent\FogotPassWindow.xaml.cs">
-      <DependentUpon>FogotPassWindow.xaml</DependentUpon>
+    <Compile Include="Views\ProjectPages\MyProjectPage.xaml.cs">
+      <DependentUpon>MyProjectPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UsersContent\RegPage.xaml.cs">
-      <DependentUpon>RegPage.xaml</DependentUpon>
+    <Compile Include="Views\ProjectPages\ProjectDetailsPage.xaml.cs">
+      <DependentUpon>ProjectDetailsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UsersContent\StackPanelButtonPage.xaml.cs">
+    <Compile Include="Views\Shared\SearchWindow.xaml.cs">
+      <DependentUpon>SearchWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\StackPanelButtonPage.xaml.cs">
       <DependentUpon>StackPanelButtonPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UsersContent\UpcomingTasksPage.xaml.cs">
+    <Compile Include="Views\TaskPages\AddTaskWindow.xaml.cs">
+      <DependentUpon>AddTaskWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TaskPages\CompletedPage.xaml.cs">
+      <DependentUpon>CompletedPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TaskPages\FiltersPage.xaml.cs">
+      <DependentUpon>FiltersPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TaskPages\IncomingPage.xaml.cs">
+      <DependentUpon>IncomingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TaskPages\TaskDetailsWindow.xaml.cs">
+      <DependentUpon>TaskDetailsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TaskPages\TodayPage.xaml.cs">
+      <DependentUpon>TodayPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TaskPages\UpcomingTasksPage.xaml.cs">
       <DependentUpon>UpcomingTasksPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UsersContent\UserPage.xaml.cs">
+    <Compile Include="Views\UserPages\AuthPage.xaml.cs">
+      <DependentUpon>AuthPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserPages\FogotPassWindow.xaml.cs">
+      <DependentUpon>FogotPassWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserPages\InputDialogWindow.xaml.cs">
+      <DependentUpon>InputDialogWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserPages\RegPage.xaml.cs">
+      <DependentUpon>RegPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserPages\UserPage.xaml.cs">
       <DependentUpon>UserPage.xaml</DependentUpon>
     </Compile>
-    <Page Include="SearchWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UsersContent\AddProjectWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UsersContent\CompletedPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UsersContent\FiltersPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UsersContent\IncomingPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UsersContent\InputDialogWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UsersContent\MyProjectPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UsersContent\ProjectDetailsPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UsersContent\TodayPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="AddTaskWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -260,33 +225,73 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="TaskDetailsWindow.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Views\ProjectPages\AddProjectWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="UsersContent\AuthPage.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Views\ProjectPages\MyProjectPage.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="UsersContent\FogotPassWindow.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Views\ProjectPages\ProjectDetailsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="UsersContent\RegPage.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Views\Shared\SearchWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="UsersContent\StackPanelButtonPage.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Views\Shared\StackPanelButtonPage.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="UsersContent\UpcomingTasksPage.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Views\TaskPages\AddTaskWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="UsersContent\UserPage.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Views\TaskPages\CompletedPage.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TaskPages\FiltersPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TaskPages\IncomingPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TaskPages\TaskDetailsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TaskPages\TodayPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TaskPages\UpcomingTasksPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserPages\AuthPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserPages\FogotPassWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserPages\InputDialogWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserPages\RegPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserPages\UserPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

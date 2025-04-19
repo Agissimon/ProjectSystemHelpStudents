@@ -12,24 +12,20 @@ namespace ProjectSystemHelpStudents
     using System;
     using System.Collections.Generic;
     
-    public partial class Project
+    public partial class Section
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Project()
+        public Section()
         {
             this.Task = new HashSet<Task>();
-            this.Section = new HashSet<Section>();
         }
     
-        public int ProjectId { get; set; }
+        public int IdSection { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
-        public Nullable<System.DateTime> StartDate { get; set; }
-        public Nullable<System.DateTime> EndDate { get; set; }
+        public int ProjectId { get; set; }
     
+        public virtual Project Project { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Task { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Section> Section { get; set; }
     }
 }

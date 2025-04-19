@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ProjectSystemHelpStudents.Helper;
 using ProjectSystemHelpStudents.UsersContent;
+using static System.Collections.Specialized.BitVector32;
 
 namespace ProjectSystemHelpStudents
 {
@@ -23,10 +24,18 @@ namespace ProjectSystemHelpStudents
     public partial class AddTaskWindow : Window
     {
         private DateTime? _preselectedDate;
+        private int _projectId;
+        private int _sectionId;
 
         public AddTaskWindow()
         {
             InitializeComponent();
+        }
+
+        public AddTaskWindow(int projectId, int sectionId) : this()
+        {
+            _projectId = projectId;
+            _sectionId = sectionId;
         }
 
         public void SetPreselectedDate(DateTime date)
@@ -73,14 +82,15 @@ namespace ProjectSystemHelpStudents
                     StatusId = DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId ?? 1,
                     IdUser = UserSession.IdUser,
                     PriorityId = (int)(priority?.PriorityId),
-                    ProjectId = 1
+                    ProjectId = _projectId,
+                    SectionId = _sectionId
                 };
 
                 DBClass.entities.Task.Add(newTask);
                 DBClass.entities.SaveChanges();
                 MessageBox.Show("Задача успешно добавлена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                this.DialogResult = true; // <-- ВАЖНО: чтобы вызывающий код знал, что задача была добавлена
+                this.DialogResult = true;
                 this.Close();
             }
             catch (Exception ex)
@@ -89,4 +99,5 @@ namespace ProjectSystemHelpStudents
             }
         }
     }
+
 }
