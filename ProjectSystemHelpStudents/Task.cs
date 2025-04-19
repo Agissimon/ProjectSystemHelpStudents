@@ -31,6 +31,7 @@ namespace ProjectSystemHelpStudents
         public int StatusId { get; set; }
         public int IdUser { get; set; }
         public Nullable<int> ProjectId { get; set; }
+        public Nullable<int> SectionId { get; set; }
     
         public virtual Category Category { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -43,5 +44,6 @@ namespace ProjectSystemHelpStudents
         public virtual Users Users { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaskLabels> TaskLabels { get; set; }
+        public virtual Section Section { get; set; }
     }
 }

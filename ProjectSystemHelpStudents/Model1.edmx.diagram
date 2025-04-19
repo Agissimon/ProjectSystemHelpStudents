@@ -9,7 +9,7 @@
         <EntityTypeShape EntityType="TaskManagementModel.Comment" Width="1.5" PointX="3" PointY="3.625" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Files" Width="1.5" PointX="8.25" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Priority" Width="1.5" PointX="3.75" PointY="9.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="TaskManagementModel.Project" Width="1.5" PointX="3.75" PointY="11.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="TaskManagementModel.Project" Width="1.5" PointX="8.125" PointY="11.75" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Status" Width="1.5" PointX="3.75" PointY="14.75" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.sysdiagrams" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Task" Width="1.5" PointX="6" PointY="2.75" IsExpanded="true" />
@@ -28,6 +28,9 @@
         <AssociationConnector Association="TaskManagementModel.FK__Filters__UserId__41EDCAC5" />
         <AssociationConnector Association="TaskManagementModel.FK__TaskLabel__Label__3F115E1A" />
         <AssociationConnector Association="TaskManagementModel.FK__TaskLabel__TaskI__3E1D39E1" />
+        <EntityTypeShape EntityType="TaskManagementModel.Section" Width="1.5" PointX="10.375" PointY="12" />
+        <AssociationConnector Association="TaskManagementModel.FK__Section__Project__4F47C5E3" />
+        <AssociationConnector Association="TaskManagementModel.FK__Task__SectionId__503BEA1C" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
