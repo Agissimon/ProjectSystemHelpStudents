@@ -94,5 +94,17 @@ namespace ProjectSystemHelpStudents.Properties {
                 this["ExpandersState"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DetachedProjects {
+            get {
+                return ((string)(this["DetachedProjects"]));
+            }
+            set {
+                this["DetachedProjects"] = value;
+            }
+        }
     }
 }

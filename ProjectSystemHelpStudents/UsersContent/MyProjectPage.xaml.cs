@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Collections.Specialized;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -52,11 +53,13 @@ namespace ProjectSystemHelpStudents.UsersContent
                     Projects.Clear();
                     foreach (var project in userProjects)
                     {
+                        var isDetached = UserSettingsHelper.IsDetached(project.ProjectId);
                         Projects.Add(new ProjectViewModel
                         {
                             ProjectId = project.ProjectId,
                             Name = project.Name,
-                            Icon = "📁"
+                            Icon = "📁",
+                            IsDetached = isDetached // Помечаем, если проект в избранном
                         });
                     }
                 }
@@ -65,14 +68,6 @@ namespace ProjectSystemHelpStudents.UsersContent
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при загрузке проектов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private int GetProjectTaskCount(int projectId)
-        {
-            using (var context = new TaskManagementEntities1())
-            {
-                return context.Task.Where(t => t.ProjectId == projectId).Count();
             }
         }
 
@@ -100,133 +95,59 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
         }
 
-        private void AddProjectAbove_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
-            {
-                MessageBox.Show($"Добавить проект выше: {project.Name}");
-            }
-        }
-
-        private void AddProjectBelow_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
-            {
-                MessageBox.Show($"Добавить проект ниже: {project.Name}");
-            }
-        }
-
-        //private void EditProject_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
-        //    {
-        //        try
-        //        {
-        //            AddProjectWindow editWindow = new AddProjectWindow();
-        //            editWindow.ProjectId = project.ProjectId; // Передаем ID проекта для редактирования
-        //            editWindow.ShowDialog();
-
-        //            if (editWindow.IsProjectUpdated)
-        //            {
-        //                RefreshProjects(); // Обновляем список проектов
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            MessageBox.Show($"Ошибка при редактировании проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        //        }
-        //    }
-        //}
-
         private void AddToFavorites_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
             {
-                MessageBox.Show($"Добавить в избранное: {project.Name}");
+                if (UserSettingsHelper.IsDetached(project.ProjectId)) // Только если ОТКРЕПЛЁН
+                {
+                    UserSettingsHelper.RemoveDetachedProject(project.ProjectId); // Закрепляем
+                    project.IsDetached = false;
+                    RefreshProjects();
+
+                    // Обновим StackPanel
+                    StackPanelButtonPage.RefreshProjectStackPanel?.Invoke();
+
+                    MessageBox.Show($"Проект «{project.Name}» закреплён в боковой панели.", "Закреплено", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Проект уже закреплён.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
         }
 
-        private void DuplicateProject_Click(object sender, RoutedEventArgs e)
+        private void EditProject_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
             {
-                MessageBox.Show($"Дублировать проект: {project.Name}");
-            }
-        }
+                try
+                {
+                    // Открытие окна редактирования с переданным ProjectId
+                    AddProjectWindow editWindow = new AddProjectWindow
+                    {
+                        ProjectId = project.ProjectId
+                    };
 
-        private void ShareProject_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
-            {
-                MessageBox.Show($"Общий доступ к проекту: {project.Name}");
-            }
-        }
+                    // Обработка закрытия окна редактирования
+                    editWindow.ProjectAdded += (newProject) =>
+                    {
+                        // Обновляем список проектов после редактирования
+                        Dispatcher.Invoke(() => RefreshProjects());
+                    };
 
-        private void CopyProjectLink_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
-            {
-                MessageBox.Show($"Скопировать ссылку на проект: {project.Name}");
-            }
-        }
+                    editWindow.ShowDialog();
 
-        private void SaveAsTemplate_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
-            {
-                MessageBox.Show($"Сохранить как шаблон: {project.Name}");
-            }
-        }
-
-        private void ViewTemplates_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Посмотреть шаблоны");
-        }
-
-        private void ImportFromCSV_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Импорт из CSV");
-        }
-
-        private void ExportToCSV_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Экспорт CSV");
-        }
-
-        private void AddTasksByEmail_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Добавлять задачи по Email");
-        }
-
-        private void ShowProjectCalendar_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
-            {
-                MessageBox.Show($"Календарная лента проекта: {project.Name}");
-            }
-        }
-
-        private void ShowActivityLog_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
-            {
-                MessageBox.Show($"Журнал действий: {project.Name}");
-            }
-        }
-
-        private void AddExtension_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
-            {
-                MessageBox.Show($"Добавить расширение для: {project.Name}");
-            }
-        }
-
-        private void ArchiveProject_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
-            {
-                MessageBox.Show($"Архивировать проект: {project.Name}");
+                    // После того как проект обновлен, обновляем список
+                    if (editWindow.IsProjectUpdated)
+                    {
+                        RefreshProjects();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при редактировании проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -272,6 +193,5 @@ namespace ProjectSystemHelpStudents.UsersContent
                 MessageBox.Show("Ошибка: Данные проекта не найдены.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
     }
 }

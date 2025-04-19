@@ -102,6 +102,7 @@
     <Compile Include="Helper\TaskBoardView.cs" />
     <Compile Include="Helper\TaskCalendarView.cs" />
     <Compile Include="Helper\TaskLabel.cs" />
+    <Compile Include="Helper\UserSettingsHelper.cs" />
     <Compile Include="Labels.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

@@ -40,10 +40,9 @@
                                             </MenuItem>
                                             <MenuItem Style="{StaticResource CustomMenuItemStyle}" Header="Добавить проект ниже" Click="AddProjectBelow_Click"/>
                                             -->
-                                            <!--<MenuItem Header="Изменить" Click="EditProject_Click"/>-->
-                                            <!--
-                                            <MenuItem Header="Добавить в избранное" Click="AddToFavorites_Click"/>
-                                            <MenuItem Header="Дублировать" Click="DuplicateProject_Click"/>
+                                            <MenuItem Header="Изменить" Click="EditProject_Click" Tag="{Binding}"/>
+                                            <MenuItem Header="Добавить в избранное" Click="AddToFavorites_Click" Tag="{Binding}"/>
+                                            <!--<MenuItem Header="Дублировать" Click="DuplicateProject_Click"/>
                                             <MenuItem Header="Общий доступ" Click="ShareProject_Click"/>
                                             <MenuItem Header="Скопировать ссылку на проект" Click="CopyProjectLink_Click"/>
                                             <MenuItem Header="Сохранить как шаблон" Click="SaveAsTemplate_Click"/>
