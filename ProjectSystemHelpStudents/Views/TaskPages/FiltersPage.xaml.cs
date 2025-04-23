@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -35,14 +38,44 @@ namespace ProjectSystemHelpStudents.UsersContent
         private void AddFilter_Click(object sender, RoutedEventArgs e)
         {
             var newFilterName = PromptForInput("Введите название фильтра:");
-            if (!string.IsNullOrEmpty(newFilterName))
+
+            // Проверка на пустое значение
+            if (string.IsNullOrEmpty(newFilterName))
             {
-                using (var context = new TaskManagementEntities1())
+                MessageBox.Show("Название фильтра не может быть пустым.");
+                return;
+            }
+
+            // Проверка на наличие пробела в названии
+            if (newFilterName.Contains(" "))
+            {
+                MessageBox.Show("Название фильтра не может содержать пробел.");
+                return;
+            }
+
+            // Проверка на существующие фильтры с таким названием
+            using (var context = new TaskManagementEntities1())
+            {
+                var existingFilter = context.Filters.FirstOrDefault(f => f.Name == newFilterName);
+                if (existingFilter != null)
                 {
-                    var newFilter = new Filters { Name = newFilterName };
+                    MessageBox.Show("Фильтр с таким названием уже существует.");
+                    return;
+                }
+
+                var newFilter = new Filters { Name = newFilterName, Query = "Default Query", UserId = null }; 
+
+                // Пытаемся добавить и сохранить фильтр
+                try
+                {
                     context.Filters.Add(newFilter);
                     context.SaveChanges();
                     LoadFilters();
+                }
+                catch (Exception ex)
+                {
+                    // Отлавливаем общие ошибки, если что-то пошло не так при сохранении
+                    MessageBox.Show($"Ошибка при сохранении фильтра: {ex.Message}");
                 }
             }
         }

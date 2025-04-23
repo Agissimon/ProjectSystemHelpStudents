@@ -72,6 +72,7 @@
           <Property Name="IdSection" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="ProjectId" Type="int" Nullable="false" />
+          <Property Name="PageKey" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Status">
           <Key>
@@ -702,6 +703,7 @@
           <Property Name="ProjectId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Project" Relationship="TaskManagementModel.FK__Section__Project__4F47C5E3" FromRole="Section" ToRole="Project" />
           <NavigationProperty Name="Task" Relationship="TaskManagementModel.FK__Task__SectionId__503BEA1C" FromRole="Section" ToRole="Task" />
+          <Property Name="PageKey" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK__Section__Project__4F47C5E3">
           <End Type="TaskManagementModel.Project" Role="Project" Multiplicity="1" />
@@ -861,6 +863,7 @@
           <EntitySetMapping Name="Section">
             <EntityTypeMapping TypeName="TaskManagementModel.Section">
               <MappingFragment StoreEntitySet="Section">
+                <ScalarProperty Name="PageKey" ColumnName="PageKey" />
                 <ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="IdSection" ColumnName="IdSection" />

@@ -23,6 +23,17 @@ namespace ProjectSystemHelpStudents.UsersContent
             RefreshProjects();
         }
 
+        private void ProjectsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ProjectsListView.SelectedItem is ProjectViewModel selectedProject)
+            {
+                var projectDetailsPage = new ProjectDetailsPage(selectedProject.ProjectId);
+                NavigationService?.Navigate(projectDetailsPage);
+
+                ProjectsListView.SelectedItem = null; // сброс выбора, чтобы можно было снова выбрать тот же проект
+            }
+        }
+
         private void OpenContextMenu_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.ContextMenu != null)

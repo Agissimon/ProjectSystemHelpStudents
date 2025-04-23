@@ -13,12 +13,11 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <Grid Grid.Row="0">
             <!-- Главный контейнер -->
             <StackPanel Orientation="Vertical">
 
-                <!-- Верхний ряд: заголовок и кнопка "Отображение" справа -->
                 <DockPanel Margin="0" VerticalAlignment="Center" Width="Auto" MaxWidth="1000">
                     <TextBlock Text="Предстоящее"
                                FontSize="28"
@@ -87,9 +86,7 @@
             <Grid x:Name="ListViewSection">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <!-- Верхняя панель -->
                     <RowDefinition Height="*"/>
-                    <!-- Контент с задачами -->
                 </Grid.RowDefinitions>
 
                 <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
@@ -153,38 +150,44 @@
                                       Margin="0,10" 
                                       Expanded="Expander_ExpandedCollapsed" Collapsed="Expander_ExpandedCollapsed">
                                 <ListView x:Name="OverdueTasksListView"
-                                ItemsSource="{Binding OverdueTasks}"
-                                SelectionChanged="TaskListView_SelectionChanged"
-                                Style="{StaticResource DarkListViewStyle}"
-                                MinWidth="800">
+                                          ItemsSource="{Binding OverdueTasks}"
+                                          SelectionChanged="TaskListView_SelectionChanged"
+                                          Style="{StaticResource TransparentListViewStyle}"
+                                          MinWidth="800">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted}" Click="ToggleTaskStatus_Click">
-                                                    <CheckBox.Style>
-                                                        <Style TargetType="CheckBox">
-                                                            <Setter Property="Template">
-                                                                <Setter.Value>
-                                                                    <ControlTemplate TargetType="CheckBox">
-                                                                        <Border Width="20" Height="20" CornerRadius="10" BorderBrush="Gray" BorderThickness="2" Background="{TemplateBinding Background}">
-                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                        </Border>
-                                                                    </ControlTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Style>
-                                                    </CheckBox.Style>
-                                                </CheckBox>
-                                                <StackPanel Margin="10,0,0,0">
-                                                    <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
-                                                    <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
-                                                    <TextBlock Text="{Binding EndDate, StringFormat=\{0:dd MMMM yyyy\}}" Foreground="Red" FontSize="12"/>
-                                                    <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12"/>
+                                            <StackPanel Margin="0,10,0,10">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted}" Click="ToggleTaskStatus_Click">
+                                                        <CheckBox.Style>
+                                                            <Style TargetType="CheckBox">
+                                                                <Setter Property="Template">
+                                                                    <Setter.Value>
+                                                                        <ControlTemplate TargetType="CheckBox">
+                                                                            <Border Width="20" Height="20" CornerRadius="10" BorderBrush="Gray" BorderThickness="2" Background="{TemplateBinding Background}">
+                                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                            </Border>
+                                                                        </ControlTemplate>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style>
+                                                        </CheckBox.Style>
+                                                    </CheckBox>
+
+                                                    <StackPanel Margin="10,0,0,0">
+                                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                                        <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
+                                                        <TextBlock Text="{Binding EndDate, StringFormat=\{0:dd MMMM yyyy\}}" Foreground="Red" FontSize="12"/>
+                                                        <TextBlock Text="{Binding LabelsFormatted}" Foreground="LightGray" FontSize="12"/>
+                                                    </StackPanel>
                                                 </StackPanel>
+
+                                                <Separator Height="1" Background="Gray" Margin="0,10,0,0"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
                                 </ListView>
+
                             </Expander>
 
                             <ListView x:Name="TasksListView"
@@ -246,7 +249,7 @@
             </Grid>
 
             <Grid x:Name="CalendarViewSection" Visibility="Collapsed">
-                <TextBlock Text="Здесь будет календарь" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
 
             <Grid x:Name="BoardViewSection" Visibility="Collapsed">

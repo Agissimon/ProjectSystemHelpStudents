@@ -24,23 +24,18 @@ namespace ProjectSystemHelpStudents
     public partial class AddTaskWindow : Window
     {
         private DateTime? _preselectedDate;
-        private int _projectId;
-        private int _sectionId;
+        private int? _projectId;
+        private int? _sectionId;
 
         public AddTaskWindow()
         {
             InitializeComponent();
         }
 
-        public AddTaskWindow(int projectId, int sectionId) : this()
+        public AddTaskWindow(int? projectId = null, int? sectionId = null) : this()
         {
             _projectId = projectId;
             _sectionId = sectionId;
-        }
-
-        public void SetPreselectedDate(DateTime date)
-        {
-            dpEndDate.SelectedDate = date;
         }
 
         public AddTaskWindow(DateTime preselectedDate) : this()
@@ -49,12 +44,16 @@ namespace ProjectSystemHelpStudents
             dpEndDate.SelectedDate = preselectedDate;
         }
 
+        public void SetPreselectedDate(DateTime date)
+        {
+            dpEndDate.SelectedDate = date;
+        }
+
         private void SaveTask_Click(object sender, RoutedEventArgs e)
         {
             string title = txtTitle.Text;
             string description = txtDescription.Text;
             DateTime? endDate = dpEndDate.SelectedDate;
-
             string priorityName = (cmbPriority.SelectedItem as ComboBoxItem)?.Content.ToString();
 
             if (string.IsNullOrWhiteSpace(title))
@@ -72,6 +71,8 @@ namespace ProjectSystemHelpStudents
             try
             {
                 var priority = DBClass.entities.Priority.FirstOrDefault(p => p.Name == priorityName);
+                var sectionExists = _sectionId.HasValue && DBClass.entities.Section.Any(s => s.IdSection == _sectionId.Value);
+                var projectExists = _projectId.HasValue && DBClass.entities.Project.Any(p => p.ProjectId == _projectId.Value);
 
                 var newTask = new Task
                 {
@@ -82,8 +83,8 @@ namespace ProjectSystemHelpStudents
                     StatusId = DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId ?? 1,
                     IdUser = UserSession.IdUser,
                     PriorityId = (int)(priority?.PriorityId),
-                    ProjectId = _projectId,
-                    SectionId = _sectionId
+                    ProjectId = projectExists ? _projectId : 1,
+                    SectionId = sectionExists ? _sectionId : null
                 };
 
                 DBClass.entities.Task.Add(newTask);
@@ -99,5 +100,4 @@ namespace ProjectSystemHelpStudents
             }
         }
     }
-
 }

@@ -10,7 +10,36 @@
                 <Setter Property="Background" Value="#333"/>
                 <Setter Property="FontSize" Value="14"/>
             </Style>
-            
+
+            <Style x:Key="AddChapterButtonStyle" TargetType="Button">
+                <Setter Property="Foreground" Value="Gray"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <TextBlock x:Name="textBlock"
+                           Text="{TemplateBinding Content}"
+                           Foreground="{TemplateBinding Foreground}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center">
+                                <TextBlock.TextDecorations>
+                                    <TextDecorationCollection />
+                                </TextBlock.TextDecorations>
+                            </TextBlock>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="textBlock" Property="TextBlock.Foreground" Value="#E06C75"/>
+                                    <Setter TargetName="textBlock" Property="TextBlock.TextDecorations" Value="Underline"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <Style x:Key="DisplayOptionsButtonStyle" TargetType="Button">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="White"/>

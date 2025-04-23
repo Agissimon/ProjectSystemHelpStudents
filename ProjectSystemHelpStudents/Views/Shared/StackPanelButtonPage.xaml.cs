@@ -53,7 +53,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                 {
                     Content = project.Name,
                     Style = (Style)FindResource("TransparentButtonStyle"),
-                    Margin = new Thickness(5),
+                    Margin = new Thickness(10, 5, 0, 0),
                     Tag = project.ProjectId
                 };
                 projectButton.Click += ProjectButton_Click;
@@ -64,7 +64,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                     Content = "⨉",
                     Width = 25,
                     Height = 25,
-                    Margin = new Thickness(5, 0, 0, 0),
+                    Margin = new Thickness(5, 10, 0, 0),
                     Tag = project.ProjectId,
                     Style = (Style)FindResource("TransparentButtonStyle")
                 };

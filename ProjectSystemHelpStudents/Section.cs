@@ -23,6 +23,7 @@ namespace ProjectSystemHelpStudents
         public int IdSection { get; set; }
         public string Name { get; set; }
         public int ProjectId { get; set; }
+        public string PageKey { get; set; }
     
         public virtual Project Project { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

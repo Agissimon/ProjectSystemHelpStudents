@@ -150,6 +150,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                 }
             }
         }
+
         private void OpenAddSectionPopup_Click(object sender, RoutedEventArgs e)
         {
             SectionNameTextBox.Text = string.Empty;
@@ -185,5 +186,78 @@ namespace ProjectSystemHelpStudents.UsersContent
                 MessageBox.Show("Введите название раздела.");
             }
         }
+
+        private void EditSection_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is int sectionId)
+            {
+                var dialog = new InputDialog("Введите новое название раздела:")
+                {
+                    TitleText = "Редактирование раздела",
+                    PlaceholderText = "Введите название нового раздела"
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    var newSectionName = dialog.InputText;
+                    if (!string.IsNullOrWhiteSpace(newSectionName))
+                    {
+                        using (var context = new TaskManagementEntities1())
+                        {
+                            var section = context.Section.FirstOrDefault(s => s.IdSection == sectionId);
+                            if (section != null)
+                            {
+                                section.Name = newSectionName;
+                                context.SaveChanges();
+                                RefreshTasks();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void DeleteSection_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is int sectionId)
+            {
+                var result = MessageBox.Show("Вы уверены, что хотите удалить этот раздел и все его задачи?", "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Yes)
+                {
+                    using (var context = new TaskManagementEntities1())
+                    {
+                        var section = context.Section.FirstOrDefault(s => s.IdSection == sectionId);
+                        if (section != null)
+                        {
+                            // Получаем все задачи в этой секции
+                            var tasks = context.Task.Where(t => t.SectionId == sectionId).ToList();
+
+                            // Удаляем связанные записи из TaskLabels (и других связанных таблиц, если нужно)
+                            foreach (var task in tasks)
+                            {
+                                var labels = context.TaskLabels.Where(tl => tl.TaskId == task.IdTask).ToList();
+                                context.TaskLabels.RemoveRange(labels);
+
+                                var comments = context.Comment.Where(c => c.IdTask == task.IdTask).ToList();
+                                context.Comment.RemoveRange(comments);
+
+                                var files = context.Files.Where(f => f.TaskId == task.IdTask).ToList();
+                                context.Files.RemoveRange(files);
+                            }
+
+                            // Удаляем задачи
+                            context.Task.RemoveRange(tasks);
+
+                            // Удаляем саму секцию
+                            context.Section.Remove(section);
+
+                            context.SaveChanges();
+                            RefreshTasks();
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

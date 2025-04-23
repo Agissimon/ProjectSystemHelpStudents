@@ -5,14 +5,19 @@
         Height="200" 
         Width="400" 
         WindowStartupLocation="CenterScreen"
-        Style="{StaticResource window}">
+        Style="{StaticResource BaseDarkStyle}">
 
     <Grid>
-        <TextBlock Name="MessageText" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,10,10,0"/>
-        <TextBox Name="InputTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10"/>
+        <TextBlock Name="MessageText" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,10,10,0" Style="{StaticResource NormalTextBlockStyle}"/>
+
+        <!-- Bind the Text property to InputText -->
+        <TextBox Name="InputTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10" 
+                 Style="{StaticResource InputFieldStyle}" 
+                 Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"/>
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10">
-            <Button Content="OK" Width="75" Margin="10" Click="OkButton_Click"/>
-            <Button Content="Отмена" Width="75" Margin="10" Click="CancelButton_Click"/>
+            <Button Content="OK" Width="75" Margin="10" Click="OkButton_Click" Style="{StaticResource LoginButtonStyle}"/>
+            <Button Content="Отмена" Width="75" Margin="10" Click="CancelButton_Click" Style="{StaticResource LoginButtonStyle}"/>
         </StackPanel>
     </Grid>
 </Window>
