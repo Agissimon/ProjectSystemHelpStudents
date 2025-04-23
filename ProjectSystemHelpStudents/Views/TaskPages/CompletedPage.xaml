@@ -24,12 +24,30 @@
                                     <CheckBox Width="20" Height="20" IsChecked="{Binding IsCompleted, Mode=TwoWay}" Click="ToggleTaskStatus_Click">
                                         <CheckBox.Style>
                                             <Style TargetType="CheckBox">
+                                                <Setter Property="Background" Value="Transparent"/>
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate TargetType="CheckBox">
-                                                            <Border Width="20" Height="20" CornerRadius="10" BorderBrush="Gray" BorderThickness="2" Background="{TemplateBinding Background}">
-                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            <Border Width="20" Height="20"
+                                                                    Background="White"
+                                                                    CornerRadius="10"
+                                                                    BorderThickness="2"
+                                                                    BorderBrush="Gray">
+                                                                <Grid>
+                                                                    <Path x:Name="CheckMark"
+                                                                          Data="M 4 10 L 8 14 L 16 6"
+                                                                          Stroke="Black"
+                                                                          StrokeThickness="2"
+                                                                          StrokeStartLineCap="Round"
+                                                                          StrokeEndLineCap="Round"
+                                                                          Visibility="Collapsed"/>
+                                                                </Grid>
                                                             </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsChecked" Value="True">
+                                                                    <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
                                                         </ControlTemplate>
                                                     </Setter.Value>
                                                 </Setter>

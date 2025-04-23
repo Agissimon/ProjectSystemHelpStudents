@@ -5,7 +5,6 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="ce302a4b5b2c46a6b7254870deef2b3a" Name="Diagram1">
-        <EntityTypeShape EntityType="TaskManagementModel.Category" Width="1.5" PointX="3.75" PointY="7.125" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Comment" Width="1.5" PointX="3" PointY="3.625" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Files" Width="1.5" PointX="8.25" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Priority" Width="1.5" PointX="3.75" PointY="9.5" IsExpanded="true" />
@@ -14,7 +13,6 @@
         <EntityTypeShape EntityType="TaskManagementModel.sysdiagrams" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Task" Width="1.5" PointX="6" PointY="2.75" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Users" Width="1.5" PointX="0.75" PointY="3.375" IsExpanded="true" />
-        <AssociationConnector Association="TaskManagementModel.FK__Task__CategoryId__534D60F1" ManuallyRouted="false" />
         <AssociationConnector Association="TaskManagementModel.FK_Comment_Task" ManuallyRouted="false" />
         <AssociationConnector Association="TaskManagementModel.FK_Comment_User" ManuallyRouted="false" />
         <AssociationConnector Association="TaskManagementModel.FK_File_Task" ManuallyRouted="false" />

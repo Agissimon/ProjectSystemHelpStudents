@@ -23,6 +23,7 @@ namespace ProjectSystemHelpStudents
     /// </summary>
     public partial class AddTaskWindow : Window
     {
+        private List<LabelViewModel> _labelViewModels;
         private DateTime? _preselectedDate;
         private int? _projectId;
         private int? _sectionId;
@@ -30,6 +31,25 @@ namespace ProjectSystemHelpStudents
         public AddTaskWindow()
         {
             InitializeComponent();
+            LoadTags(); // Загрузить метки из БД
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoadTags();
+        }
+
+        private void LoadTags()
+        {
+            _labelViewModels = DBClass.entities.Labels
+                .Select(l => new LabelViewModel
+                {
+                    Id = l.Id,
+                    Name = l.Name,
+                    IsSelected = false
+                }).ToList();
+
+            lstTags.ItemsSource = _labelViewModels;
         }
 
         public AddTaskWindow(int? projectId = null, int? sectionId = null) : this()
@@ -79,16 +99,27 @@ namespace ProjectSystemHelpStudents
                     Title = title,
                     Description = description,
                     EndDate = endDate.Value,
-                    CategoryId = 1,
                     StatusId = DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId ?? 1,
                     IdUser = UserSession.IdUser,
                     PriorityId = (int)(priority?.PriorityId),
                     ProjectId = projectExists ? _projectId : 1,
                     SectionId = sectionExists ? _sectionId : null
                 };
-
                 DBClass.entities.Task.Add(newTask);
-                DBClass.entities.SaveChanges();
+                DBClass.entities.SaveChanges(); // Сохраняем задачу и получаем Id
+
+                var selectedLabels = _labelViewModels.Where(l => l.IsSelected).ToList();
+                foreach (var label in selectedLabels)
+                {
+                    var taskLabel = new TaskLabels
+                    {
+                        TaskId = newTask.IdTask,
+                        LabelId = label.Id
+                    };
+                    DBClass.entities.TaskLabels.Add(taskLabel);
+                }
+                DBClass.entities.SaveChanges(); // Сохраняем связи
+
                 MessageBox.Show("Задача успешно добавлена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 this.DialogResult = true;
@@ -98,6 +129,11 @@ namespace ProjectSystemHelpStudents
             {
                 MessageBox.Show("Ошибка при добавлении задачи: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
         }
     }
 }

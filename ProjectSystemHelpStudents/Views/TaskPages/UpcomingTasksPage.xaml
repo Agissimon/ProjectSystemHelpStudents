@@ -38,7 +38,11 @@
                     </Button>
                 </DockPanel>
 
-                <Popup x:Name="DisplayOptionsMenu" PlacementTarget="{Binding ElementName=DisplayOptionsButton}" Placement="Bottom">
+                <Popup x:Name="DisplayOptionsMenu" PlacementTarget="{Binding ElementName=DisplayOptionsButton}" 
+                       Placement="Bottom" 
+                       StaysOpen="False" 
+                       AllowsTransparency="True"
+                       FlowDirection="LeftToRight">
                     <Border Background="#222" Padding="15" CornerRadius="10" BorderThickness="1" BorderBrush="#444">
                         <StackPanel>
                             <TextBlock Text="Отображение" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
