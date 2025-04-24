@@ -18,6 +18,7 @@ namespace ProjectSystemHelpStudents
         public string Name { get; set; }
         public string Query { get; set; }
         public Nullable<int> UserId { get; set; }
+        public string Color { get; set; }
     
         public virtual Users Users { get; set; }
     }

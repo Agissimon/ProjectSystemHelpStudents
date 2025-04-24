@@ -5,13 +5,6 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="Хранилище TaskManagementModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="Category">
-          <Key>
-            <PropertyRef Name="CategoryId" />
-          </Key>
-          <Property Name="CategoryId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
-        </EntityType>
         <EntityType Name="Comment">
           <Key>
             <PropertyRef Name="Id" />
@@ -39,6 +32,7 @@
           <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Query" Type="nvarchar(max)" Nullable="false" />
           <Property Name="UserId" Type="int" />
+          <Property Name="Color" Type="nvarchar" MaxLength="10" />
         </EntityType>
         <EntityType Name="Labels">
           <Key>
@@ -72,6 +66,7 @@
           <Property Name="IdSection" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="ProjectId" Type="int" Nullable="false" />
+          <Property Name="PageKey" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Status">
           <Key>
@@ -98,7 +93,6 @@
           <Property Name="Title" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="Description" Type="text" Nullable="false" />
           <Property Name="EndDate" Type="date" Nullable="false" />
-          <Property Name="CategoryId" Type="int" Nullable="false" />
           <Property Name="PriorityId" Type="int" Nullable="false" />
           <Property Name="StatusId" Type="int" Nullable="false" />
           <Property Name="IdUser" Type="int" Nullable="false" />
@@ -147,18 +141,6 @@
             </Principal>
             <Dependent Role="Section">
               <PropertyRef Name="ProjectId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Task__CategoryId__534D60F1">
-          <End Role="Category" Type="Self.Category" Multiplicity="1" />
-          <End Role="Task" Type="Self.Task" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Category">
-              <PropertyRef Name="CategoryId" />
-            </Principal>
-            <Dependent Role="Task">
-              <PropertyRef Name="CategoryId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -285,7 +267,6 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="Хранилище TaskManagementModelContainer">
-          <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Comment" EntityType="Self.Comment" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Files" EntityType="Self.Files" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Filters" EntityType="Self.Filters" Schema="dbo" store:Type="Tables" />
@@ -305,10 +286,6 @@
           <AssociationSet Name="FK__Section__Project__4F47C5E3" Association="Self.FK__Section__Project__4F47C5E3">
             <End Role="Project" EntitySet="Project" />
             <End Role="Section" EntitySet="Section" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Task__CategoryId__534D60F1" Association="Self.FK__Task__CategoryId__534D60F1">
-            <End Role="Category" EntitySet="Category" />
-            <End Role="Task" EntitySet="Task" />
           </AssociationSet>
           <AssociationSet Name="FK__Task__PriorityId__5441852A" Association="Self.FK__Task__PriorityId__5441852A">
             <End Role="Priority" EntitySet="Priority" />
@@ -355,14 +332,6 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="TaskManagementModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="Category">
-          <Key>
-            <PropertyRef Name="CategoryId" />
-          </Key>
-          <Property Name="CategoryId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="Task" Relationship="Self.FK__Task__CategoryId__534D60F1" FromRole="Category" ToRole="Task" />
-        </EntityType>
         <EntityType Name="Comment">
           <Key>
             <PropertyRef Name="Id" />
@@ -431,12 +400,10 @@
           <Property Name="Title" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="CategoryId" Type="Int32" Nullable="false" />
           <Property Name="PriorityId" Type="Int32" Nullable="false" />
           <Property Name="StatusId" Type="Int32" Nullable="false" />
           <Property Name="IdUser" Type="Int32" Nullable="false" />
           <Property Name="ProjectId" Type="Int32" />
-          <NavigationProperty Name="Category" Relationship="Self.FK__Task__CategoryId__534D60F1" FromRole="Task" ToRole="Category" />
           <NavigationProperty Name="Comment" Relationship="Self.FK_Comment_Task" FromRole="Task" ToRole="Comment" />
           <NavigationProperty Name="Files" Relationship="Self.FK_File_Task" FromRole="Task" ToRole="Files" />
           <NavigationProperty Name="Priority" Relationship="Self.FK__Task__PriorityId__5441852A" FromRole="Task" ToRole="Priority" />
@@ -463,18 +430,6 @@
           <NavigationProperty Name="Task" Relationship="Self.FK__Task__UserId__5629CD9C" FromRole="Users" ToRole="Task" />
           <NavigationProperty Name="Filters" Relationship="TaskManagementModel.FK__Filters__UserId__41EDCAC5" FromRole="Users" ToRole="Filters" />
         </EntityType>
-        <Association Name="FK__Task__CategoryId__534D60F1">
-          <End Role="Category" Type="Self.Category" Multiplicity="1" />
-          <End Role="Task" Type="Self.Task" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Category">
-              <PropertyRef Name="CategoryId" />
-            </Principal>
-            <Dependent Role="Task">
-              <PropertyRef Name="CategoryId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Comment_Task">
           <End Role="Task" Type="Self.Task" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
@@ -562,7 +517,6 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="TaskManagementEntities1" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Category" EntityType="Self.Category" />
           <EntitySet Name="Comment" EntityType="Self.Comment" />
           <EntitySet Name="Files" EntityType="Self.Files" />
           <EntitySet Name="Priority" EntityType="Self.Priority" />
@@ -571,10 +525,6 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
           <EntitySet Name="Task" EntityType="Self.Task" />
           <EntitySet Name="Users" EntityType="Self.Users" />
-          <AssociationSet Name="FK__Task__CategoryId__534D60F1" Association="Self.FK__Task__CategoryId__534D60F1">
-            <End Role="Category" EntitySet="Category" />
-            <End Role="Task" EntitySet="Task" />
-          </AssociationSet>
           <AssociationSet Name="FK_Comment_Task" Association="Self.FK_Comment_Task">
             <End Role="Task" EntitySet="Task" />
             <End Role="Comment" EntitySet="Comment" />
@@ -637,6 +587,7 @@
           <Property Name="Query" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="UserId" Type="Int32" />
           <NavigationProperty Name="Users" Relationship="TaskManagementModel.FK__Filters__UserId__41EDCAC5" FromRole="Filters" ToRole="Users" />
+          <Property Name="Color" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Labels">
           <Key>
@@ -702,6 +653,7 @@
           <Property Name="ProjectId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Project" Relationship="TaskManagementModel.FK__Section__Project__4F47C5E3" FromRole="Section" ToRole="Project" />
           <NavigationProperty Name="Task" Relationship="TaskManagementModel.FK__Task__SectionId__503BEA1C" FromRole="Section" ToRole="Task" />
+          <Property Name="PageKey" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK__Section__Project__4F47C5E3">
           <End Type="TaskManagementModel.Project" Role="Project" Multiplicity="1" />
@@ -733,14 +685,6 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="Хранилище TaskManagementModelContainer" CdmEntityContainer="TaskManagementEntities1">
-          <EntitySetMapping Name="Category">
-            <EntityTypeMapping TypeName="TaskManagementModel.Category">
-              <MappingFragment StoreEntitySet="Category">
-                <ScalarProperty Name="CategoryId" ColumnName="CategoryId" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Comment">
             <EntityTypeMapping TypeName="TaskManagementModel.Comment">
               <MappingFragment StoreEntitySet="Comment">
@@ -808,7 +752,6 @@
                 <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="EndDate" ColumnName="EndDate" />
-                <ScalarProperty Name="CategoryId" ColumnName="CategoryId" />
                 <ScalarProperty Name="PriorityId" ColumnName="PriorityId" />
                 <ScalarProperty Name="StatusId" ColumnName="StatusId" />
                 <ScalarProperty Name="IdUser" ColumnName="IdUser" />
@@ -833,6 +776,7 @@
           <EntitySetMapping Name="Filters">
             <EntityTypeMapping TypeName="TaskManagementModel.Filters">
               <MappingFragment StoreEntitySet="Filters">
+                <ScalarProperty Name="Color" ColumnName="Color" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="Query" ColumnName="Query" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
@@ -861,6 +805,7 @@
           <EntitySetMapping Name="Section">
             <EntityTypeMapping TypeName="TaskManagementModel.Section">
               <MappingFragment StoreEntitySet="Section">
+                <ScalarProperty Name="PageKey" ColumnName="PageKey" />
                 <ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="IdSection" ColumnName="IdSection" />

@@ -26,14 +26,12 @@ namespace ProjectSystemHelpStudents
         public string Title { get; set; }
         public string Description { get; set; }
         public System.DateTime EndDate { get; set; }
-        public int CategoryId { get; set; }
         public int PriorityId { get; set; }
         public int StatusId { get; set; }
         public int IdUser { get; set; }
         public Nullable<int> ProjectId { get; set; }
         public Nullable<int> SectionId { get; set; }
     
-        public virtual Category Category { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Comment> Comment { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

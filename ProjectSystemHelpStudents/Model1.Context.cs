@@ -25,7 +25,6 @@ namespace ProjectSystemHelpStudents
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Category> Category { get; set; }
         public virtual DbSet<Comment> Comment { get; set; }
         public virtual DbSet<Files> Files { get; set; }
         public virtual DbSet<Priority> Priority { get; set; }

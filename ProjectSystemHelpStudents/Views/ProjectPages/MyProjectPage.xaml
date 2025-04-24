@@ -22,7 +22,11 @@
                 </StackPanel>
 
                 <TextBlock Text="{Binding ProjectCountText}" FontSize="18" Foreground="#AAAAAA" Margin="0,10,0,10" />
-                <ListView Name="ProjectsListView" Background="Transparent" BorderThickness="0" Foreground="White">
+                <ListView Name="ProjectsListView" 
+                          Background="Transparent" 
+                          BorderThickness="0" 
+                          Foreground="White" 
+                          SelectionChanged="ProjectsListView_SelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="0,10,0,10" VerticalAlignment="Center" HorizontalAlignment="Stretch">

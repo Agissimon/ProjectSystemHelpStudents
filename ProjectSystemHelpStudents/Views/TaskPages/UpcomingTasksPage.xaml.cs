@@ -118,7 +118,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                         }
                     }
 
-                    // Фильтр по исполнителю (если требуется, раскомментируй)
+                    // Фильтр по исполнителю 
                     if (selectedExecutorIndex > 0)
                     {
                         var selectedExecutorItem = (ComboBoxItem)ExecutorComboBox.Items[selectedExecutorIndex];
@@ -172,11 +172,9 @@ namespace ProjectSystemHelpStudents.UsersContent
                             AvailableLabels = new ObservableCollection<LabelViewModel>(
                                 t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
                             EndDateFormatted = formattedDate,
-                            // Если нужно, добавь поля исполнителя и др.
                         });
                     }
 
-                    // Обновляем список для ListView (группировка задач)
                     _groupedTasks.Clear();
                     var upcomingTasks = allTasks.Where(t => t.EndDate >= DateTime.Today).ToList();
                     foreach (var task in upcomingTasks)
@@ -193,7 +191,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                     if (TasksListView != null)
                     {
                         TasksListView.ItemsSource = _groupedTasks;
-                        // Вызываем восстановление состояния здесь
+
                         Dispatcher.BeginInvoke(new Action(() =>
                         {
                             RestoreExpandersState();
@@ -203,13 +201,11 @@ namespace ProjectSystemHelpStudents.UsersContent
                     if (OverdueTasksListView != null)
                         OverdueTasksListView.ItemsSource = allTasks.Where(t => t.EndDate < DateTime.Today).ToList();
 
-                    // Пересоздаем доску и календарь из полного списка задач
                     Grid newBoard = TaskBoardView.CreateBoardView(allTasks);
                     newBoard.Tag = allTasks;
                     Grid newCalendar = TaskCalendarView.CreateCalendarView(allTasks);
                     newCalendar.Tag = allTasks;
 
-                    // Обновляем контейнеры (очищаем и вставляем новые представления)
                     if (BoardViewSection != null)
                     {
                         BoardViewSection.Children.Clear();
@@ -221,7 +217,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                         CalendarViewSection.Children.Add(newCalendar);
                     }
 
-                    // Переключаем вид согласно выбранному режиму
                     switch (currentMode)
                     {
                         case "List":
@@ -247,15 +242,12 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void UpdateMonthText(DateTime date)
         {
-            // Русский формат месяца и год, например: Апрель 2025
             string monthYear = date.ToString("MMMM yyyy", new CultureInfo("ru-RU"));
-            // Первая буква заглавная
             MonthTextBlock.Text = char.ToUpper(monthYear[0]) + monthYear.Substring(1);
         }
 
         private void MonthPickerButton_Click(object sender, RoutedEventArgs e)
         {
-            // Перед открытием устанавливаем фокус и открываем выпадающий список
             MonthDayPicker.Focus();
             MonthDayPicker.IsDropDownOpen = true;
         }
@@ -427,8 +419,8 @@ namespace ProjectSystemHelpStudents.UsersContent
         private void AddTask_Click(object sender, RoutedEventArgs e)
         {
             var addTaskWindow = new AddTaskWindow();
-            addTaskWindow.ShowDialog(); // при закрытии окна данные сохранятся в БД
-            RefreshTasks(); // сразу обновляем страницу — все представления пересоздаются
+            addTaskWindow.ShowDialog();
+            RefreshTasks();
         }
 
         private void DisplayOptionsButton_Click(object sender, RoutedEventArgs e)
