@@ -32,6 +32,7 @@
           <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Query" Type="nvarchar(max)" Nullable="false" />
           <Property Name="UserId" Type="int" />
+          <Property Name="Color" Type="nvarchar" MaxLength="10" />
         </EntityType>
         <EntityType Name="Labels">
           <Key>
@@ -586,6 +587,7 @@
           <Property Name="Query" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="UserId" Type="Int32" />
           <NavigationProperty Name="Users" Relationship="TaskManagementModel.FK__Filters__UserId__41EDCAC5" FromRole="Filters" ToRole="Users" />
+          <Property Name="Color" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Labels">
           <Key>
@@ -774,6 +776,7 @@
           <EntitySetMapping Name="Filters">
             <EntityTypeMapping TypeName="TaskManagementModel.Filters">
               <MappingFragment StoreEntitySet="Filters">
+                <ScalarProperty Name="Color" ColumnName="Color" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="Query" ColumnName="Query" />
                 <ScalarProperty Name="Name" ColumnName="Name" />

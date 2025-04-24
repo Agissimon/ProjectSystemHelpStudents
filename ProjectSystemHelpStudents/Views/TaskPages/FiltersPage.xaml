@@ -24,8 +24,11 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="5">
-                                <Ellipse Width="16" Height="16" Fill="SkyBlue" Margin="0,0,10,0"/>
-                                <TextBlock Text="{Binding Name}" FontSize="16" Foreground="White"/>
+                                <Ellipse Width="16" Height="16" Fill="{Binding Color}" Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding Name}" FontSize="16" Foreground="{Binding Color}"/>
+                                <Button Content="✎" Foreground="White" Background="Transparent" BorderBrush="Transparent"
+                                        Click="EditFilter_Click" CommandParameter="{Binding Id}" 
+                                        Margin="10,0,0,0"/>
                                 <Button Content="✖" Foreground="White" Background="Transparent" BorderBrush="Transparent"
                                         Click="DeleteFilter_Clik" CommandParameter="{Binding Id}" 
                                         Margin="10,0,0,0"/>
@@ -47,13 +50,19 @@
                 <ListBox x:Name="LabelsList" Style="{StaticResource TransparentListBoxStyle}" BorderThickness="0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
+                            <!-- Пример для меток, аналогично сделай для фильтров -->
                             <StackPanel Orientation="Horizontal" Margin="5">
-                                <Ellipse Width="14" Height="14" Fill="{Binding Color}" Margin="0,0,10,0"/>
-                                <TextBlock Text="{Binding Name}" FontSize="14" Foreground="White"/>
-                                <Button Content="✖"  Foreground="White" Background="Transparent" BorderBrush="Transparent"
-                                        Click="DeleteLabel_Clik" CommandParameter="{Binding Id}" 
-                                        Margin="10,0,0,0"/>
+                                <Ellipse Width="16" Height="16" Fill="{Binding Color}" Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding Name}" FontSize="16" Foreground="{Binding Color}" VerticalAlignment="Center"/>
+
+                                <!-- Кнопка редактирования -->
+                                <Button Content="✎" Foreground="White" Background="Transparent" BorderBrush="Transparent"
+                                        Click="EditLabel_Click" CommandParameter="{Binding Id}" Margin="10,0,0,0"/>
+
+                                <Button Content="✖" Foreground="White" Background="Transparent" BorderBrush="Transparent"
+                                        Click="DeleteLabel_Clik" CommandParameter="{Binding Id}" Margin="10,0,0,0"/>
                             </StackPanel>
+
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

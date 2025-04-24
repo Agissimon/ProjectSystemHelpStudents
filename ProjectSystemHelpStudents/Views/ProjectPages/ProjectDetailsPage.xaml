@@ -17,9 +17,14 @@
                         Click="OpenAddSectionPopup_Click"
                         Style="{StaticResource AddChapterButtonStyle}" Margin="0,10,0,10"/>
 
-                <Popup x:Name="AddSectionPopup" Placement="Center" StaysOpen="False">
+                <Popup x:Name="AddSectionPopup" 
+                       Placement="Center" 
+                       StaysOpen="False" 
+                       AllowsTransparency="True"
+                       FlowDirection="LeftToRight">
                     <Border Background="#2d2d2d" BorderBrush="#444" BorderThickness="1" Padding="20" CornerRadius="10">
                         <StackPanel Width="400">
+                            <TextBlock Text="Введите название нового раздела" Style="{StaticResource NormalTextBlockStyle}"/>
                             <TextBox x:Name="SectionNameTextBox" 
                                      Margin="0,0,0,10"
                                      Style="{StaticResource InputFieldStyle}" />

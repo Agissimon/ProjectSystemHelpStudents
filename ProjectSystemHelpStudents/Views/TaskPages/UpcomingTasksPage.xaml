@@ -43,6 +43,9 @@
                        StaysOpen="False" 
                        AllowsTransparency="True"
                        FlowDirection="LeftToRight">
+                    <Popup.PlacementRectangle>
+                        <Rect X="0" Y="45" Width="0" Height="0"/>
+                    </Popup.PlacementRectangle>
                     <Border Background="#222" Padding="15" CornerRadius="10" BorderThickness="1" BorderBrush="#444">
                         <StackPanel>
                             <TextBlock Text="Отображение" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
