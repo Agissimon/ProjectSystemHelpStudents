@@ -140,7 +140,12 @@ namespace ProjectSystemHelpStudents.UsersContent
                     var label = context.Labels.FirstOrDefault(l => l.Id == labelId);
                     if (label != null)
                     {
-                        var window = new LabelOrFilterWindow(isFilter: false, label.Name, label.Color);
+                        var window = new LabelOrFilterWindow(
+                            isFilter: false,
+                            initialName: label.Name,
+                            initialValue: "",
+                            initialColor: label.Color
+                        );
                         if (window.ShowDialog() == true)
                         {
                             label.Name = window.InputName;
@@ -169,7 +174,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                             initialValue: filter.Query,
                             initialColor: filter.Color
                         );
-
                         if (window.ShowDialog() == true)
                         {
                             filter.Name = window.InputName;

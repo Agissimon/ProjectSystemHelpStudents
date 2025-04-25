@@ -1,6 +1,7 @@
 ﻿using ProjectSystemHelpStudents.Helper;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,21 +9,54 @@ using System.Windows.Navigation;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
-    public partial class StackPanelButtonPage : Page
+    public partial class StackPanelButtonPage : Page, INotifyPropertyChanged
     {
+        private string _nameUser;
         public static Action RefreshProjectStackPanel;
+
+        public string NameUser
+        {
+            get => _nameUser;
+            set
+            {
+                _nameUser = value;
+                OnPropertyChanged(nameof(NameUser));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         public StackPanelButtonPage()
         {
             InitializeComponent();
             DataContext = this;
-            UserNameButton.Content = UserSession.NameUser;
+
+            NameUser = string.Empty;
+            if (!string.IsNullOrEmpty(UserSession.NameUser))
+            {
+                NameUser = UserSession.NameUser.Split(' ')[0];
+            }
 
             GenerateProjectButtons();
             RefreshProjectStackPanel = GenerateProjectButtons;
-
             SubscribeToProjectAddedEvent();
+
+            UserSession.UserNameUpdated += (newName) =>
+            {
+                Dispatcher.Invoke(() => UpdateUserName(newName));
+            };
         }
 
+        private void UpdateUserName(string newName)
+        {
+            NameUser = string.Empty;
+            NameUser = newName;
+        }
 
         private void SubscribeToProjectAddedEvent()
         {
@@ -38,13 +72,13 @@ namespace ProjectSystemHelpStudents.UsersContent
             var projectStackPanel = new StackPanel();
             var projects = GetProjects();
 
-            // Получаем список откреплённых ID
             var detachedProjects = UserSettingsHelper.GetDetachedProjects();
+            ProjectStackPanel.Children.Clear();
 
             foreach (var project in projects)
             {
                 if (detachedProjects.Contains(project.ProjectId))
-                    continue; // Пропускаем откреплённые
+                    continue;
 
                 StackPanel projectPanel = new StackPanel { Orientation = Orientation.Horizontal };
 
@@ -116,6 +150,10 @@ namespace ProjectSystemHelpStudents.UsersContent
             FrmClass.frmContentUser.Content = content;
             StackPanelButtonPage _content = new StackPanelButtonPage();
             FrmClass.frmStackPanelButton.Content = _content;
+
+            // После изменения имени пользователя обновите его в интерфейсе
+            var updatedName = "Новое имя пользователя"; // Пример нового имени
+            UpdateUserName(updatedName);
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)

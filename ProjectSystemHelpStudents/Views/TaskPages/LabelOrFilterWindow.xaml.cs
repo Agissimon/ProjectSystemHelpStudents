@@ -38,17 +38,17 @@ namespace ProjectSystemHelpStudents.Views.TaskPages
             DataContext = this;
 
             ColorOptions = new ObservableCollection<ColorOption>
-    {
-        new ColorOption { Name = "Синий", Hex = "#0000FF" },
-        new ColorOption { Name = "Виноградный", Hex = "#6B3FA0" },
-        new ColorOption { Name = "Фиолетовый", Hex = "#800080" },
-        new ColorOption { Name = "Лавандовый", Hex = "#E6E6FA" },
-        new ColorOption { Name = "Ярко-розовый", Hex = "#FF69B4" },
-        new ColorOption { Name = "Розовый", Hex = "#FFC0CB" },
-        new ColorOption { Name = "Аспидно-серый", Hex = "#708090" },
-        new ColorOption { Name = "Серый", Hex = "#808080" },
-        new ColorOption { Name = "Тауп", Hex = "#483C32" }
-    };
+            {
+                new ColorOption { Name = "Синий", Hex = "#0000FF" },
+                new ColorOption { Name = "Виноградный", Hex = "#6B3FA0" },
+                new ColorOption { Name = "Фиолетовый", Hex = "#800080" },
+                new ColorOption { Name = "Лавандовый", Hex = "#E6E6FA" },
+                new ColorOption { Name = "Ярко-розовый", Hex = "#FF69B4" },
+                new ColorOption { Name = "Розовый", Hex = "#FFC0CB" },
+                new ColorOption { Name = "Аспидно-серый", Hex = "#708090" },
+                new ColorOption { Name = "Серый", Hex = "#808080" },
+                new ColorOption { Name = "Тауп", Hex = "#483C32" }
+            };
 
             NameTextBox.Text = initialName;
 

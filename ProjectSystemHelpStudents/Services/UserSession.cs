@@ -6,9 +6,18 @@ using System.Threading.Tasks;
 
 namespace ProjectSystemHelpStudents.Helper
 {
-    internal class UserSession
+    public static class UserSession
     {
-        public static int IdUser { get; set; }
         public static string NameUser { get; set; }
+        public static int IdUser { get; set; }
+
+        public static event Action<string> UserNameUpdated;
+
+        public static void NotifyUserNameUpdated(string newName)
+        {
+            NameUser = string.Empty;
+            NameUser = newName;
+            UserNameUpdated?.Invoke(newName);
+        }
     }
 }

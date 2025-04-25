@@ -68,7 +68,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                         else if (user.RoleUser == 2)
                         {
                             UserSession.IdUser = user.IdUser;
-                            UserSession.NameUser = user.Name;
+                            UserSession.NotifyUserNameUpdated(user.Name);
                             MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
 
                             var mainWindow = Application.Current.MainWindow as MainWindow;

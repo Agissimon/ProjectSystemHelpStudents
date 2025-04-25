@@ -4,8 +4,11 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:ProjectSystemHelpStudents.Helper"
+      xmlns:local1="clr-namespace:ProjectSystemHelpStudents.ViewModels"
+      xmlns:fa="clr-namespace:FontAwesome.Sharp;assembly=FontAwesome.Sharp"
       mc:Ignorable="d"
       Title="UpcomingTasksPage"
+      Loaded="UpcomingTasksPage_Loaded"
       Background="#222">
 
     <Grid Margin="0,10,10,30">
@@ -32,7 +35,7 @@
                             HorizontalAlignment="Right"
                             DockPanel.Dock="Right">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Resources/Icon/settings-sliders.png" Width="20" Height="20" Margin="0,0,5,0"/>
+                            <fa:IconImage Icon="Sliders" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
                             <TextBlock Text="Отображение" VerticalAlignment="Center" Foreground="White"/>
                         </StackPanel>
                     </Button>
@@ -153,7 +156,7 @@
                     <Grid Margin="10,0,0,10">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
 
-                            <Expander x:Name="OverdueTasksExpander" Header="Просрочено" IsExpanded="True" FontSize="18" Foreground="Red" 
+                            <Expander x:Name="OverdueTasksExpander" Header="Просрочено" FontSize="18" Foreground="Red" 
                                       Margin="0,10" 
                                       Expanded="Expander_ExpandedCollapsed" Collapsed="Expander_ExpandedCollapsed">
                                 <ListView x:Name="OverdueTasksListView"
@@ -202,7 +205,7 @@
                             Style="{StaticResource TransparentListViewStyle}"
                             MinWidth="800">
                                 <ListView.Resources>
-                                    <DataTemplate DataType="{x:Type local:TaskGroupViewModel}">
+                                    <DataTemplate DataType="{x:Type local1:TaskGroupViewModel}">
                                         <StackPanel>
                                             <TextBlock Text="{Binding DateHeader}" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,10,0,5"/>
                                             <Separator Height="1" Background="Gray" Margin="0,0,0,10"/>

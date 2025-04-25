@@ -8,6 +8,9 @@ namespace ProjectSystemHelpStudents.UsersContent
 {
     public partial class UserPage : Page
     {
+        public delegate void UserNameUpdatedHandler(string newName);
+        public event UserNameUpdatedHandler UserNameUpdated;
+
         private User currentUser;
 
         public UserPage()
@@ -19,7 +22,6 @@ namespace ProjectSystemHelpStudents.UsersContent
         private void LoadUserData()
         {
             int userId = UserSession.IdUser;
-
             var user = DBClass.entities.Users.FirstOrDefault(u => u.IdUser == userId);
             if (user != null)
             {
@@ -33,7 +35,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                     Password = user.Password,
                     Mail = user.Mail
                 };
-
                 UserNameTextBox.Text = currentUser.Name;
                 UserSurnameTextBox.Text = currentUser.Surname;
                 UserPatronymicTextBox.Text = currentUser.Patronymic;
@@ -58,6 +59,10 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                     SaveUserDataToDatabase();
 
+                    // Передаем только имя пользователя
+                    string newName = currentUser.Name;
+                    UserSession.NotifyUserNameUpdated(newName);
+
                     MessageBox.Show("Данные пользователя успешно сохранены.");
                 }
                 else
@@ -80,7 +85,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                 user.Surname = currentUser.Surname;
                 user.Patronymic = currentUser.Patronymic;
                 user.Mail = currentUser.Mail;
-
                 DBClass.entities.SaveChanges();
             }
         }

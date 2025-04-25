@@ -4,60 +4,67 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:ProjectSystemHelpStudents.UsersContent"
+      xmlns:fa="clr-namespace:FontAwesome.Sharp;assembly=FontAwesome.Sharp"
       mc:Ignorable="d"
       d:DesignHeight="450" d:DesignWidth="200"
       Title="StackPanelButtonPage">
 
     <Grid Margin="0,0,10,0">
-        <StackPanel Background="#444" >
+        <StackPanel Background="#444">
 
-            <Button x:Name="UserNameButton" FontSize="18" Margin="10 5" FontWeight="Bold" Style="{StaticResource TransparentButtonStyle}" Click="UserNameButton_Click">
+            <Button Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="UserNameButton_Click">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Resources/Icon/user.png" Width="20" Height="20" Margin="0,0,10,0"/>
-                    <TextBlock Text="{Binding NameUser}" VerticalAlignment="Center"/>
+                    <fa:IconImage Icon="User" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="{Binding NameUser, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
 
             <Button Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="SearchButton_Click">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Resources/Icon/search.png" Width="20" Height="20" Margin="0,0,10,0"/>
-                    <TextBlock Text="Поиск" VerticalAlignment="Center"/>
+                    <fa:IconImage Icon="Search" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Поиск" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
+
             <Button Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="IncomingButton_Click">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Resources/Icon/inbox.png" Width="20" Height="20" Margin="0,0,10,0"/>
-                    <TextBlock Text="Входящие" VerticalAlignment="Center"/>
+                    <fa:IconImage Icon="Inbox" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Входящие" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
-            <Button Style="{StaticResource TransparentButtonStyle}" Margin="10 5"  Click="TodayButton_Click">
+
+            <Button Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="TodayButton_Click">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Resources/Icon/calendar.png" Width="20" Height="20" Margin="0,0,10,0"/>
-                    <TextBlock Text="Сегодня" VerticalAlignment="Center"/>
+                    <fa:IconImage Icon="CalendarAlt" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Сегодня" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
+
             <Button Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="UpcomingButton_Click">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Resources/Icon/duration-alt.png" Width="20" Height="20" Margin="0,0,10,0"/>
-                    <TextBlock Text="Предстоящее" VerticalAlignment="Center"/>
+                    <fa:IconImage Icon="Clock" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Предстоящее" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
+
             <Button Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="FiltersButton_Click">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Resources/Icon/filter.png" Width="20" Height="20" Margin="0,0,10,0"/>
-                    <TextBlock Text="Фильтры и метки" VerticalAlignment="Center"/>
+                    <fa:IconImage Icon="Filter" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Фильтры и метки" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
+
             <Button Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="CompletedButton_Click">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Resources/Icon/check-circle.png" Width="20" Height="20" Margin="0,0,10,0"/>
-                    <TextBlock Text="Выполнено" VerticalAlignment="Center"/>
+                    <fa:IconImage Icon="CheckCircle" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Выполнено" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
 
             <Button Style="{StaticResource TransparentButtonStyle}" Margin="10,15,0,10" FontWeight="Bold" Click="MyProjectButton_Click">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Мои проекты" VerticalAlignment="Center"/>
+                    <fa:IconImage Icon="FolderOpen" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Мои проекты" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
 
