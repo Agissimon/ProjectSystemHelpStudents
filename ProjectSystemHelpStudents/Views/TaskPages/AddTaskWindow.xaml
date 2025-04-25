@@ -4,6 +4,7 @@
         Title="Добавить задачу"
         Height="Auto"
         Width="Auto"
+        MaxHeight="350"
         WindowStartupLocation="CenterScreen"
         Icon="/Resources/Icon/logo001.png"
         Style="{StaticResource SmallWindowStyle}"

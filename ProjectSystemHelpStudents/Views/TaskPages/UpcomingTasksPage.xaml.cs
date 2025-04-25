@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using ProjectSystemHelpStudents.Views;
 using System.Globalization;
+using ProjectSystemHelpStudents.ViewModels;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -36,10 +37,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             if (TasksListView != null)
             {
                 RefreshPage();
-
-                // Восстанавливаем состояние экспандеров
                 RestoreExpandersState();
-
                 if (MonthDayPicker.SelectedDate.HasValue)
                 {
                     UpdateMonthText(MonthDayPicker.SelectedDate.Value);
@@ -184,6 +182,23 @@ namespace ProjectSystemHelpStudents.UsersContent
                         {
                             group = new TaskGroupViewModel { DateHeader = task.EndDateFormatted };
                             _groupedTasks.Add(group);
+
+                            var expander = new Expander
+                            {
+                                Header = group.DateHeader,
+                                FontSize = 18,
+                                Foreground = Brushes.White,
+                                Margin = new Thickness(0, 10, 0, 0)
+                            };
+                            expander.Expanded += Expander_ExpandedCollapsed;
+                            expander.Collapsed += Expander_ExpandedCollapsed;
+
+                            expander.Content = new ListBox
+                            {
+                                ItemsSource = group.Tasks,
+                                Style = (Style)FindResource("TransparentListBoxStyle")
+                            };
+                            group.Expander = expander;
                         }
                         group.Tasks.Add(task);
                     }
@@ -523,59 +538,50 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void SaveExpandedGroupsState()
         {
-            // Проверка на null для TasksListView
-            if (TasksListView == null)
-            {
-                // Можно добавить логирование или вывод сообщения об ошибке
-                Console.WriteLine("TasksListView is null!");
-                return;
-            }
 
             var expanded = new List<string>();
 
-            // Перебираем все элементы в TasksListView, чтобы сохранить состояние экспандеров
-            foreach (var item in TasksListView.Items)
+            if (OverdueTasksExpander != null && OverdueTasksExpander.IsExpanded)
             {
-                if (item is Expander expander && expander.IsExpanded)
+                expanded.Add("Просрочено");
+            }
+
+            if (TasksListView != null)
+            {
+                foreach (var item in TasksListView.Items)
                 {
-                    expanded.Add(expander.Header.ToString());
+                    if (item is TaskGroupViewModel group && group.Expander != null && group.Expander.IsExpanded)
+                    {
+                        expanded.Add(group.DateHeader);
+                    }
                 }
             }
 
-            // Сохраняем заголовки развернутых групп в настройки
             Properties.Settings.Default.ExpandersState = string.Join(";", expanded);
             Properties.Settings.Default.Save();
-        }
-
-        private bool IsGroupExpanded(string header)
-        {
-            if (header == null) return false;
-
-            string saved = Properties.Settings.Default.ExpandersState;
-            if (string.IsNullOrEmpty(saved)) return false;
-
-            var list = saved.Split(';');
-            return list.Contains(header);
         }
 
         private void RestoreExpandersState()
         {
             string savedState = Properties.Settings.Default.ExpandersState;
+
             if (!string.IsNullOrEmpty(savedState))
             {
                 var expandedHeaders = savedState.Split(';');
 
-                // Отдельная обработка для OverdueTasksExpander
                 if (OverdueTasksExpander != null)
                 {
                     OverdueTasksExpander.IsExpanded = expandedHeaders.Contains("Просрочено");
                 }
 
-                foreach (var item in TasksListView.Items)
+                if (TasksListView != null)
                 {
-                    if (item is Expander expander && expander.Header != null)
+                    foreach (var item in TasksListView.Items)
                     {
-                        expander.IsExpanded = expandedHeaders.Contains(expander.Header.ToString());
+                        if (item is TaskGroupViewModel group && group.Expander != null)
+                        {
+                            group.Expander.IsExpanded = expandedHeaders.Contains(group.DateHeader);
+                        }
                     }
                 }
             }

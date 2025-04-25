@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:ProjectSystemHelpStudents.Helper"
         Title="MyTask" 
         Icon="/Resources/Icon/logo001.png" 
-        MinWidth="700" 
+        MinWidth="720" 
         Width="700" 
         Style="{StaticResource SmallWindowStyle}"  
         WindowStartupLocation="CenterScreen">

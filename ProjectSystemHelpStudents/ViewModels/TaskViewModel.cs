@@ -140,17 +140,4 @@ namespace ProjectSystemHelpStudents.Helper
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
-
-    public class TaskGroupViewModel
-    {
-        public string DateHeader { get; set; }
-        public ObservableCollection<TaskViewModel> Tasks { get; set; }
-
-        public TaskGroupViewModel()
-        {
-            Tasks = new ObservableCollection<TaskViewModel>();
-        }
-    }
-
 }

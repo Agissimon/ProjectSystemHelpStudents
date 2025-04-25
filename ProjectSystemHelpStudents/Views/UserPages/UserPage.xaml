@@ -11,18 +11,18 @@
                 <TextBlock Text="Редактирование данных пользователя" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
 
                 <TextBlock Text="Имя:" Style="{StaticResource TransparentTextBlockStyle}"/>
-                <TextBox x:Name="UserNameTextBox" Style="{StaticResource TransparentTextBoxStyle}"/>
+                <TextBox x:Name="UserNameTextBox" Style="{StaticResource InputFieldStyle}"/>
 
                 <TextBlock Text="Фамилия:" Style="{StaticResource TransparentTextBlockStyle}"/>
-                <TextBox x:Name="UserSurnameTextBox" Style="{StaticResource TransparentTextBoxStyle}"/>
+                <TextBox x:Name="UserSurnameTextBox" Style="{StaticResource InputFieldStyle}"/>
 
                 <TextBlock Text="Отчество:" Style="{StaticResource TransparentTextBlockStyle}"/>
-                <TextBox x:Name="UserPatronymicTextBox" Style="{StaticResource TransparentTextBoxStyle}"/>
+                <TextBox x:Name="UserPatronymicTextBox" Style="{StaticResource InputFieldStyle}"/>
 
                 <TextBlock Text="Email:" Style="{StaticResource TransparentTextBlockStyle}"/>
-                <TextBox x:Name="UserEmailTextBox" Style="{StaticResource TransparentTextBoxStyle}"/>
+                <TextBox x:Name="UserEmailTextBox" Style="{StaticResource InputFieldStyle}"/>
 
-                <Button Content="Сохранить" Style="{StaticResource NavigationButtonStyle}" Click="SaveButton_Click"/>
+                <Button Content="Сохранить" Style="{StaticResource DisplayOptionsButtonStyle}" Click="SaveButton_Click"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

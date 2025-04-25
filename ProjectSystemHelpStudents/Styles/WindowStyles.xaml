@@ -36,5 +36,4 @@
         <Setter Property="MaxWidth" Value="600"/>
     </Style>
     
-    
 </ResourceDictionary>
