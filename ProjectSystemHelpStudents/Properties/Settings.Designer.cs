@@ -106,5 +106,16 @@ namespace ProjectSystemHelpStudents.Properties {
                 this["DetachedProjects"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection SearchHistory {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["SearchHistory"]));
+            }
+            set {
+                this["SearchHistory"] = value;
+            }
+        }
     }
 }

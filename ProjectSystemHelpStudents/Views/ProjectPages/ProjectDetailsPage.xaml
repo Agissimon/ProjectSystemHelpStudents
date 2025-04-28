@@ -45,14 +45,24 @@
                             <StackPanel Margin="0,10,0,0">
                                 <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                                     <TextBlock Text="{Binding SectionName}" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-                                    <Button Content="✎" Tag="{Binding SectionId}" Click="EditSection_Click"
-                                            Margin="10,0,0,0" Width="30" Height="30" Background="#444" Foreground="White"/>
-                                    <Button Content="🗑" Tag="{Binding SectionId}" Click="DeleteSection_Click"
-                                            Margin="5,0,0,0" Width="30" Height="30" Background="#8B0000" Foreground="White"/>
+                                    <Button Content="✎" 
+                                            Tag="{Binding SectionId}" 
+                                            Click="EditSection_Click" 
+                                            Style="{StaticResource RoundedButtonStyle}" 
+                                            Background="#444"
+                                            Margin="15 0 10 0"/>
+                                    <Button Content="🗑" 
+                                            Tag="{Binding SectionId}" 
+                                            Click="DeleteSection_Click" 
+                                            Style="{StaticResource RoundedButtonStyle}" 
+                                            Background="#8B0000"/>
                                 </StackPanel>
 
                                 <Button Content="+ Добавить задачу в раздел" Tag="{Binding SectionId}" Click="AddTaskToSection_Click"
                                         Style="{StaticResource AddTaskButtonStyle}" Margin="0,5,0,10"/>
+                                
+                                <Separator Height="1" Background="Gray" Margin="0,10,0,10"/>
+                                
                                 <ListView ItemsSource="{Binding Tasks}"
                                           SelectionChanged="TaskListView_SelectionChanged"
                                           Style="{StaticResource TransparentListViewStyle}"

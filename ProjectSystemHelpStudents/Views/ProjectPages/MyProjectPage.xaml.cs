@@ -13,6 +13,8 @@ namespace ProjectSystemHelpStudents.UsersContent
     {
         public ObservableCollection<ProjectViewModel> Projects { get; set; }
         public string ProjectCountText => $"{Projects.Count} проекта";
+        private ObservableCollection<ProjectViewModel> AllProjects = new ObservableCollection<ProjectViewModel>();
+
 
         public MyProjectPage()
         {
@@ -62,16 +64,21 @@ namespace ProjectSystemHelpStudents.UsersContent
                         .ToList();
 
                     Projects.Clear();
+                    AllProjects.Clear();
+
                     foreach (var project in userProjects)
                     {
                         var isDetached = UserSettingsHelper.IsDetached(project.ProjectId);
-                        Projects.Add(new ProjectViewModel
+                        var projectVm = new ProjectViewModel
                         {
                             ProjectId = project.ProjectId,
                             Name = project.Name,
                             Icon = "📁",
-                            IsDetached = isDetached // Помечаем, если проект в избранном
-                        });
+                            IsDetached = isDetached
+                        };
+
+                        Projects.Add(projectVm);
+                        AllProjects.Add(projectVm);
                     }
                 }
                 ProjectsListView.ItemsSource = Projects;
@@ -116,7 +123,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                     project.IsDetached = false;
                     RefreshProjects();
 
-                    // Обновим StackPanel
                     StackPanelButtonPage.RefreshProjectStackPanel?.Invoke();
 
                     MessageBox.Show($"Проект «{project.Name}» закреплён в боковой панели.", "Закреплено", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -134,22 +140,18 @@ namespace ProjectSystemHelpStudents.UsersContent
             {
                 try
                 {
-                    // Открытие окна редактирования с переданным ProjectId
                     AddProjectWindow editWindow = new AddProjectWindow
                     {
                         ProjectId = project.ProjectId
                     };
 
-                    // Обработка закрытия окна редактирования
                     editWindow.ProjectAdded += (newProject) =>
                     {
-                        // Обновляем список проектов после редактирования
                         Dispatcher.Invoke(() => RefreshProjects());
                     };
 
                     editWindow.ShowDialog();
 
-                    // После того как проект обновлен, обновляем список
                     if (editWindow.IsProjectUpdated)
                     {
                         RefreshProjects();
@@ -174,16 +176,13 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                         if (project != null)
                         {
-                            // Удаляем сначала все связанные задачи
                             var tasks = context.Task.Where(t => t.ProjectId == project.ProjectId).ToList();
                             context.Task.RemoveRange(tasks);
-                            context.SaveChanges(); // Сначала удаляем задачи
+                            context.SaveChanges();
 
-                            // Теперь удаляем сам проект
                             context.Project.Remove(project);
                             context.SaveChanges();
 
-                            // Удаляем из локального списка
                             Dispatcher.Invoke(() => Projects.Remove(projectToDelete));
 
                             MessageBox.Show("Проект успешно удален!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -202,6 +201,20 @@ namespace ProjectSystemHelpStudents.UsersContent
             else
             {
                 MessageBox.Show("Ошибка: Данные проекта не найдены.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var searchText = SearchBox.Text.ToLower();
+
+            var filtered = AllProjects
+                .Where(p => p.Name.ToLower().Contains(searchText))
+                .ToList();
+
+            Projects.Clear();
+            foreach (var project in filtered)
+            {
+                Projects.Add(project);
             }
         }
     }
