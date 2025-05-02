@@ -34,39 +34,36 @@ namespace ProjectSystemHelpStudents
 
         private void ResultsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (lstResults.SelectedItem is string selectedItem)
-            {
-                if (selectedItem.StartsWith("Задача:"))
-                {
-                    int idStart = selectedItem.LastIndexOf("(ID:") + 4;
-                    int idEnd = selectedItem.LastIndexOf(")");
-                    if (idStart >= 0 && idEnd > idStart)
-                    {
-                        string idStr = selectedItem.Substring(idStart, idEnd - idStart);
-                        if (int.TryParse(idStr, out int taskId))
-                        {
-                            var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.IdTask == taskId);
-                            if (dbTask != null)
-                            {
-                                // Заполняем данные в TaskViewModel
-                                var taskViewModel = new TaskViewModel
-                                {
-                                    IdTask = dbTask.IdTask,
-                                    Title = dbTask.Title,
-                                    Description = dbTask.Description,
-                                    EndDate = dbTask.EndDate,
-                                    ProjectId = dbTask.ProjectId ?? 0,
-                                    PriorityId = dbTask.PriorityId = 0,
-                                    Status = dbTask.Status.Name,
-                                };
+            if (!(lstResults.SelectedItem is string selectedItem) || !selectedItem.StartsWith("Задача:"))
+                return;
 
-                                var taskDetailsWindow = new TaskDetailsWindow(taskViewModel);
-                                taskDetailsWindow.ShowDialog();
-                            }
-                        }
-                    }
-                }
-            }
+            int idStart = selectedItem.LastIndexOf("(ID:") + 4;
+            int idEnd = selectedItem.LastIndexOf(")");
+            if (idStart < 0 || idEnd <= idStart)
+                return;
+
+            string idStr = selectedItem.Substring(idStart, idEnd - idStart);
+            if (!int.TryParse(idStr, out int taskId))
+                return;
+
+            var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.IdTask == taskId);
+            if (dbTask == null)
+                return;
+
+            var taskViewModel = new TaskViewModel
+            {
+                IdTask = dbTask.IdTask,
+                Title = dbTask.Title,
+                Description = dbTask.Description,
+                EndDate = dbTask.EndDate,
+                ProjectId = (int)dbTask.ProjectId,
+                PriorityId = dbTask.PriorityId,
+                Status = dbTask.Status.Name
+            };
+
+            var taskDetailsWindow = new TaskDetailsWindow(taskViewModel);
+            taskDetailsWindow.TaskUpdated += () => { };
+            taskDetailsWindow.ShowDialog();
         }
     }
 }

@@ -117,5 +117,17 @@ namespace ProjectSystemHelpStudents.Properties {
                 this["SearchHistory"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool OverdueExpanderExpanded {
+            get {
+                return ((bool)(this["OverdueExpanderExpanded"]));
+            }
+            set {
+                this["OverdueExpanderExpanded"] = value;
+            }
+        }
     }
 }

@@ -1,24 +1,12 @@
 ﻿using ProjectSystemHelpStudents.Helper;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Data.Entity;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
-    /// <summary>
-    /// Логика взаимодействия для IncomingPage.xaml
-    /// </summary>
     public partial class IncomingPage : Page
     {
         public IncomingPage()
@@ -31,27 +19,34 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             try
             {
-                var completedTasks = DBClass.entities.Task
-                    .Where(t => t.Project != null && t.Project.Name == "Входящие" && t.Status.Name == "Не завершено" && t.IdUser == UserSession.IdUser)
-                    .Select(t => new TaskViewModel
-                    {
-                        Title = t.Title,
-                        Description = t.Description,
-                        Status = t.Status.Name,
-                        EndDate = t.EndDate,
-                        IsCompleted = false
-                    })
-                    .ToList();
-
-                foreach (var task in completedTasks)
+                using (var ctx = new TaskManagementEntities1())
                 {
-                    task.EndDateFormatted = task.EndDate != DateTime.MinValue
-                        ? task.EndDate.ToString("dd MMMM yyyy")
-                        : "Без срока";
-                }
+                    var incoming = ctx.Task
+                        .Include(t => t.Status)
+                        .Include(t => t.Project)
+                        .Where(t =>
+                            t.Project != null &&
+                            t.Project.Name == "Входящие" &&
+                            t.IdUser == UserSession.IdUser)
+                        .ToList();
 
-                TasksListView.ItemsSource = null;
-                TasksListView.ItemsSource = completedTasks;
+                    var vms = incoming
+                        .Select(t => new TaskViewModel
+                        {
+                            IdTask = t.IdTask,
+                            Title = t.Title,
+                            Description = t.Description,
+                            IsCompleted = t.Status != null && t.Status.Name == "Завершено",
+                            EndDate = t.EndDate,
+                            EndDateFormatted = t.EndDate != DateTime.MinValue
+                                ? t.EndDate.ToString("dd MMMM yyyy")
+                                : "Без срока"
+                        })
+                        .Where(vm => !vm.IsCompleted)
+                        .ToList();
+
+                    TasksListView.ItemsSource = vms;
+                }
             }
             catch (Exception ex)
             {
@@ -61,36 +56,44 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void ToggleTaskStatus_Click(object sender, RoutedEventArgs e)
         {
-            var checkBox = sender as CheckBox;
-            var task = checkBox.DataContext as TaskViewModel;
+            var cb = sender as CheckBox;
+            var task = cb?.DataContext as TaskViewModel;
+            if (task == null) return;
 
-            if (task != null)
+            using (var ctx = new TaskManagementEntities1())
             {
-                var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.Title == task.Title);
+                var dbTask = ctx.Task.FirstOrDefault(t => t.IdTask == task.IdTask);
                 if (dbTask != null)
                 {
-                    dbTask.StatusId = (int)(checkBox.IsChecked == true ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId : DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId);
-                    DBClass.entities.SaveChanges();
+                    var done = ctx.Status.First(s => s.Name == "Завершено");
+                    var undone = ctx.Status.First(s => s.Name == "Не завершено");
 
-                    LoadTasks();
+                    dbTask.StatusId = cb.IsChecked == true
+                        ? done.StatusId
+                        : undone.StatusId;
+
+                    ctx.SaveChanges();
                 }
             }
+
+            LoadTasks();
         }
 
         private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (sender is ListView listView && listView.SelectedItem is TaskViewModel selectedTask)
+            if (sender is ListView lv && lv.SelectedItem is TaskViewModel vm)
             {
-                var detailsWindow = new TaskDetailsWindow(selectedTask);
-                detailsWindow.ShowDialog();
-                listView.SelectedItem = null;
+                var wnd = new TaskDetailsWindow(vm);
+                wnd.ShowDialog();
+                lv.SelectedItem = null;
+                LoadTasks();
             }
         }
 
         private void ButtonCreateTask_Click(object sender, RoutedEventArgs e)
         {
-            AddTaskWindow addTaskWindow = new AddTaskWindow();
-            addTaskWindow.ShowDialog();
+            var addWnd = new AddTaskWindow(DateTime.Today);
+            addWnd.ShowDialog();
             LoadTasks();
         }
     }

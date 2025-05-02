@@ -13,7 +13,12 @@
         <StackPanel Orientation="Horizontal">
             <StackPanel Orientation="Vertical" Width="502">
                 <StackPanel Orientation="Horizontal" Width="494">
-                    <CheckBox x:Name="IsCompletedCheckBox" IsChecked="{Binding IsCompleted}" Margin="0,0,10,0" VerticalAlignment="Center" Click="ToggleTaskStatus_Click"/>
+                    <CheckBox x:Name="IsCompletedCheckBox"
+                              IsChecked="{Binding IsCompleted, Mode=TwoWay}"
+                              Checked="ToggleTaskStatus_Click"
+                              Unchecked="ToggleTaskStatus_Click"
+                              Margin="0,0,10,0"
+                              VerticalAlignment="Center"/>
                     <TextBox x:Name="TitleTextBox" Text="{Binding Title}" FontSize="18" FontWeight="Bold" Foreground="White" Background="#333" BorderBrush="Transparent"/>
                 </StackPanel>
 
