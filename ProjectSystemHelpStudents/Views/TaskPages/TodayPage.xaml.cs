@@ -14,6 +14,27 @@ namespace ProjectSystemHelpStudents.UsersContent
             InitializeComponent();
             UpdateTodayDateText();
             LoadTasks();
+
+            var window = Window.GetWindow(this);
+            if (window != null)
+            {
+                window.Closed += (s, e) => SaveExpanderState();
+            }
+        }
+
+        private void SaveExpanderState()
+        {
+            Properties.Settings.Default.Save();
+        }
+
+        private void Expander_Expanded(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.OverdueExpanderExpanded = true;
+        }
+
+        private void Expander_Collapsed(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.OverdueExpanderExpanded = false;
         }
 
         private void UpdateTodayDateText()
@@ -27,35 +48,40 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             try
             {
-                var allTasks = DBClass.entities.Task
-                    .Where(t => t.IdUser == UserSession.IdUser)
-                    .Select(t => new TaskViewModel 
+                using (var context = new TaskManagementEntities1())
+                {
+                    var allTasks = context.Task
+                        .Include("Status")
+                        .Where(t => t.IdUser == UserSession.IdUser)
+                        .ToList();
+
+                    var vms = allTasks.Select(t => new TaskViewModel
                     {
+                        IdTask = t.IdTask,
                         Title = t.Title,
                         Description = t.Description,
-                        Status = t.Status != null ? t.Status.Name : "Без статуса",
+                        IsCompleted = t.Status != null && t.Status.Name == "Завершено",
                         EndDate = t.EndDate,
-                        IsCompleted = t.Status != null && t.Status.Name == "Завершено"
+                        EndDateFormatted = t.EndDate != DateTime.MinValue
+                            ? t.EndDate.ToString("dd MMMM yyyy")
+                            : "Без срока"
                     })
                     .ToList();
 
-                foreach (var task in allTasks)
-                {
-                    task.EndDateFormatted = task.EndDate != DateTime.MinValue
-                        ? task.EndDate.ToString("dd MMMM yyyy")
-                        : "Без срока";
+                    var overdue = vms
+                        .Where(vm => vm.EndDate != DateTime.MinValue
+                                  && vm.EndDate.Date < DateTime.Today
+                                  && !vm.IsCompleted)
+                        .ToList();
+
+                    var today = vms
+                        .Where(vm => vm.EndDate.Date == DateTime.Today
+                                  && !vm.IsCompleted)
+                        .ToList();
+
+                    OverdueTasksListView.ItemsSource = overdue;
+                    TasksListView.ItemsSource = today;
                 }
-
-                var overdueTasks = allTasks
-                    .Where(t => t.EndDateFormatted != "Без срока" && DateTime.Parse(t.EndDateFormatted) < DateTime.Today && !t.IsCompleted)
-                    .ToList();
-
-                var todayTasks = allTasks
-                    .Where(t => t.EndDateFormatted != "Без срока" && DateTime.Parse(t.EndDateFormatted) == DateTime.Today && !t.IsCompleted)
-                    .ToList();
-
-                OverdueTasksListView.ItemsSource = overdueTasks;
-                TasksListView.ItemsSource = todayTasks;
             }
             catch (Exception ex)
             {
@@ -65,39 +91,53 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (sender is ListView listView && listView.SelectedItem is TaskViewModel selectedTask)
+            if (!(sender is ListView listView && listView.SelectedItem is TaskViewModel selectedTask))
+                return;
+
+            var detailsWindow = new TaskDetailsWindow(selectedTask);
+            detailsWindow.TaskUpdated += () =>
             {
-                var detailsWindow = new TaskDetailsWindow(selectedTask);
-                detailsWindow.ShowDialog();
-                listView.SelectedItem = null;
-            }
+                LoadTasks();
+            };
+            detailsWindow.ShowDialog();
+
+            listView.SelectedItem = null;
         }
 
         private void ToggleTaskStatus_Click(object sender, RoutedEventArgs e)
         {
-            var checkBox = sender as CheckBox;
-            var task = checkBox.DataContext as TaskViewModel;
+            var cb = (CheckBox)sender;
+            var task = (TaskViewModel)cb.DataContext;
+            if (task == null) return;
 
-            if (task != null)
+            using (var ctx = new TaskManagementEntities1())
             {
-                var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.Title == task.Title);
-                if (dbTask != null)
-                {
-                    dbTask.StatusId = (int)(checkBox.IsChecked == true
-                        ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId
-                        : DBClass.entities.Status.FirstOrDefault(s => s.Name == "В процессе")?.StatusId);
+                var dbTask = ctx.Task.FirstOrDefault(t => t.IdTask == task.IdTask);
+                if (dbTask == null) return;
 
-                    DBClass.entities.SaveChanges();
-                    LoadTasks();
-                }
+                var doneStatus = ctx.Status.First(s => s.Name == "Завершено");
+                var undoneStatus = ctx.Status.First(s => s.Name == "Не завершено");
+
+                dbTask.StatusId = cb.IsChecked == true
+                    ? doneStatus.StatusId
+                    : undoneStatus.StatusId;
+
+                ctx.SaveChanges();
             }
+
+            LoadTasks();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            AddTaskWindow addTaskWindow = new AddTaskWindow();
-            addTaskWindow.ShowDialog();
-            LoadTasks();
+            var addTaskWindow = new AddTaskWindow(
+                projectId: null,
+                sectionId: null,
+                preselectedDate: DateTime.Today
+            );
+            if (addTaskWindow.ShowDialog() == true)
+                LoadTasks();
         }
+
     }
 }
