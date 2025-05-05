@@ -12,13 +12,35 @@
     <Grid Margin="0,0,10,0">
         <StackPanel Background="#444">
 
-            <Button Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="UserNameButton_Click">
+            <Button x:Name="UserNameButton" Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="UserNameButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <fa:IconImage Icon="User" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
                     <TextBlock Text="{Binding NameUser, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
-
+            
+            <Popup x:Name="UserPopup"
+                   PlacementTarget="{Binding ElementName=UserNameButton}"
+                   Placement="Bottom"
+                   StaysOpen="False"
+                   FlowDirection="LeftToRight"
+                   AllowsTransparency="True">
+                <Border Background="#333" Padding="10" CornerRadius="5">
+                    <StackPanel>
+                        <Button Content="Редактировать профиль"
+              Style="{StaticResource PopupButtonStyle}"
+              Click="EditProfile_Click"/>
+                        <Button Content="Создать команду"
+              Style="{StaticResource PopupButtonStyle}"
+              Click="CreateTeam_Click"/>
+                        <Separator Margin="0,5"/>
+                        <Button Content="Выйти"
+              Style="{StaticResource PopupButtonStyle}"
+              Click="Logout_Click"/>
+                    </StackPanel>
+                </Border>
+            </Popup>
+            
             <Button Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="SearchButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <fa:IconImage Icon="Search" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>

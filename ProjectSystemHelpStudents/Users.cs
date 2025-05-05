@@ -20,6 +20,10 @@ namespace ProjectSystemHelpStudents
             this.Comment = new HashSet<Comment>();
             this.Task = new HashSet<Task>();
             this.Filters = new HashSet<Filters>();
+            this.Team = new HashSet<Team>();
+            this.TeamInvitation = new HashSet<TeamInvitation>();
+            this.TeamInvitation1 = new HashSet<TeamInvitation>();
+            this.TeamMember = new HashSet<TeamMember>();
         }
     
         public int IdUser { get; set; }
@@ -37,5 +41,13 @@ namespace ProjectSystemHelpStudents
         public virtual ICollection<Task> Task { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Filters> Filters { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Team> Team { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<TeamInvitation> TeamInvitation { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<TeamInvitation> TeamInvitation1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<TeamMember> TeamMember { get; set; }
     }
 }

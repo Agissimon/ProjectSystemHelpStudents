@@ -107,6 +107,33 @@
           <Property Name="TaskId" Type="int" Nullable="false" />
           <Property Name="LabelId" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="Team">
+          <Key>
+            <PropertyRef Name="TeamId" />
+          </Key>
+          <Property Name="TeamId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="LeaderId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TeamInvitation">
+          <Key>
+            <PropertyRef Name="InvitationId" />
+          </Key>
+          <Property Name="InvitationId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TeamId" Type="int" Nullable="false" />
+          <Property Name="InviterId" Type="int" Nullable="false" />
+          <Property Name="InviteeId" Type="int" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TeamMember">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TeamId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="IsLeader" Type="bit" Nullable="false" />
+        </EntityType>
         <EntityType Name="Users">
           <Key>
             <PropertyRef Name="IdUser" />
@@ -254,6 +281,42 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Invitation_Invitee">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="TeamInvitation" Type="Self.TeamInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="TeamInvitation">
+              <PropertyRef Name="InviteeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invitation_Inviter">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="TeamInvitation" Type="Self.TeamInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="TeamInvitation">
+              <PropertyRef Name="InviterId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invitation_Team">
+          <End Role="Team" Type="Self.Team" Multiplicity="1" />
+          <End Role="TeamInvitation" Type="Self.TeamInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Team">
+              <PropertyRef Name="TeamId" />
+            </Principal>
+            <Dependent Role="TeamInvitation">
+              <PropertyRef Name="TeamId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Task_Project">
           <End Role="Project" Type="Self.Project" Multiplicity="0..1" />
           <End Role="Task" Type="Self.Task" Multiplicity="*" />
@@ -263,6 +326,42 @@
             </Principal>
             <Dependent Role="Task">
               <PropertyRef Name="ProjectId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Team_Leader">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Team" Type="Self.Team" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="Team">
+              <PropertyRef Name="LeaderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TeamMember_Team">
+          <End Role="Team" Type="Self.Team" Multiplicity="1" />
+          <End Role="TeamMember" Type="Self.TeamMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Team">
+              <PropertyRef Name="TeamId" />
+            </Principal>
+            <Dependent Role="TeamMember">
+              <PropertyRef Name="TeamId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TeamMember_User">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="TeamMember" Type="Self.TeamMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="TeamMember">
+              <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -278,6 +377,9 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Task" EntityType="Self.Task" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TaskLabels" EntityType="Self.TaskLabels" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Team" EntityType="Self.Team" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TeamInvitation" EntityType="Self.TeamInvitation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TeamMember" EntityType="Self.TeamMember" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK__Filters__UserId__41EDCAC5" Association="Self.FK__Filters__UserId__41EDCAC5">
             <End Role="Users" EntitySet="Users" />
@@ -323,9 +425,33 @@
             <End Role="Task" EntitySet="Task" />
             <End Role="Files" EntitySet="Files" />
           </AssociationSet>
+          <AssociationSet Name="FK_Invitation_Invitee" Association="Self.FK_Invitation_Invitee">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="TeamInvitation" EntitySet="TeamInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invitation_Inviter" Association="Self.FK_Invitation_Inviter">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="TeamInvitation" EntitySet="TeamInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invitation_Team" Association="Self.FK_Invitation_Team">
+            <End Role="Team" EntitySet="Team" />
+            <End Role="TeamInvitation" EntitySet="TeamInvitation" />
+          </AssociationSet>
           <AssociationSet Name="FK_Task_Project" Association="Self.FK_Task_Project">
             <End Role="Project" EntitySet="Project" />
             <End Role="Task" EntitySet="Task" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Team_Leader" Association="Self.FK_Team_Leader">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Team" EntitySet="Team" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TeamMember_Team" Association="Self.FK_TeamMember_Team">
+            <End Role="Team" EntitySet="Team" />
+            <End Role="TeamMember" EntitySet="TeamMember" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TeamMember_User" Association="Self.FK_TeamMember_User">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="TeamMember" EntitySet="TeamMember" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -429,6 +555,10 @@
           <NavigationProperty Name="Comment" Relationship="Self.FK_Comment_User" FromRole="Users" ToRole="Comment" />
           <NavigationProperty Name="Task" Relationship="Self.FK__Task__UserId__5629CD9C" FromRole="Users" ToRole="Task" />
           <NavigationProperty Name="Filters" Relationship="TaskManagementModel.FK__Filters__UserId__41EDCAC5" FromRole="Users" ToRole="Filters" />
+          <NavigationProperty Name="Team" Relationship="TaskManagementModel.FK_Team_Leader" FromRole="Users" ToRole="Team" />
+          <NavigationProperty Name="TeamInvitation" Relationship="TaskManagementModel.FK_Invitation_Invitee" FromRole="Users" ToRole="TeamInvitation" />
+          <NavigationProperty Name="TeamInvitation1" Relationship="TaskManagementModel.FK_Invitation_Inviter" FromRole="Users" ToRole="TeamInvitation" />
+          <NavigationProperty Name="TeamMember" Relationship="TaskManagementModel.FK_TeamMember_User" FromRole="Users" ToRole="TeamMember" />
         </EntityType>
         <Association Name="FK_Comment_Task">
           <End Role="Task" Type="Self.Task" Multiplicity="0..1">
@@ -577,6 +707,33 @@
             <End Role="Section" EntitySet="Section" />
             <End Role="Task" EntitySet="Task" />
           </AssociationSet>
+          <EntitySet Name="Team" EntityType="TaskManagementModel.Team" />
+          <EntitySet Name="TeamInvitation" EntityType="TaskManagementModel.TeamInvitation" />
+          <EntitySet Name="TeamMember" EntityType="TaskManagementModel.TeamMember" />
+          <AssociationSet Name="FK_Invitation_Team" Association="TaskManagementModel.FK_Invitation_Team">
+            <End Role="Team" EntitySet="Team" />
+            <End Role="TeamInvitation" EntitySet="TeamInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Team_Leader" Association="TaskManagementModel.FK_Team_Leader">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Team" EntitySet="Team" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TeamMember_Team" Association="TaskManagementModel.FK_TeamMember_Team">
+            <End Role="Team" EntitySet="Team" />
+            <End Role="TeamMember" EntitySet="TeamMember" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invitation_Invitee" Association="TaskManagementModel.FK_Invitation_Invitee">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="TeamInvitation" EntitySet="TeamInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invitation_Inviter" Association="TaskManagementModel.FK_Invitation_Inviter">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="TeamInvitation" EntitySet="TeamInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TeamMember_User" Association="TaskManagementModel.FK_TeamMember_User">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="TeamMember" EntitySet="TeamMember" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Filters">
           <Key>
@@ -676,6 +833,113 @@
             </Principal>
             <Dependent Role="Task">
               <PropertyRef Name="SectionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Team">
+          <Key>
+            <PropertyRef Name="TeamId" />
+          </Key>
+          <Property Name="TeamId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="LeaderId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="TeamInvitation" Relationship="TaskManagementModel.FK_Invitation_Team" FromRole="Team" ToRole="TeamInvitation" />
+          <NavigationProperty Name="Users" Relationship="TaskManagementModel.FK_Team_Leader" FromRole="Team" ToRole="Users" />
+          <NavigationProperty Name="TeamMember" Relationship="TaskManagementModel.FK_TeamMember_Team" FromRole="Team" ToRole="TeamMember" />
+        </EntityType>
+        <EntityType Name="TeamInvitation">
+          <Key>
+            <PropertyRef Name="InvitationId" />
+          </Key>
+          <Property Name="InvitationId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TeamId" Type="Int32" Nullable="false" />
+          <Property Name="InviterId" Type="Int32" Nullable="false" />
+          <Property Name="InviteeId" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Team" Relationship="TaskManagementModel.FK_Invitation_Team" FromRole="TeamInvitation" ToRole="Team" />
+          <NavigationProperty Name="Users" Relationship="TaskManagementModel.FK_Invitation_Invitee" FromRole="TeamInvitation" ToRole="Users" />
+          <NavigationProperty Name="Users1" Relationship="TaskManagementModel.FK_Invitation_Inviter" FromRole="TeamInvitation" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="TeamMember">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TeamId" Type="Int32" Nullable="false" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="IsLeader" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Team" Relationship="TaskManagementModel.FK_TeamMember_Team" FromRole="TeamMember" ToRole="Team" />
+          <NavigationProperty Name="Users" Relationship="TaskManagementModel.FK_TeamMember_User" FromRole="TeamMember" ToRole="Users" />
+        </EntityType>
+        <Association Name="FK_Invitation_Team">
+          <End Type="TaskManagementModel.Team" Role="Team" Multiplicity="1" />
+          <End Type="TaskManagementModel.TeamInvitation" Role="TeamInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Team">
+              <PropertyRef Name="TeamId" />
+            </Principal>
+            <Dependent Role="TeamInvitation">
+              <PropertyRef Name="TeamId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Team_Leader">
+          <End Type="TaskManagementModel.Users" Role="Users" Multiplicity="1" />
+          <End Type="TaskManagementModel.Team" Role="Team" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="Team">
+              <PropertyRef Name="LeaderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TeamMember_Team">
+          <End Type="TaskManagementModel.Team" Role="Team" Multiplicity="1" />
+          <End Type="TaskManagementModel.TeamMember" Role="TeamMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Team">
+              <PropertyRef Name="TeamId" />
+            </Principal>
+            <Dependent Role="TeamMember">
+              <PropertyRef Name="TeamId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invitation_Invitee">
+          <End Type="TaskManagementModel.Users" Role="Users" Multiplicity="1" />
+          <End Type="TaskManagementModel.TeamInvitation" Role="TeamInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="TeamInvitation">
+              <PropertyRef Name="InviteeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invitation_Inviter">
+          <End Type="TaskManagementModel.Users" Role="Users" Multiplicity="1" />
+          <End Type="TaskManagementModel.TeamInvitation" Role="TeamInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="TeamInvitation">
+              <PropertyRef Name="InviterId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TeamMember_User">
+          <End Type="TaskManagementModel.Users" Role="Users" Multiplicity="1" />
+          <End Type="TaskManagementModel.TeamMember" Role="TeamMember" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="TeamMember">
+              <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -809,6 +1073,36 @@
                 <ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="IdSection" ColumnName="IdSection" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Team">
+            <EntityTypeMapping TypeName="TaskManagementModel.Team">
+              <MappingFragment StoreEntitySet="Team">
+                <ScalarProperty Name="LeaderId" ColumnName="LeaderId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="TeamId" ColumnName="TeamId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TeamInvitation">
+            <EntityTypeMapping TypeName="TaskManagementModel.TeamInvitation">
+              <MappingFragment StoreEntitySet="TeamInvitation">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="InviteeId" ColumnName="InviteeId" />
+                <ScalarProperty Name="InviterId" ColumnName="InviterId" />
+                <ScalarProperty Name="TeamId" ColumnName="TeamId" />
+                <ScalarProperty Name="InvitationId" ColumnName="InvitationId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TeamMember">
+            <EntityTypeMapping TypeName="TaskManagementModel.TeamMember">
+              <MappingFragment StoreEntitySet="TeamMember">
+                <ScalarProperty Name="IsLeader" ColumnName="IsLeader" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="TeamId" ColumnName="TeamId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

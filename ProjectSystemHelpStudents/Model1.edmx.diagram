@@ -29,6 +29,15 @@
         <EntityTypeShape EntityType="TaskManagementModel.Section" Width="1.5" PointX="10.375" PointY="12" />
         <AssociationConnector Association="TaskManagementModel.FK__Section__Project__4F47C5E3" />
         <AssociationConnector Association="TaskManagementModel.FK__Task__SectionId__503BEA1C" />
+        <EntityTypeShape EntityType="TaskManagementModel.Team" Width="1.5" PointX="3" PointY="22.25" />
+        <EntityTypeShape EntityType="TaskManagementModel.TeamInvitation" Width="1.5" PointX="9.25" PointY="15.625" />
+        <EntityTypeShape EntityType="TaskManagementModel.TeamMember" Width="1.5" PointX="6.25" PointY="15.75" />
+        <AssociationConnector Association="TaskManagementModel.FK_Invitation_Team" />
+        <AssociationConnector Association="TaskManagementModel.FK_Team_Leader" />
+        <AssociationConnector Association="TaskManagementModel.FK_TeamMember_Team" />
+        <AssociationConnector Association="TaskManagementModel.FK_Invitation_Invitee" />
+        <AssociationConnector Association="TaskManagementModel.FK_Invitation_Inviter" />
+        <AssociationConnector Association="TaskManagementModel.FK_TeamMember_User" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

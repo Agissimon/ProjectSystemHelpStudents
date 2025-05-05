@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="ProjectSystemHelpStudents.Views.UserPages.InviteUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ProjectSystemHelpStudents.Views.UserPages"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="#444444">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0"
+             Margin="0,0,0,10"
+             Style="{StaticResource InputFieldStyle}"
+             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Border Grid.Row="1">
+            <ListBox ItemsSource="{Binding Users}"
+               Style="{StaticResource TransparentListBoxStyle}"
+               SelectedItem="{Binding SelectedUser}"
+               BorderThickness="0"
+               ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <Image Width="32" Height="32" Margin="0,0,8,0" Source="{Binding AvatarUrl}" />
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}"
+                           Style="{StaticResource NormalTextBlockStyle}" FontSize="18" Foreground="White"/>
+                                <TextBlock Text="{Binding Login}"
+                           Style="{StaticResource SmallTextBlockStyle}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <StackPanel Grid.Row="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Margin="0,10,0,0">
+            <Button Content="Отмена"
+              Width="80" Margin="0,0,10,0"
+              Command="{Binding CancelCommand}"
+              Style="{StaticResource LoginButtonStyle}"/>
+            <Button Content="{Binding AddButtonText}"
+              Width="120"
+              IsEnabled="{Binding IsUserSelected}"
+              Command="{Binding ConfirmCommand}"
+              Style="{StaticResource LoginButtonStyle}"
+              Background="{StaticResource AccentBrush}"
+              Foreground="White"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

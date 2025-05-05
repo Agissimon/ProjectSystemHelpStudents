@@ -1,4 +1,5 @@
 ﻿using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.Views.UserPages;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -114,6 +115,61 @@ namespace ProjectSystemHelpStudents.UsersContent
             ProjectStackPanel.Children.Add(projectStackPanel);
         }
 
+        private void UserNameButton_Click(object sender, RoutedEventArgs e)
+        {
+            UserPopup.IsOpen = true;
+        }
+
+        private void EditProfile_Click(object sender, RoutedEventArgs e)
+        {
+            int userId = UserSession.IdUser;
+
+            UserPage content = new UserPage();
+            FrmClass.frmContentUser.Content = content;
+            StackPanelButtonPage _content = new StackPanelButtonPage();
+            FrmClass.frmStackPanelButton.Content = _content;
+
+            var updatedName = "Новое имя пользователя";
+            UpdateUserName(updatedName);
+        }
+
+        private void CreateTeam_Click(object sender, RoutedEventArgs e)
+        {
+            UserPopup.IsOpen = false;
+
+            var window = new Window
+            {
+                Title = "Управление командой",
+                Content = new TeamManagementControl(),
+                Width = 800,
+                Height = 600,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen
+            };
+
+            window.Show();
+        }
+
+        private void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            UserSession.IdUser = 0;
+            UserSession.NameUser = null;
+
+            var mainWindow = Application.Current.MainWindow as MainWindow;
+
+            if (mainWindow != null)
+            {
+                mainWindow.frmAuth.Content = null;
+
+                mainWindow.frmContentUser.Content = null;
+                mainWindow.frmStackPanelButton.Content = null;
+
+                mainWindow.frmAuth.Navigate(new AuthPage());
+
+                Console.WriteLine(UserSession.IdUser);
+                Console.WriteLine(UserSession.NameUser);
+            }
+        }
+
         private void DetachButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is int projectId)
@@ -140,20 +196,6 @@ namespace ProjectSystemHelpStudents.UsersContent
             FrmClass.frmContentUser.Content = content;
             StackPanelButtonPage _content = new StackPanelButtonPage();
             FrmClass.frmStackPanelButton.Content = _content;
-        }
-
-        private void UserNameButton_Click(object sender, RoutedEventArgs e)
-        {
-            int userId = UserSession.IdUser;
-
-            UserPage content = new UserPage();
-            FrmClass.frmContentUser.Content = content;
-            StackPanelButtonPage _content = new StackPanelButtonPage();
-            FrmClass.frmStackPanelButton.Content = _content;
-
-            // После изменения имени пользователя обновите его в интерфейсе
-            var updatedName = "Новое имя пользователя"; // Пример нового имени
-            UpdateUserName(updatedName);
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
