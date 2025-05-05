@@ -9,7 +9,6 @@ namespace ProjectSystemHelpStudents.UsersContent
     public partial class UserPage : Page
     {
         public delegate void UserNameUpdatedHandler(string newName);
-        public event UserNameUpdatedHandler UserNameUpdated;
 
         private User currentUser;
 

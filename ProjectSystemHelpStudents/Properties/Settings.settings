@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="SortOption" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ExecutorFilter" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>

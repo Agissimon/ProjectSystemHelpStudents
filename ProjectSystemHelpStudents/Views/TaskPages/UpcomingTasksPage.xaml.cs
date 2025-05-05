@@ -16,7 +16,6 @@ namespace ProjectSystemHelpStudents.UsersContent
     {
         private DateTime _startOfWeek;
         private ObservableCollection<TaskGroupViewModel> _groupedTasks;
-        private bool _isRefreshingTasks = false;
         private bool _isDateManuallyChanged = false;
 
         public UpcomingTasksPage()
@@ -52,206 +51,178 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void RefreshPage()
         {
+            LoadFilters();
+
             SortComboBox.SelectedIndex = Properties.Settings.Default.SortOption;
-            ExecutorComboBox.SelectedIndex = Properties.Settings.Default.ExecutorFilter;
-            PriorityComboBox.SelectedIndex = Properties.Settings.Default.PriorityFilter;
-            LabelComboBox.SelectedIndex = Properties.Settings.Default.LabelFilter;
+            ExecutorComboBox.SelectedValue = Properties.Settings.Default.ExecutorFilter;
+            PriorityComboBox.SelectedValue = Properties.Settings.Default.PriorityFilter;
+            LabelComboBox.SelectedValue = Properties.Settings.Default.LabelFilter;
 
             UpdateTodayDateText();
-            //UpdateWeekText();
             RefreshTasks();
             LoadWeekTimeline();
 
             RestoreExpandersState();
         }
 
+        private void LoadFilters()
+        {
+            using (var ctx = new TaskManagementEntities1())
+            {
+                // Сортировка
+                SortComboBox.ItemsSource = new List<string> { "Умная", "Дата", "Приоритет" };
+
+                // Исполнители
+                var executors = ctx.Users
+                    .Select(u => new ExecutorViewModel { IdUser = u.IdUser, FullName = u.Name })
+                    .ToList();
+                executors.Insert(0, new ExecutorViewModel { IdUser = 0, FullName = "Все" });
+                ExecutorComboBox.ItemsSource = executors;
+
+                // Приоритеты
+                var priorities = ctx.Priority
+                    .Select(p => new PriorityViewModel { PriorityId = p.PriorityId, Name = p.Name })
+                    .OrderBy(p => p.PriorityId)
+                    .ToList();
+                priorities.Insert(0, new PriorityViewModel { PriorityId = 0, Name = "Все" });
+                PriorityComboBox.ItemsSource = priorities;
+
+                // Метки
+                var labels = ctx.Labels
+                    .Select(l => new LabelViewModel { Id = l.Id, Name = l.Name })
+                    .OrderBy(l => l.Id)
+                    .ToList();
+                labels.Insert(0, new LabelViewModel { Id = 0, Name = "Все" });
+                LabelComboBox.ItemsSource = labels;
+            }
+        }
+
         private void RefreshTasks()
         {
-            // Выбираем активный режим отображения до загрузки данных,
-            // чтобы при обновлении (например, после добавления) сразу отобразился нужный контейнер.
             string currentMode = Properties.Settings.Default.LastViewMode;
-
             if (_groupedTasks == null)
                 _groupedTasks = new ObservableCollection<TaskGroupViewModel>();
 
             try
             {
-                using (var context = new TaskManagementEntities1())
+                using (var ctx = new TaskManagementEntities1())
                 {
-                    int selectedPriority = Properties.Settings.Default.PriorityFilter;
-                    int selectedLabel = Properties.Settings.Default.LabelFilter;
-                    int selectedExecutorIndex = Properties.Settings.Default.ExecutorFilter;
+                    int selExecutor = (int)(ExecutorComboBox.SelectedValue ?? 0);
+                    int selPriority = (int)(PriorityComboBox.SelectedValue ?? 0);
+                    int selLabel = (int)(LabelComboBox.SelectedValue ?? 0);
                     int sortOption = Properties.Settings.Default.SortOption;
 
-                    var query = context.Task
-                        .Where(t => t.Status.Name != "Завершено" && t.IdUser == UserSession.IdUser);
+                    var query = ctx.Task
+                        .Include("Status")
+                        .Include("Priority")
+                        .Include("TaskLabels.Labels")
+                        .Where(t => t.Status.Name != "Завершено"
+                                 && t.IdUser == UserSession.IdUser);
 
-                    // Фильтр по приоритету
-                    if (selectedPriority > 0)
-                    {
-                        var selectedPriorityName = context.Priority
-                            .OrderBy(p => p.PriorityId)
-                            .Skip(selectedPriority - 1)
-                            .Select(p => p.Name)
-                            .FirstOrDefault();
+                    //if (selExecutor > 0)
+                    //    query = query.Where(t => t.ExecutorId == selExecutor);
+                    if (selPriority > 0)
+                        query = query.Where(t => t.PriorityId == selPriority);
+                    if (selLabel > 0)
+                        query = query.Where(t => t.TaskLabels.Any(tl => tl.LabelId == selLabel));
 
-                        if (!string.IsNullOrEmpty(selectedPriorityName))
-                        {
-                            query = query.Where(t => t.Priority.Name == selectedPriorityName);
-                        }
-                    }
-
-                    // Фильтр по метке
-                    if (selectedLabel > 0)
-                    {
-                        var selectedLabelName = context.Labels
-                            .OrderBy(l => l.Id)
-                            .Skip(selectedLabel - 1)
-                            .Select(l => l.Name)
-                            .FirstOrDefault();
-
-                        if (!string.IsNullOrEmpty(selectedLabelName))
-                        {
-                            query = query.Where(t => t.TaskLabels.Any(tl => tl.Labels.Name == selectedLabelName));
-                        }
-                    }
-
-                    // Фильтр по исполнителю 
-                    if (selectedExecutorIndex > 0)
-                    {
-                        var selectedExecutorItem = (ComboBoxItem)ExecutorComboBox.Items[selectedExecutorIndex];
-                        if (selectedExecutorItem?.Tag is int executorId)
-                        {
-                            // query = query.Where(t => t.ExecutorId == executorId);
-                        }
-                    }
-
-                    // Сортировка
                     switch (sortOption)
                     {
-                        case 1:
+                        case 0:
                             query = query.OrderBy(t => t.EndDate);
                             break;
-                        case 2:
+                        case 1:
                             query = query.OrderBy(t => t.Priority.PriorityId);
                             break;
                         default:
-                            query = query.OrderBy(t => t.EndDate);
+                            query = query
+                                .OrderByDescending(t => t.EndDate)
+                                .ThenBy(t => t.Priority.PriorityId);
                             break;
                     }
 
-                    var tasksFromDb = query.ToList();
-                    List<TaskViewModel> allTasks = new List<TaskViewModel>();
+                    var allTasks = query
+                        .ToList()
+                        .Select(t =>
+                        {
+                            string hdr;
+                            if (t.EndDate.Date == DateTime.Today)
+                                hdr = $"{DateTime.Today:dd MMMM} ‧ Сегодня ‧ {DateTime.Today:dddd}";
+                            else if (t.EndDate.Date == DateTime.Today.AddDays(1))
+                                hdr = $"{DateTime.Today.AddDays(1):dd MMMM} ‧ Завтра ‧ {DateTime.Today.AddDays(1):dddd}";
+                            else
+                                hdr = $"{t.EndDate:dd MMMM} ‧ {t.EndDate:dddd}";
 
-                    foreach (var t in tasksFromDb)
-                    {
-                        string formattedDate;
-                        if (t.EndDate.Date == DateTime.Today)
-                        {
-                            formattedDate = string.Format("{0:dd MMMM} ‧ Сегодня ‧ {1:dddd}", DateTime.Today, DateTime.Today);
-                        }
-                        else if (t.EndDate.Date == DateTime.Today.AddDays(1))
-                        {
-                            formattedDate = string.Format("{0:dd MMMM} ‧ Завтра ‧ {1:dddd}", DateTime.Today.AddDays(1), DateTime.Today.AddDays(1));
-                        }
-                        else
-                        {
-                            formattedDate = string.Format("{0:dd MMMM} ‧ {0:dddd}", t.EndDate);
-                        }
-
-                        allTasks.Add(new TaskViewModel
-                        {
-                            IdTask = t.IdTask,
-                            Title = t.Title,
-                            Description = t.Description,
-                            Status = t.Status?.Name,
-                            EndDate = t.EndDate,
-                            IsCompleted = t.Status?.Name == "Завершено",
-                            AvailableLabels = new ObservableCollection<LabelViewModel>(
-                                t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
-                            EndDateFormatted = formattedDate,
-                        });
-                    }
+                            return new TaskViewModel
+                            {
+                                IdTask = t.IdTask,
+                                Title = t.Title,
+                                Description = t.Description,
+                                Status = t.Status?.Name,
+                                EndDate = t.EndDate,
+                                IsCompleted = t.Status?.Name == "Завершено",
+                                EndDateFormatted = hdr,
+                                AvailableLabels = new ObservableCollection<LabelViewModel>(
+                                    t.TaskLabels.Select(l => new LabelViewModel
+                                    {
+                                        Id = l.LabelId,
+                                        Name = l.Labels.Name
+                                    }))
+                            };
+                        })
+                        .ToList();
 
                     _groupedTasks.Clear();
-                    var upcomingTasks = allTasks.Where(t => t.EndDate >= DateTime.Today).ToList();
-                    foreach (var task in upcomingTasks)
+                    foreach (var vm in allTasks.Where(x => x.EndDate.Date >= DateTime.Today))
                     {
-                        var group = _groupedTasks.FirstOrDefault(g => g.DateHeader == task.EndDateFormatted);
-                        if (group == null)
+                        var grp = _groupedTasks.FirstOrDefault(g => g.DateHeader == vm.EndDateFormatted);
+                        if (grp == null)
                         {
-                            group = new TaskGroupViewModel { DateHeader = task.EndDateFormatted };
-                            _groupedTasks.Add(group);
-
-                            var expander = new Expander
+                            grp = new TaskGroupViewModel { DateHeader = vm.EndDateFormatted };
+                            grp.Expander = new Expander
                             {
-                                Header = group.DateHeader,
+                                Header = grp.DateHeader,
                                 FontSize = 18,
                                 Foreground = Brushes.White,
-                                Margin = new Thickness(0, 10, 0, 0)
+                                Margin = new Thickness(0, 10, 0, 0),
+                                Content = new ListBox
+                                {
+                                    ItemsSource = grp.Tasks,
+                                    Style = (Style)FindResource("TransparentListViewStyle")
+                                }
                             };
-                            expander.Expanded += Expander_ExpandedCollapsed;
-                            expander.Collapsed += Expander_ExpandedCollapsed;
-
-                            expander.Content = new ListBox
-                            {
-                                ItemsSource = group.Tasks,
-                                Style = (Style)FindResource("TransparentListBoxStyle")
-                            };
-                            group.Expander = expander;
+                            grp.Expander.Expanded += Expander_ExpandedCollapsed;
+                            grp.Expander.Collapsed += Expander_ExpandedCollapsed;
+                            _groupedTasks.Add(grp);
                         }
-                        group.Tasks.Add(task);
+                        grp.Tasks.Add(vm);
                     }
 
-                    if (TasksListView != null)
-                    {
-                        TasksListView.ItemsSource = _groupedTasks;
+                    TasksListView.ItemsSource = _groupedTasks;
+                    OverdueTasksListView.ItemsSource = allTasks.Where(x => x.EndDate.Date < DateTime.Today).ToList();
 
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            RestoreExpandersState();
-                        }), System.Windows.Threading.DispatcherPriority.Background);
-                    }
-
-                    if (OverdueTasksListView != null)
-                        OverdueTasksListView.ItemsSource = allTasks.Where(t => t.EndDate < DateTime.Today).ToList();
-
-                    Grid newBoard = TaskBoardView.CreateBoardView(allTasks);
-                    newBoard.Tag = allTasks;
-                    Grid newCalendar = TaskCalendarView.CreateCalendarView(allTasks);
-                    newCalendar.Tag = allTasks;
-
-                    if (BoardViewSection != null)
-                    {
-                        BoardViewSection.Children.Clear();
-                        BoardViewSection.Children.Add(newBoard);
-                    }
-                    if (CalendarViewSection != null)
-                    {
-                        CalendarViewSection.Children.Clear();
-                        CalendarViewSection.Children.Add(newCalendar);
-                    }
+                    var board = TaskBoardView.CreateBoardView(allTasks);
+                    var calendar = TaskCalendarView.CreateCalendarView(allTasks);
+                    BoardViewSection.Children.Clear();
+                    BoardViewSection.Children.Add(board);
+                    CalendarViewSection.Children.Clear();
+                    CalendarViewSection.Children.Add(calendar);
 
                     switch (currentMode)
                     {
-                        case "List":
-                            ShowListView();
-                            break;
-                        case "Calendar":
-                            ShowCalendarView();
-                            break;
-                        case "Board":
-                            ShowBoardView();
-                            break;
-                        default:
-                            ShowListView();
-                            break;
+                        case "Board": ShowBoardView(); break;
+                        case "Calendar": ShowCalendarView(); break;
+                        default: ShowListView(); break;
                     }
+
+                    Dispatcher.BeginInvoke((Action)RestoreExpandersState,
+                        System.Windows.Threading.DispatcherPriority.Background);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при загрузке задач: " + ex.Message);
+                MessageBox.Show($"Ошибка при загрузке задач: {ex.Message}",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -309,12 +280,6 @@ namespace ProjectSystemHelpStudents.UsersContent
             string todayDate = DateTime.Today.ToString("dd MMMM");
             string dayOfWeek = DateTime.Today.ToString("dddd");
         }
-
-        //private void UpdateWeekText()
-        //{
-        //    var endOfWeek = _startOfWeek.AddDays(6);
-        //    CurrentWeekText.Text = string.Format("{0:dd MMMM} - {1:dd MMMM}", _startOfWeek, endOfWeek);
-        //}
 
         private void LoadWeekTimeline()
         {
@@ -445,42 +410,27 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void SortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_isRefreshingTasks) return;
-            _isRefreshingTasks = true;
             Properties.Settings.Default.SortOption = SortComboBox.SelectedIndex;
             Properties.Settings.Default.Save();
             RefreshTasks();
-            _isRefreshingTasks = false;
         }
-
         private void ExecutorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_isRefreshingTasks) return;
-            _isRefreshingTasks = true;
-            Properties.Settings.Default.ExecutorFilter = ExecutorComboBox.SelectedIndex;
+            Properties.Settings.Default.ExecutorFilter = (int)(ExecutorComboBox.SelectedValue ?? 0);
             Properties.Settings.Default.Save();
             RefreshTasks();
-            _isRefreshingTasks = false;
         }
-
         private void PriorityComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_isRefreshingTasks) return;
-            _isRefreshingTasks = true;
-            Properties.Settings.Default.PriorityFilter = PriorityComboBox.SelectedIndex;
+            Properties.Settings.Default.PriorityFilter = (int)(PriorityComboBox.SelectedValue ?? 0);
             Properties.Settings.Default.Save();
             RefreshTasks();
-            _isRefreshingTasks = false;
         }
-
         private void LabelComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_isRefreshingTasks) return;
-            _isRefreshingTasks = true;
-            Properties.Settings.Default.LabelFilter = LabelComboBox.SelectedIndex;
+            Properties.Settings.Default.LabelFilter = (int)(LabelComboBox.SelectedValue ?? 0);
             Properties.Settings.Default.Save();
             RefreshTasks();
-            _isRefreshingTasks = false;
         }
 
         private void ShowListView()

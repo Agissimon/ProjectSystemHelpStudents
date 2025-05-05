@@ -177,7 +177,9 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\BoardViewControl.cs" />
+    <Compile Include="ViewModels\ExecutorViewModel.cs" />
     <Compile Include="ViewModels\LabelViewModel.cs" />
+    <Compile Include="ViewModels\PriorityViewModel.cs" />
     <Compile Include="ViewModels\ProjectViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
     <Compile Include="ViewModels\SectionTaskGroupViewModel.cs" />

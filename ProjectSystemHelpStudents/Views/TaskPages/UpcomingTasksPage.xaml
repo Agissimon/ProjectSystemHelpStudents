@@ -58,34 +58,36 @@
                                 <Button Content="Календарь" Style="{StaticResource TabStyle}" Click="CalendarTab_Click" Width="80"/>
                             </StackPanel>
 
-                            <TextBlock Text="Сортировка" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
-                            <ComboBox x:Name="SortComboBox" SelectionChanged="SortComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
-                                <ComboBoxItem>Умная (по умолчанию)</ComboBoxItem>
-                                <ComboBoxItem>Дата</ComboBoxItem>
-                                <ComboBoxItem>Приоритет</ComboBoxItem>
-                            </ComboBox>
+                            <TextBlock Text="Сортировка" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                            <ComboBox x:Name="SortComboBox"
+                                      Style="{StaticResource FilterComboBoxStyle}"
+                                      Width="200"
+                                      SelectionChanged="SortComboBox_SelectionChanged"/>
 
                             <TextBlock Text="Фильтр" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
-                            <TextBlock Text="Исполнитель" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
-                            <ComboBox x:Name="ExecutorComboBox" SelectionChanged="ExecutorComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
-                                <ComboBoxItem>По умолчанию</ComboBoxItem>
-                                <ComboBoxItem>Выбранный</ComboBoxItem>
-                            </ComboBox>
+                                <TextBlock Text="Исполнитель" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
+                                <ComboBox x:Name="ExecutorComboBox"
+                                          Style="{StaticResource FilterComboBoxStyle}"
+                                          DisplayMemberPath="FullName"
+                                          SelectedValuePath="IdUser"
+                                          Width="200"
+                                          SelectionChanged="ExecutorComboBox_SelectionChanged" />
 
-                            <TextBlock Text="Приоритет" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
-                            <ComboBox x:Name="PriorityComboBox" SelectionChanged="PriorityComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
-                                <ComboBoxItem>Все (по умолчанию)</ComboBoxItem>
-                                <ComboBoxItem>Высокий</ComboBoxItem>
-                                <ComboBoxItem>Средний</ComboBoxItem>
-                                <ComboBoxItem>Низкий</ComboBoxItem>
-                            </ComboBox>
+                                <TextBlock Text="Приоритет" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
+                                <ComboBox x:Name="PriorityComboBox"
+                                          Style="{StaticResource FilterComboBoxStyle}"
+                                          DisplayMemberPath="Name"
+                                          SelectedValuePath="PriorityId"
+                                          Width="200"
+                                          SelectionChanged="PriorityComboBox_SelectionChanged" />
 
-                            <TextBlock Text="Метка" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
-                            <ComboBox x:Name="LabelComboBox" SelectionChanged="LabelComboBox_SelectionChanged" Style="{StaticResource FilterComboBoxStyle}" SelectedIndex="0" Width="200">
-                                <ComboBoxItem>Все (по умолчанию)</ComboBoxItem>
-                                <ComboBoxItem>Красная</ComboBoxItem>
-                                <ComboBoxItem>Синяя</ComboBoxItem>
-                            </ComboBox>
+                                <TextBlock Text="Метка" Foreground="White" FontSize="12" Margin="0,5,0,0"/>
+                            <ComboBox x:Name="LabelComboBox"
+                                      Style="{StaticResource FilterComboBoxStyle}"
+                                      DisplayMemberPath="Name"
+                                      SelectedValuePath="Id"
+                                      Width="200"
+                                      SelectionChanged="LabelComboBox_SelectionChanged"/>
                         </StackPanel>
                     </Border>
                 </Popup>

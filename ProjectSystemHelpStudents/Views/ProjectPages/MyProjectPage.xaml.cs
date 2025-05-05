@@ -40,8 +40,8 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             if (sender is Button button && button.ContextMenu != null)
             {
-                button.ContextMenu.PlacementTarget = button; // Устанавливаем кнопку как цель размещения
-                button.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom; // Открытие снизу
+                button.ContextMenu.PlacementTarget = button;
+                button.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
                 button.ContextMenu.IsOpen = true;
             }
         }
