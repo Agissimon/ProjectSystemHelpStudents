@@ -4,7 +4,6 @@ namespace ProjectSystemHelpStudents
 {
     public partial class InputDialog : Window
     {
-        // Public properties to be set by the caller
         public string InputText { get; set; }
         public string PlaceholderText { get; set; }
         public string TitleText { get; set; }

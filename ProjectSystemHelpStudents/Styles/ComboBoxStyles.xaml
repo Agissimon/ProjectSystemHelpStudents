@@ -102,69 +102,80 @@
         </Setter>
     </Style>
 
-
     <Style x:Key="FilterComboBoxStyle" TargetType="ComboBox">
         <Setter Property="Background" Value="#333"/>
         <Setter Property="Foreground" Value="White"/>
-        <Setter Property="FontSize" Value="14"/>
         <Setter Property="BorderBrush" Value="#555"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="5"/>
-        <Setter Property="Width" Value="200"/>
+        <Setter Property="Padding" Value="6,2"/>
+        <Setter Property="FontSize" Value="14"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
                     <Grid>
-                        <!-- Основной контейнер -->
-                        <Border Background="{TemplateBinding Background}" 
-                BorderBrush="{TemplateBinding BorderBrush}" 
-                BorderThickness="{TemplateBinding BorderThickness}" 
-                CornerRadius="5">
-                            <DockPanel>
-                                <!-- Отображение выбранного элемента -->
-                                <ContentPresenter Content="{TemplateBinding SelectionBoxItem}" 
-                                  Margin="10,0,0,0"
-                                  VerticalAlignment="Center"/>
-                                <!-- Кнопка раскрытия -->
-                                <ToggleButton DockPanel.Dock="Right" 
-                              IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                        <Border x:Name="Border"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="4">
+                            <Grid>
+                                <ContentPresenter x:Name="ContentSite"
+                                  IsHitTestVisible="False"
+                                  Content="{TemplateBinding SelectionBoxItem}"
+                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                  Margin="6,2,30,2"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Left"/>
+                                <ToggleButton x:Name="ToggleButton"
+                              Focusable="False"
+                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                              ClickMode="Press"
                               Background="Transparent"
                               BorderThickness="0"
+                              HorizontalAlignment="Right"
                               Width="30">
-                                    <Path Data="M 0 0 L 8 8 L 16 0" 
-                          Stretch="Uniform"
-                          Stroke="White"
-                          StrokeThickness="2"
-                          HorizontalAlignment="Center"/>
+                                    <Path Data="M 0 0 L 8 8 L 16 0"
+                        Stretch="Uniform"
+                        Stroke="White"
+                        StrokeThickness="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"/>
                                 </ToggleButton>
-                            </DockPanel>
+                            </Grid>
                         </Border>
 
-                        <!-- Выпадающий список -->
-                        <Popup IsOpen="{TemplateBinding IsDropDownOpen}"
-               Placement="Bottom"
-               AllowsTransparency="True"
-               StaysOpen="False">
+                        <Popup x:Name="PART_Popup"
+                   Placement="Bottom"
+                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                   AllowsTransparency="True"
+                   Focusable="False"
+                   PopupAnimation="Slide">
                             <Border Background="#444"
-                    BorderBrush="#555"
-                    BorderThickness="1"
-                    CornerRadius="5">
-                                <ScrollViewer>
-                                    <StackPanel>
-                                        <ItemsPresenter/>
-                                    </StackPanel>
+                      BorderBrush="#555"
+                      BorderThickness="1"
+                      CornerRadius="4">
+                                <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                    <StackPanel IsItemsHost="True"
+                              KeyboardNavigation.DirectionalNavigation="Contained"/>
                                 </ScrollViewer>
                             </Border>
                         </Popup>
                     </Grid>
 
-                    <!-- Триггеры -->
                     <ControlTemplate.Triggers>
+                        <Trigger Property="HasItems" Value="False">
+                            <Setter TargetName="Border" Property="MinHeight" Value="25"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="Gray"/>
+                            <Setter TargetName="Border" Property="Opacity" Value="0.6"/>
+                        </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#555"/>
+                            <Setter TargetName="Border" Property="Background" Value="#444"/>
                         </Trigger>
                         <Trigger Property="IsDropDownOpen" Value="True">
-                            <Setter Property="Background" Value="#666"/>
+                            <Setter TargetName="Border" Property="Background" Value="#555"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -256,18 +267,15 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
                     <Grid>
-                        <!-- Основной контейнер -->
                         <Border Background="{TemplateBinding Background}" 
                             BorderBrush="{TemplateBinding BorderBrush}" 
                             BorderThickness="{TemplateBinding BorderThickness}" 
                             CornerRadius="8">
                             <DockPanel>
-                                <!-- Отображение выбранного элемента -->
                                 <ContentPresenter Content="{TemplateBinding SelectionBoxItem}" 
                                               ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                               Margin="10,0,0,0"
                                               VerticalAlignment="Center"/>
-                                <!-- Кнопка раскрытия -->
                                 <ToggleButton DockPanel.Dock="Right" 
                                           IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                           Background="Transparent"
@@ -286,7 +294,6 @@
                             </DockPanel>
                         </Border>
 
-                        <!-- Выпадающий список -->
                         <Popup IsOpen="{TemplateBinding IsDropDownOpen}"
                            Placement="Bottom"
                            AllowsTransparency="True"
@@ -302,7 +309,6 @@
                         </Popup>
                     </Grid>
 
-                    <!-- Триггеры -->
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="#444"/>
@@ -315,16 +321,15 @@
             </Setter.Value>
         </Setter>
 
-        <!-- Шаблон для элементов выпадающего списка -->
         <Setter Property="ItemTemplate">
             <Setter.Value>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <!-- Цветная точка -->
+
                         <Ellipse Width="10" Height="10" Fill="{Binding Brush}" VerticalAlignment="Center" Margin="5"/>
-                        <!-- Название цвета -->
+
                         <TextBlock Text="{Binding Name}" Foreground="White" FontSize="14" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                        <!-- Маркер выбора -->
+                        
                         <CheckBox IsChecked="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Visibility="Hidden"/>
                     </StackPanel>
                 </DataTemplate>
