@@ -18,11 +18,13 @@
     <Grid Margin="20">
         <StackPanel>
             <TextBlock Text="Добавить новый проект" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,20" />
-            <TextBlock Text="Название проекта" Style="{StaticResource TransparentTextBlockStyle}"/>
-            <TextBox Name="NameTextBox" Background="#333" Foreground="White" Padding="5" Margin="0,0,0,10" />
-            <TextBlock Text="Описание проекта" Style="{StaticResource TransparentTextBlockStyle}"/>
-            <TextBox Name="DescriptionTextBox" Background="#333" Foreground="White" Padding="5" Margin="0,0,0,10" AcceptsReturn="True" />
-            <TextBlock Text="Даты старта и завершения можно заполнить по желанию" Style="{StaticResource TransparentTextBlockStyle}"/>
+            <TextBlock Text="Название проекта" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox Name="NameTextBox" Style="{StaticResource InputFieldStyle}"/>
+            <TextBlock Text="Описание проекта" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox Name="DescriptionTextBox" Style="{StaticResource InputFieldStyle}" AcceptsReturn="True" />
+            <TextBlock Text="Привязать к команде (опционально)" Style="{StaticResource NormalTextBlockStyle}" Margin="0,10,0,5"/>
+            <ComboBox x:Name="cmbTeams" Style="{StaticResource ComboBoxStyle}" DisplayMemberPath="Name" SelectedValuePath="TeamId" Margin="0,0,0,10"/>
+            <TextBlock Text="Даты старта и завершения можно заполнить по желанию" Style="{StaticResource NormalTextBlockStyle}"/>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                 <TextBlock Text="Дата начала" Margin="0,0,5,5"/>
                 <DatePicker Name="StartDatePicker" Background="#333" Foreground="White" Margin="1" />
@@ -30,7 +32,7 @@
                 <DatePicker Name="EndDatePicker" Background="#333" Foreground="White" Margin="1" />
             </StackPanel>
 
-            <Button Content="Добавить проект" Background="#333" Foreground="White" Height="40" Click="AddProjectButton_Click" />
+            <Button Content="Добавить проект" Style="{StaticResource NormalButtonStyle}" Height="40" Click="AddProjectButton_Click" />
         </StackPanel>
     </Grid>
 </Window>

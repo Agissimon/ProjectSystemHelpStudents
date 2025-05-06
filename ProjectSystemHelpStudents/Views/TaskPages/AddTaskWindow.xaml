@@ -39,6 +39,17 @@
                     <ComboBoxItem Content="Низкий приоритет"/>
                 </ComboBox>
 
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Исполнитель" 
+                   Style="{StaticResource NormalTextBlockStyle}"
+                   VerticalAlignment="Center"/>
+                    <ComboBox x:Name="cmbAssignedTo"
+                  Width="140"
+                  Style="{StaticResource ComboBoxStyle}"
+                  DisplayMemberPath="Name"
+                  SelectedValuePath="IdUser"/>
+                </StackPanel>
+                
                 <TextBlock Style="{StaticResource NormalTextBlockStyle}" Text="Метки:" Margin="0,10,0,0"/>
                 <ListBox x:Name="lstTags"
                                  SelectionMode="Multiple"

@@ -21,6 +21,9 @@ namespace ProjectSystemHelpStudents.Helper
         private bool _isCompleted;
         private string _Status;
         private int _IdLabel;
+
+        public int IdUser { get; set; }
+
         public bool IsPinned { get; set; }
 
         public int? SectionId { get; set; }

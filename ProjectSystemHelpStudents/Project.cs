@@ -26,10 +26,15 @@ namespace ProjectSystemHelpStudents
         public string Description { get; set; }
         public Nullable<System.DateTime> StartDate { get; set; }
         public Nullable<System.DateTime> EndDate { get; set; }
+        public Nullable<int> TeamId { get; set; }
+        public Nullable<int> OwnerId { get; set; }
+        public bool IsCompleted { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Task { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Section> Section { get; set; }
+        public virtual Team Team { get; set; }
+        public virtual Users Users { get; set; }
     }
 }

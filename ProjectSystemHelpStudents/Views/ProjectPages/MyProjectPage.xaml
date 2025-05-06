@@ -3,9 +3,14 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ProjectSystemHelpStudents.Helper"
       mc:Ignorable="d" 
       Background="#222"
       Title="MyProjectPage">
+
+    <Page.Resources>
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+    </Page.Resources>
 
     <Grid Margin="10,0,0,10">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -24,15 +29,25 @@
                              Margin="10,0,0,0"
                              TextChanged="SearchBox_TextChanged"
                              />
-                    <!--<ComboBox Name="FilterComboBox" Width="150" Height="30" Margin="10,0,0,0" Background="Transparent" Foreground="Black">
-                        <ComboBoxItem Content="Активные проекты" IsSelected="True" />
-                        <ComboBoxItem Content="Завершенные проекты" />
-                    </ComboBox>-->
+                    <ComboBox Name="FilterComboBox"
+                          Style="{StaticResource ComboBoxStyle}"
+                          Width="150"
+                          Height="30"
+                          Margin="10,0,0,0"
+                          Background="#333"
+                          Foreground="White"
+                          SelectionChanged="FilterComboBox_SelectionChanged">
+                        <ComboBoxItem Content="Все проекты" IsSelected="True"/>
+                        <ComboBoxItem Content="Активные проекты"/>
+                        <ComboBoxItem Content="Завершенные проекты"/>
+                    </ComboBox>
+
                     <Button Content="+" Width="30" Height="30" Margin="10,0,10,0" Background="#333" Foreground="White" Click="AddProject_Click"/>
                 </StackPanel>
 
                 <TextBlock Text="{Binding ProjectCountText}" FontSize="18" Foreground="#AAAAAA" Margin="0,10,0,10" />
                 <ListView Name="ProjectsListView" 
+                          ItemsSource="{Binding Projects}"
                           Background="Transparent" 
                           BorderThickness="0" 
                           Foreground="White" 
@@ -40,20 +55,22 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="0,10,0,10" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold" Foreground="White" />
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold" Foreground="White" />
+
+                                    <TextBlock Text="{Binding TeamName, StringFormat=Команда: {0}}" 
+                                            FontSize="14" 
+                                            Foreground="#AAAAAA" 
+                                            Margin="0,2,0,0" 
+                                            Visibility="{Binding TeamName, Converter={StaticResource NullToVisibilityConverter}}" />
+                                </StackPanel>
+
                                 <TextBlock Text="{Binding Icon}" FontSize="16" Margin="10,0,0,0" Foreground="White" />
                                 <Button Style="{StaticResource ButtonOptionsStyle}" Tag="{Binding}" IsEnabled="True" Click="OpenContextMenu_Click">
                                     <TextBlock Text="..." FontSize="16" Foreground="White"/>
                                     <Button.ContextMenu>
                                         <ContextMenu>
-                                            <!--Style="{StaticResource CustomContextMenuStyle}"-->
-                                            <!--<MenuItem Style="{StaticResource CustomMenuItemStyle}" Header="Добавить проект выше" Click="AddProjectAbove_Click">
-                                                <MenuItem.Icon>
-                                                    <Image Source="path_to_up_arrow_icon.png" Width="16" Height="16"/>
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                            <MenuItem Style="{StaticResource CustomMenuItemStyle}" Header="Добавить проект ниже" Click="AddProjectBelow_Click"/>
-                                            -->
+                                            <MenuItem Header="Завершить проект" Click="MarkAsCompleted_Click" Tag="{Binding}" />
                                             <MenuItem Header="Изменить" Click="EditProject_Click" Tag="{Binding}"/>
                                             <MenuItem Header="Добавить в избранное" Click="AddToFavorites_Click" Tag="{Binding}"/>
                                             <MenuItem Header="Удалить" Click="DeleteProject_Click" Tag="{Binding}">

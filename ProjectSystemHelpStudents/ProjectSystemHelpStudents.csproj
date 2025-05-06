@@ -125,7 +125,9 @@
     <Compile Include="Helper\ExpanderStateManager.cs" />
     <Compile Include="Helper\FileItem.cs" />
     <Compile Include="Helper\NullToBoolConverter.cs" />
+    <Compile Include="Helper\NullToVisibilityConverter.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
+    <Compile Include="Helper\StatusToVisibilityConverter.cs" />
     <Compile Include="Helper\TaskLabel.cs" />
     <Compile Include="Labels.cs">
       <DependentUpon>Model1.tt</DependentUpon>
@@ -189,6 +191,7 @@
     <Compile Include="ViewModels\BoardViewControl.cs" />
     <Compile Include="ViewModels\ExecutorViewModel.cs" />
     <Compile Include="ViewModels\LabelViewModel.cs" />
+    <Compile Include="ViewModels\NotificationViewModel.cs" />
     <Compile Include="ViewModels\PriorityViewModel.cs" />
     <Compile Include="ViewModels\ProjectViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
@@ -198,6 +201,7 @@
     <Compile Include="ViewModels\TaskCalendarView.cs" />
     <Compile Include="ViewModels\TaskGroupViewModel.cs" />
     <Compile Include="ViewModels\TaskViewModel.cs" />
+    <Compile Include="ViewModels\TeamMemberViewModel.cs" />
     <Compile Include="ViewModels\TeamViewModel.cs" />
     <Compile Include="Views\Popup\DisplayOptionsControl.xaml.cs">
       <DependentUpon>DisplayOptionsControl.xaml</DependentUpon>
@@ -252,6 +256,9 @@
     </Compile>
     <Compile Include="Views\UserPages\InviteUserControl.xaml.cs">
       <DependentUpon>InviteUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserPages\NotificationsPage.xaml.cs">
+      <DependentUpon>NotificationsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UserPages\RegPage.xaml.cs">
       <DependentUpon>RegPage.xaml</DependentUpon>
@@ -374,6 +381,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\UserPages\NotificationsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\UserPages\RegPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -421,9 +432,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="AdminContent\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Resources\Icon\logo001.png" />
   </ItemGroup>

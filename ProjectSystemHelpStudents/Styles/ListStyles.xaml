@@ -3,7 +3,7 @@
 
     <Style x:Key="DarkGroupBoxStyle" TargetType="GroupBox">
         <Setter Property="Foreground" Value="White"/>
-        <Setter Property="Background" Value="#1E1E1E"/>
+        <Setter Property="Background" Value="#2A2A2A"/>
         <Setter Property="BorderBrush" Value="#444"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="10"/>

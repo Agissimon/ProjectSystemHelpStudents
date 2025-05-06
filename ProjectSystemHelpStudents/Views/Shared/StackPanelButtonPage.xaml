@@ -11,14 +11,51 @@
 
     <Grid Margin="0,0,10,0">
         <StackPanel Background="#444">
-
-            <Button x:Name="UserNameButton" Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="UserNameButton_Click">
-                <StackPanel Orientation="Horizontal">
-                    <fa:IconImage Icon="User" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
-                    <TextBlock Text="{Binding NameUser, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
-                </StackPanel>
-            </Button>
             
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="UserNameButton" Style="{StaticResource TransparentButtonStyle}" Margin="10 5" Click="UserNameButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:IconImage Icon="User" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                        <TextBlock Text="{Binding NameUser, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <Button x:Name="NotificationsButton"
+        Style="{StaticResource TransparentButtonStyle}"
+        Margin="10 5"
+        Click="NotificationsButton_Click">
+                    <!-- Используем Grid, чтобы накладывать бейдж поверх иконки -->
+                    <Grid>
+                        <!-- Сам колокольчик -->
+                        <fa:IconImage Icon="Bell"
+                      Width="20"
+                      Height="20"
+                      Foreground="White"
+                      Margin="0,0,10,0"/>
+                        <!-- Бейдж -->
+                        <Border x:Name="NotificationBadge"
+                Background="Red"
+                Width="16"
+                Height="16"
+                CornerRadius="8"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,-4,-4,0"
+                Visibility="Collapsed">
+                            <TextBlock x:Name="NotificationCountText"
+                       Text="0"
+                       FontSize="10"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                </Button>
+
+
+            </StackPanel>
+        
             <Popup x:Name="UserPopup"
                    PlacementTarget="{Binding ElementName=UserNameButton}"
                    Placement="Bottom"

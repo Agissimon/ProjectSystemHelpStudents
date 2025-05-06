@@ -1,7 +1,6 @@
 ﻿using ProjectSystemHelpStudents.Helper;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;   // EF6
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Windows;
@@ -15,6 +14,7 @@ namespace ProjectSystemHelpStudents
         private DateTime? _preselectedDate;
         private int? _projectId;
         private int? _sectionId;
+        private List<Users> _allUsers;
 
         public AddTaskWindow()
         {
@@ -40,7 +40,18 @@ namespace ProjectSystemHelpStudents
         {
             if (_preselectedDate.HasValue)
                 dpEndDate.SelectedDate = _preselectedDate.Value;
+
+            using (var ctx = new TaskManagementEntities1())
+            {
+                _allUsers = ctx.Users
+                               .OrderBy(u => u.Name)
+                               .ToList();
+            }
+            cmbAssignedTo.ItemsSource = _allUsers;
+
+            cmbAssignedTo.SelectedValue = UserSession.IdUser;
         }
+
 
         private void LoadTags()
         {
@@ -95,7 +106,7 @@ namespace ProjectSystemHelpStudents
                                           ? _sectionId.Value
                                           : (int?)null;
 
-                    var newTask = new ProjectSystemHelpStudents.Task
+                    var newTask = new Task
                     {
                         Title = txtTitle.Text.Trim(),
                         Description = txtDescription.Text.Trim(),

@@ -24,6 +24,7 @@ namespace ProjectSystemHelpStudents
             this.TeamInvitation = new HashSet<TeamInvitation>();
             this.TeamInvitation1 = new HashSet<TeamInvitation>();
             this.TeamMember = new HashSet<TeamMember>();
+            this.Project = new HashSet<Project>();
         }
     
         public int IdUser { get; set; }
@@ -49,5 +50,7 @@ namespace ProjectSystemHelpStudents
         public virtual ICollection<TeamInvitation> TeamInvitation1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TeamMember> TeamMember { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Project> Project { get; set; }
     }
 }

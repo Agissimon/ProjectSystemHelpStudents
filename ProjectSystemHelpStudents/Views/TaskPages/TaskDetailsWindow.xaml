@@ -105,11 +105,20 @@
 
                 <TextBlock Text="Приоритет" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,5"/>
                 <ComboBox x:Name="PriorityComboBox"
-                    Style="{StaticResource ComboBoxStyle}"
+                      Style="{StaticResource ComboBoxStyle}"
                       DisplayMemberPath="Name"
                       SelectedValuePath="PriorityId"
                       SelectedValue="{Binding PriorityId, Mode=TwoWay}"/>
 
+                <TextBlock Text="Исполнитель" 
+                        Style="{StaticResource TransparentTextBlockStyle}" 
+                        Margin="0,10,0,5"/>
+                <ComboBox x:Name="AssignedToComboBox"
+                      Style="{StaticResource ComboBoxStyle}"
+                      DisplayMemberPath="Name"
+                      SelectedValuePath="IdUser"
+                      SelectedValue="{Binding IdUser, Mode=TwoWay}" />
+                
                 <StackPanel Orientation="Vertical">
                     <TextBlock Text="Метки" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,5"/>
                     <ListBox x:Name="LabelsListBox" 

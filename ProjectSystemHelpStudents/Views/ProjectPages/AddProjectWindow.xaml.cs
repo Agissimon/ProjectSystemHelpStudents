@@ -7,52 +7,74 @@ namespace ProjectSystemHelpStudents.UsersContent
 {
     public partial class AddProjectWindow : Window
     {
-        public bool IsProjectAdded { get; private set; } = false;
-        public event Action<Project> ProjectAdded;
+        private readonly TaskManagementEntities1 _ctx = new TaskManagementEntities1();
         public int? ProjectId { get; set; }
-        public bool IsProjectUpdated { get; private set; } = false;
 
-        public AddProjectWindow()
+        public bool IsProjectAdded { get; private set; }
+        public bool IsProjectUpdated { get; private set; }
+
+        public event Action<Project> ProjectAdded;
+
+        public string WindowTitle => ProjectId.HasValue ? "Редактировать проект" : "Добавить проект";
+        public string AddButtonText => ProjectId.HasValue ? "Сохранить изменения" : "Добавить проект";
+
+        public AddProjectWindow(int? projectId = null)
         {
             InitializeComponent();
+            DataContext = this;
+            ProjectId = projectId;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            // 1) Загрузка списка команд
+            var teams = _ctx.Team
+                            .OrderBy(t => t.Name)
+                            .ToList();
+            // Пункт “Без команды”
+            teams.Insert(0, new Team { TeamId = 0, Name = "<Без команды>" });
+            cmbTeams.ItemsSource = teams;
+
+            // 2) Если редактирование — заполняем поля по существующему проекту
             if (ProjectId.HasValue)
             {
-                using (var context = new TaskManagementEntities1())
+                var project = _ctx.Project.Find(ProjectId.Value);
+                if (project == null)
                 {
-                    var project = context.Project.FirstOrDefault(p => p.ProjectId == ProjectId.Value);
-                    if (project != null)
-                    {
-                        NameTextBox.Text = project.Name;
-                        DescriptionTextBox.Text = project.Description;
-                        StartDatePicker.SelectedDate = project.StartDate;
-                        EndDatePicker.SelectedDate = project.EndDate;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Проект не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    MessageBox.Show("Проект не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Close();
+                    return;
                 }
+
+                NameTextBox.Text = project.Name;
+                DescriptionTextBox.Text = project.Description;
+                StartDatePicker.SelectedDate = project.StartDate;
+                EndDatePicker.SelectedDate = project.EndDate;
+
+                // выбираем команду (null → 0)
+                cmbTeams.SelectedValue = project.TeamId ?? 0;
+            }
+            else
+            {
+                // новый проект — по умолчанию “Без команды”
+                cmbTeams.SelectedValue = 0;
             }
         }
 
         private void AddProjectButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = NameTextBox.Text;
-            string description = DescriptionTextBox.Text;
-            DateTime? startDate = StartDatePicker.SelectedDate;
-            DateTime? endDate = EndDatePicker.SelectedDate;
+            string name = NameTextBox.Text.Trim();
+            string description = DescriptionTextBox.Text.Trim();
+            DateTime? start = StartDatePicker.SelectedDate;
+            DateTime? end = EndDatePicker.SelectedDate;
+            int teamId = (int)(cmbTeams.SelectedValue ?? 0);
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                MessageBox.Show("Название проекта не может быть пустым.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Введите название проекта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
-            if (startDate > endDate)
+            if (start.HasValue && end.HasValue && start > end)
             {
                 MessageBox.Show("Дата начала не может быть позже даты окончания.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -60,64 +82,46 @@ namespace ProjectSystemHelpStudents.UsersContent
 
             try
             {
-                using (var context = new TaskManagementEntities1())
+                if (ProjectId.HasValue)
                 {
-                    // Если это редактирование, то обновляем проект, иначе создаем новый
-                    if (ProjectId.HasValue)
-                    {
-                        var existingProject = context.Project.FirstOrDefault(p => p.ProjectId == ProjectId.Value);
-                        if (existingProject != null)
-                        {
-                            // Обновляем проект
-                            existingProject.Name = name;
-                            existingProject.Description = description;
-                            existingProject.StartDate = startDate ?? DateTime.Now;
-                            existingProject.EndDate = endDate ?? DateTime.Now.AddYears(1);
+                    // обновление
+                    var proj = _ctx.Project.Find(ProjectId.Value);
+                    proj.Name = name;
+                    proj.Description = description;
+                    proj.StartDate = start ?? proj.StartDate;
+                    proj.EndDate = end ?? proj.EndDate;
+                    proj.TeamId = teamId == 0 ? (int?)null : teamId;
 
-                            context.SaveChanges();
-                            IsProjectUpdated = true;
-                            MessageBox.Show("Проект успешно обновлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Проект не найден для редактирования.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                    else
-                    {
-                        // Если это создание нового проекта
-                        var newProject = new Project
-                        {
-                            Name = name,
-                            Description = description,
-                            StartDate = startDate ?? DateTime.Now,
-                            EndDate = endDate ?? DateTime.Now.AddYears(1)
-                        };
-
-                        var currentUser = context.Users.FirstOrDefault(u => u.IdUser == UserSession.IdUser);
-                        if (currentUser != null)
-                        {
-                            context.Project.Add(newProject);
-                            context.SaveChanges();
-                            IsProjectAdded = true;
-
-                            // Уведомляем подписчиков о новом проекте
-                            ProjectAdded?.Invoke(newProject);
-
-                            MessageBox.Show("Проект успешно добавлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Не удалось определить текущего пользователя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-
-                    this.Close();
+                    _ctx.SaveChanges();
+                    IsProjectUpdated = true;
+                    MessageBox.Show("Проект обновлён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
+                else
+                {
+                    // создание
+                    var proj = new Project
+                    {
+                        Name = name,
+                        Description = description,
+                        StartDate = start ?? DateTime.Now,
+                        EndDate = end ?? DateTime.Now.AddYears(1),
+                        TeamId = teamId == 0 ? (int?)null : teamId,
+                        OwnerId = UserSession.IdUser
+                    };
+                    _ctx.Project.Add(proj);
+                    _ctx.SaveChanges();
+                    IsProjectAdded = true;
+
+                    ProjectAdded?.Invoke(proj);
+
+                    MessageBox.Show("Проект добавлен.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при добавлении или обновлении проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при сохранении проекта:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

@@ -58,6 +58,9 @@
           <Property Name="Description" Type="nvarchar(max)" />
           <Property Name="StartDate" Type="date" />
           <Property Name="EndDate" Type="date" />
+          <Property Name="TeamId" Type="int" />
+          <Property Name="OwnerId" Type="int" />
+          <Property Name="IsCompleted" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="Section">
           <Key>
@@ -124,6 +127,7 @@
           <Property Name="InviterId" Type="int" Nullable="false" />
           <Property Name="InviteeId" Type="int" Nullable="false" />
           <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" />
         </EntityType>
         <EntityType Name="TeamMember">
           <Key>
@@ -317,6 +321,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Project_Team">
+          <End Role="Team" Type="Self.Team" Multiplicity="0..1" />
+          <End Role="Project" Type="Self.Project" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Team">
+              <PropertyRef Name="TeamId" />
+            </Principal>
+            <Dependent Role="Project">
+              <PropertyRef Name="TeamId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Project_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Project" Type="Self.Project" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="Project">
+              <PropertyRef Name="OwnerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Task_Project">
           <End Role="Project" Type="Self.Project" Multiplicity="0..1" />
           <End Role="Task" Type="Self.Task" Multiplicity="*" />
@@ -437,6 +465,14 @@
             <End Role="Team" EntitySet="Team" />
             <End Role="TeamInvitation" EntitySet="TeamInvitation" />
           </AssociationSet>
+          <AssociationSet Name="FK_Project_Team" Association="Self.FK_Project_Team">
+            <End Role="Team" EntitySet="Team" />
+            <End Role="Project" EntitySet="Project" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Project_Users" Association="Self.FK_Project_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Project" EntitySet="Project" />
+          </AssociationSet>
           <AssociationSet Name="FK_Task_Project" Association="Self.FK_Task_Project">
             <End Role="Project" EntitySet="Project" />
             <End Role="Task" EntitySet="Task" />
@@ -499,6 +535,11 @@
           <Property Name="EndDate" Type="DateTime" Precision="0" />
           <NavigationProperty Name="Task" Relationship="Self.FK_Task_Project" FromRole="Project" ToRole="Task" />
           <NavigationProperty Name="Section" Relationship="TaskManagementModel.FK__Section__Project__4F47C5E3" FromRole="Project" ToRole="Section" />
+          <Property Name="TeamId" Type="Int32" />
+          <NavigationProperty Name="Team" Relationship="TaskManagementModel.FK_Project_Team" FromRole="Project" ToRole="Team" />
+          <Property Name="OwnerId" Type="Int32" />
+          <NavigationProperty Name="Users" Relationship="TaskManagementModel.FK_Project_Users" FromRole="Project" ToRole="Users" />
+          <Property Name="IsCompleted" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="Status">
           <Key>
@@ -559,6 +600,7 @@
           <NavigationProperty Name="TeamInvitation" Relationship="TaskManagementModel.FK_Invitation_Invitee" FromRole="Users" ToRole="TeamInvitation" />
           <NavigationProperty Name="TeamInvitation1" Relationship="TaskManagementModel.FK_Invitation_Inviter" FromRole="Users" ToRole="TeamInvitation" />
           <NavigationProperty Name="TeamMember" Relationship="TaskManagementModel.FK_TeamMember_User" FromRole="Users" ToRole="TeamMember" />
+          <NavigationProperty Name="Project" Relationship="TaskManagementModel.FK_Project_Users" FromRole="Users" ToRole="Project" />
         </EntityType>
         <Association Name="FK_Comment_Task">
           <End Role="Task" Type="Self.Task" Multiplicity="0..1">
@@ -734,6 +776,14 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="TeamMember" EntitySet="TeamMember" />
           </AssociationSet>
+          <AssociationSet Name="FK_Project_Team" Association="TaskManagementModel.FK_Project_Team">
+            <End Role="Team" EntitySet="Team" />
+            <End Role="Project" EntitySet="Project" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Project_Users" Association="TaskManagementModel.FK_Project_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Project" EntitySet="Project" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Filters">
           <Key>
@@ -846,6 +896,7 @@
           <NavigationProperty Name="TeamInvitation" Relationship="TaskManagementModel.FK_Invitation_Team" FromRole="Team" ToRole="TeamInvitation" />
           <NavigationProperty Name="Users" Relationship="TaskManagementModel.FK_Team_Leader" FromRole="Team" ToRole="Users" />
           <NavigationProperty Name="TeamMember" Relationship="TaskManagementModel.FK_TeamMember_Team" FromRole="Team" ToRole="TeamMember" />
+          <NavigationProperty Name="Project" Relationship="TaskManagementModel.FK_Project_Team" FromRole="Team" ToRole="Project" />
         </EntityType>
         <EntityType Name="TeamInvitation">
           <Key>
@@ -859,6 +910,7 @@
           <NavigationProperty Name="Team" Relationship="TaskManagementModel.FK_Invitation_Team" FromRole="TeamInvitation" ToRole="Team" />
           <NavigationProperty Name="Users" Relationship="TaskManagementModel.FK_Invitation_Invitee" FromRole="TeamInvitation" ToRole="Users" />
           <NavigationProperty Name="Users1" Relationship="TaskManagementModel.FK_Invitation_Inviter" FromRole="TeamInvitation" ToRole="Users" />
+          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="TeamMember">
           <Key>
@@ -943,6 +995,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Project_Team">
+          <End Type="TaskManagementModel.Team" Role="Team" Multiplicity="0..1" />
+          <End Type="TaskManagementModel.Project" Role="Project" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Team">
+              <PropertyRef Name="TeamId" />
+            </Principal>
+            <Dependent Role="Project">
+              <PropertyRef Name="TeamId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Project_Users">
+          <End Type="TaskManagementModel.Users" Role="Users" Multiplicity="0..1" />
+          <End Type="TaskManagementModel.Project" Role="Project" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="IdUser" />
+            </Principal>
+            <Dependent Role="Project">
+              <PropertyRef Name="OwnerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -981,6 +1057,9 @@
           <EntitySetMapping Name="Project">
             <EntityTypeMapping TypeName="TaskManagementModel.Project">
               <MappingFragment StoreEntitySet="Project">
+                <ScalarProperty Name="IsCompleted" ColumnName="IsCompleted" />
+                <ScalarProperty Name="OwnerId" ColumnName="OwnerId" />
+                <ScalarProperty Name="TeamId" ColumnName="TeamId" />
                 <ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
@@ -1088,6 +1167,7 @@
           <EntitySetMapping Name="TeamInvitation">
             <EntityTypeMapping TypeName="TaskManagementModel.TeamInvitation">
               <MappingFragment StoreEntitySet="TeamInvitation">
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="InviteeId" ColumnName="InviteeId" />
                 <ScalarProperty Name="InviterId" ColumnName="InviterId" />
