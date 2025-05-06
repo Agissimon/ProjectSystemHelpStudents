@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="ce302a4b5b2c46a6b7254870deef2b3a" Name="Diagram1">
+      <Diagram DiagramId="ce302a4b5b2c46a6b7254870deef2b3a" Name="Diagram1" ZoomLevel="86">
         <EntityTypeShape EntityType="TaskManagementModel.Comment" Width="1.5" PointX="3" PointY="3.625" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Files" Width="1.5" PointX="8.25" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel.Priority" Width="1.5" PointX="3.75" PointY="9.5" IsExpanded="true" />
@@ -29,6 +29,17 @@
         <EntityTypeShape EntityType="TaskManagementModel.Section" Width="1.5" PointX="10.375" PointY="12" />
         <AssociationConnector Association="TaskManagementModel.FK__Section__Project__4F47C5E3" />
         <AssociationConnector Association="TaskManagementModel.FK__Task__SectionId__503BEA1C" />
+        <EntityTypeShape EntityType="TaskManagementModel.Team" Width="1.5" PointX="3" PointY="22.25" />
+        <EntityTypeShape EntityType="TaskManagementModel.TeamInvitation" Width="1.5" PointX="9.25" PointY="15.625" />
+        <EntityTypeShape EntityType="TaskManagementModel.TeamMember" Width="1.5" PointX="6.25" PointY="15.75" />
+        <AssociationConnector Association="TaskManagementModel.FK_Invitation_Team" />
+        <AssociationConnector Association="TaskManagementModel.FK_Team_Leader" />
+        <AssociationConnector Association="TaskManagementModel.FK_TeamMember_Team" />
+        <AssociationConnector Association="TaskManagementModel.FK_Invitation_Invitee" />
+        <AssociationConnector Association="TaskManagementModel.FK_Invitation_Inviter" />
+        <AssociationConnector Association="TaskManagementModel.FK_TeamMember_User" />
+        <AssociationConnector Association="TaskManagementModel.FK_Project_Team" />
+        <AssociationConnector Association="TaskManagementModel.FK_Project_Users" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

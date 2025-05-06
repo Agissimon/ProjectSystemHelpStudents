@@ -37,5 +37,8 @@ namespace ProjectSystemHelpStudents
         public virtual DbSet<Labels> Labels { get; set; }
         public virtual DbSet<TaskLabels> TaskLabels { get; set; }
         public virtual DbSet<Section> Section { get; set; }
+        public virtual DbSet<Team> Team { get; set; }
+        public virtual DbSet<TeamInvitation> TeamInvitation { get; set; }
+        public virtual DbSet<TeamMember> TeamMember { get; set; }
     }
 }

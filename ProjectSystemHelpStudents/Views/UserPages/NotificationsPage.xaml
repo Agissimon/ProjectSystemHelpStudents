@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="ProjectSystemHelpStudents.Views.UserPages.NotificationsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Background="#222">
+        <StackPanel>
+            <TextBlock Text="Управление уведомлениями"
+                       Style="{StaticResource NormalTextBlockStyle}"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Margin="10"/>
+
+            <ListView x:Name="NotificationsList"
+                      Margin="0 0 10 0"
+                      Style="{StaticResource TransparentListViewStyle}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,5" Padding="10" Background="#333" CornerRadius="4">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Title}"
+                                           FontWeight="Bold"
+                                           Foreground="White"/>
+                                <TextBlock Text="{Binding Message}"
+                                           TextWrapping="Wrap"
+                                           Foreground="#DDD"
+                                           Margin="0,2,0,0"/>
+                                <TextBlock Text="{Binding CreatedAt, StringFormat=dd.MM.yyyy HH:mm}"
+                                           FontSize="10"
+                                           Foreground="#888"
+                                           HorizontalAlignment="Right"/>
+                                <StackPanel Orientation="Horizontal"
+                                            HorizontalAlignment="Right"
+                                            Margin="0,5,0,0">
+                                    <Button Content="Принять"
+                                            Click="Accept_Click"
+                                            Tag="{Binding Payload}"
+                                            Margin="0,0,5,0"/>
+                                    <Button Content="Отклонить"
+                                            Click="Reject_Click"
+                                            Tag="{Binding Payload}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+    </Grid>
+</UserControl>

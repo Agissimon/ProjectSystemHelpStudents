@@ -40,6 +40,28 @@ namespace ProjectSystemHelpStudents.UsersContent
             {
                 using (var context = new TaskManagementEntities1())
                 {
+                    int uid = UserSession.IdUser;
+
+                    // Получаем проект
+                    var project = context.Project.FirstOrDefault(p => p.ProjectId == _projectId);
+                    if (project == null)
+                        return;
+
+                    // Проверяем, имеет ли пользователь доступ к проекту
+                    var userTeamIds = context.TeamMember
+                        .Where(tm => tm.UserId == uid)
+                        .Select(tm => tm.TeamId)
+                        .ToList();
+
+                    bool hasAccess = project.OwnerId == uid ||
+                                    (project.TeamId != null && userTeamIds.Contains(project.TeamId.Value));
+
+                    if (!hasAccess)
+                    {
+                        MessageBox.Show("У вас нет доступа к этому проекту.");
+                        return;
+                    }
+
                     var sections = context.Section
                         .Where(s => s.ProjectId == _projectId)
                         .ToList();
@@ -49,7 +71,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                     foreach (var section in sections)
                     {
                         var tasks = context.Task
-                            .Where(t => t.ProjectId == _projectId && t.SectionId == section.IdSection && t.IdUser == UserSession.IdUser)
+                            .Where(t => t.ProjectId == _projectId && t.SectionId == section.IdSection)
                             .ToList()
                             .Select(t => new TaskViewModel
                             {
@@ -229,10 +251,8 @@ namespace ProjectSystemHelpStudents.UsersContent
                         var section = context.Section.FirstOrDefault(s => s.IdSection == sectionId);
                         if (section != null)
                         {
-                            // Получаем все задачи в этой секции
                             var tasks = context.Task.Where(t => t.SectionId == sectionId).ToList();
 
-                            // Удаляем связанные записи из TaskLabels (и других связанных таблиц, если нужно)
                             foreach (var task in tasks)
                             {
                                 var labels = context.TaskLabels.Where(tl => tl.TaskId == task.IdTask).ToList();
@@ -245,10 +265,8 @@ namespace ProjectSystemHelpStudents.UsersContent
                                 context.Files.RemoveRange(files);
                             }
 
-                            // Удаляем задачи
                             context.Task.RemoveRange(tasks);
 
-                            // Удаляем саму секцию
                             context.Section.Remove(section);
 
                             context.SaveChanges();

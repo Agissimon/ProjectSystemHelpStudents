@@ -1,7 +1,8 @@
 ﻿<Application x:Class="ProjectSystemHelpStudents.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="http://schemas.xceed.com/wpf/xaml/toolkit"
              StartupUri="MainWindow.xaml">
+
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -13,7 +14,10 @@
                 <ResourceDictionary Source="Styles\ListStyles.xaml"/>
                 <ResourceDictionary Source="Styles\TextBoxStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            
+
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+            <local:NullToBoolConverter x:Key="NullToBool"/>
+
             <Style x:Key="BaseDarkStyle" TargetType="Control">
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="Background" Value="#333"/>

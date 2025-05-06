@@ -1,10 +1,12 @@
 ﻿using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.Views.UserPages;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 
 namespace ProjectSystemHelpStudents.UsersContent
@@ -50,6 +52,33 @@ namespace ProjectSystemHelpStudents.UsersContent
             {
                 Dispatcher.Invoke(() => UpdateUserName(newName));
             };
+
+            UpdateNotificationBadge();
+
+            //UserSession.NotificationsChanged += () => Dispatcher.Invoke(UpdateNotificationBadge); // сделаю если успею... (нет)
+
+        }
+
+        private void UpdateNotificationBadge()
+        {
+            int currentUserId = UserSession.IdUser;
+            int count;
+            using (var ctx = new TaskManagementEntities1())
+            {
+                // считаем Pending приглашения
+                count = ctx.TeamInvitation
+                           .Count(ti => ti.InviteeId == currentUserId && ti.Status == "Pending");
+            }
+
+            if (count > 0)
+            {
+                NotificationCountText.Text = count.ToString();
+                NotificationBadge.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                NotificationBadge.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void UpdateUserName(string newName)
@@ -114,6 +143,71 @@ namespace ProjectSystemHelpStudents.UsersContent
             ProjectStackPanel.Children.Add(projectStackPanel);
         }
 
+        private void UserNameButton_Click(object sender, RoutedEventArgs e)
+        {
+            UserPopup.IsOpen = true;
+        }
+
+        private void NotificationsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var page = new NotificationsPage();
+            FrmClass.frmContentUser.Content = page;
+            FrmClass.frmStackPanelButton.Content = new StackPanelButtonPage();
+
+            UpdateNotificationBadge();
+        }
+
+        private void EditProfile_Click(object sender, RoutedEventArgs e)
+        {
+            int userId = UserSession.IdUser;
+
+            UserPage content = new UserPage();
+            FrmClass.frmContentUser.Content = content;
+            StackPanelButtonPage _content = new StackPanelButtonPage();
+            FrmClass.frmStackPanelButton.Content = _content;
+
+            var updatedName = "Новое имя пользователя";
+            UpdateUserName(updatedName);
+        }
+
+        private void CreateTeam_Click(object sender, RoutedEventArgs e)
+        {
+            UserPopup.IsOpen = false;
+
+            var window = new Window
+            {
+                Content = new TeamManagementControl(),
+                Width = 800,
+                Height = 600,
+                Title = "MyTask",
+                //Icon = new BitmapImage(new Uri("/Resources/Icon/logo001.png", UriKind.Relative)),
+                WindowStartupLocation = WindowStartupLocation.CenterScreen
+            };
+
+            window.Show();
+        }
+
+        private void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            UserSession.IdUser = 0;
+            UserSession.NameUser = null;
+
+            var mainWindow = Application.Current.MainWindow as MainWindow;
+
+            if (mainWindow != null)
+            {
+                mainWindow.frmAuth.Content = null;
+
+                mainWindow.frmContentUser.Content = null;
+                mainWindow.frmStackPanelButton.Content = null;
+
+                mainWindow.frmAuth.Navigate(new AuthPage());
+
+                Console.WriteLine(UserSession.IdUser);
+                Console.WriteLine(UserSession.NameUser);
+            }
+        }
+
         private void DetachButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is int projectId)
@@ -125,9 +219,23 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private List<Project> GetProjects()
         {
-            using (var context = new TaskManagementEntities1())
+            int uid = UserSession.IdUser;
+            using (var ctx = new TaskManagementEntities1())
             {
-                return context.Project.ToList();
+                var userTeamIds = ctx.TeamMember
+                                     .Where(tm => tm.UserId == uid)
+                                     .Select(tm => tm.TeamId)
+                                     .ToList();
+
+                var visibleProjects = ctx.Project
+                    .Where(p =>
+                        p.OwnerId == uid ||
+                        (p.TeamId != null && userTeamIds.Contains(p.TeamId.Value))
+                    )
+                    .OrderBy(p => p.Name)
+                    .ToList();
+
+                return visibleProjects;
             }
         }
 
@@ -140,20 +248,6 @@ namespace ProjectSystemHelpStudents.UsersContent
             FrmClass.frmContentUser.Content = content;
             StackPanelButtonPage _content = new StackPanelButtonPage();
             FrmClass.frmStackPanelButton.Content = _content;
-        }
-
-        private void UserNameButton_Click(object sender, RoutedEventArgs e)
-        {
-            int userId = UserSession.IdUser;
-
-            UserPage content = new UserPage();
-            FrmClass.frmContentUser.Content = content;
-            StackPanelButtonPage _content = new StackPanelButtonPage();
-            FrmClass.frmStackPanelButton.Content = _content;
-
-            // После изменения имени пользователя обновите его в интерфейсе
-            var updatedName = "Новое имя пользователя"; // Пример нового имени
-            UpdateUserName(updatedName);
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)

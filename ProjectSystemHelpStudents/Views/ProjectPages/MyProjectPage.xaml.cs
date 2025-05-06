@@ -25,6 +25,33 @@ namespace ProjectSystemHelpStudents.UsersContent
             RefreshProjects();
         }
 
+        private void FilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ApplyFilters();
+        }
+
+        private void ApplyFilters()
+        {
+            if (Projects == null || AllProjects == null)
+                return; // или throw new InvalidOperationException("Projects или AllProjects не инициализированы");
+
+            string searchText = SearchBox?.Text?.ToLower() ?? "";
+            string selectedFilter = (FilterComboBox?.SelectedItem as ComboBoxItem)?.Content as string;
+
+            var filtered = AllProjects.Where(p =>
+                p.Name.ToLower().Contains(searchText) &&
+                (selectedFilter == "Все проекты" ||
+                 (selectedFilter == "Активные проекты" && !p.IsCompleted) ||
+                 (selectedFilter == "Завершенные проекты" && p.IsCompleted))
+            ).ToList();
+
+            Projects.Clear();
+            foreach (var project in filtered)
+            {
+                Projects.Add(project);
+            }
+        }
+
         private void ProjectsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ProjectsListView.SelectedItem is ProjectViewModel selectedProject)
@@ -48,45 +75,47 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void RefreshProjects()
         {
-            try
+            using (var ctx = new TaskManagementEntities1())
             {
-                using (var context = new TaskManagementEntities1())
+                int uid = UserSession.IdUser;
+                var userTeamIds = ctx.TeamMember
+                                     .Where(tm => tm.UserId == uid)
+                                     .Select(tm => tm.TeamId)
+                                     .ToList();
+
+                var userProjects = ctx.Project
+                    .Where(p =>
+                        p.OwnerId == uid ||
+                        (p.TeamId != null && userTeamIds.Contains(p.TeamId.Value))
+                    )
+                    .OrderBy(p => p.Name)
+                    .ToList();
+
+                Projects.Clear();
+                AllProjects.Clear();
+
+                foreach (var p in userProjects)
                 {
-                    var userProjects = context.Project
-                        .Select(p => new
-                        {
-                            p.ProjectId,
-                            p.Name,
-                            p.Description,
-                            p.StartDate,
-                            p.EndDate
-                        })
-                        .ToList();
+                    var teamName = p.Team != null ? p.Team.Name : null;
 
-                    Projects.Clear();
-                    AllProjects.Clear();
-
-                    foreach (var project in userProjects)
+                    var vm = new ProjectViewModel
                     {
-                        var isDetached = UserSettingsHelper.IsDetached(project.ProjectId);
-                        var projectVm = new ProjectViewModel
-                        {
-                            ProjectId = project.ProjectId,
-                            Name = project.Name,
-                            Icon = "📁",
-                            IsDetached = isDetached
-                        };
+                        ProjectId = p.ProjectId,
+                        Name = p.Name,
+                        Description = p.Description,
+                        StartDate = p.StartDate,
+                        EndDate = p.EndDate,
+                        TeamId = p.TeamId,
+                        TeamName = teamName,
+                        IsCompleted = p.IsCompleted
+                    };
 
-                        Projects.Add(projectVm);
-                        AllProjects.Add(projectVm);
-                    }
+                    Projects.Add(vm);
+                    AllProjects.Add(vm);
                 }
-                ProjectsListView.ItemsSource = Projects;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при загрузке проектов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+
+            ProjectsListView.ItemsSource = Projects;
         }
 
         private void AddProject_Click(object sender, RoutedEventArgs e)
@@ -203,18 +232,32 @@ namespace ProjectSystemHelpStudents.UsersContent
                 MessageBox.Show("Ошибка: Данные проекта не найдены.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var searchText = SearchBox.Text.ToLower();
+            ApplyFilters();
+        }
 
-            var filtered = AllProjects
-                .Where(p => p.Name.ToLower().Contains(searchText))
-                .ToList();
-
-            Projects.Clear();
-            foreach (var project in filtered)
+        private void MarkAsCompleted_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
             {
-                Projects.Add(project);
+                using (var ctx = new TaskManagementEntities1())
+                {
+                    var dbProject = ctx.Project.FirstOrDefault(p => p.ProjectId == project.ProjectId);
+                    if (dbProject != null && !dbProject.IsCompleted)
+                    {
+                        dbProject.IsCompleted = true;
+                        ctx.SaveChanges();
+
+                        MessageBox.Show($"Проект «{project.Name}» отмечен как завершён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        RefreshProjects();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Проект уже завершён или не найден.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
             }
         }
     }

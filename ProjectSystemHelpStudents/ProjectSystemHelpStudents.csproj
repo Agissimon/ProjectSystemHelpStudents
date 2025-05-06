@@ -124,7 +124,10 @@
     </Compile>
     <Compile Include="Helper\ExpanderStateManager.cs" />
     <Compile Include="Helper\FileItem.cs" />
+    <Compile Include="Helper\NullToBoolConverter.cs" />
+    <Compile Include="Helper\NullToVisibilityConverter.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
+    <Compile Include="Helper\StatusToVisibilityConverter.cs" />
     <Compile Include="Helper\TaskLabel.cs" />
     <Compile Include="Labels.cs">
       <DependentUpon>Model1.tt</DependentUpon>
@@ -173,12 +176,22 @@
     <Compile Include="TaskLabels.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Team.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TeamInvitation.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TeamMember.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Users.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\BoardViewControl.cs" />
     <Compile Include="ViewModels\ExecutorViewModel.cs" />
     <Compile Include="ViewModels\LabelViewModel.cs" />
+    <Compile Include="ViewModels\NotificationViewModel.cs" />
     <Compile Include="ViewModels\PriorityViewModel.cs" />
     <Compile Include="ViewModels\ProjectViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
@@ -188,6 +201,8 @@
     <Compile Include="ViewModels\TaskCalendarView.cs" />
     <Compile Include="ViewModels\TaskGroupViewModel.cs" />
     <Compile Include="ViewModels\TaskViewModel.cs" />
+    <Compile Include="ViewModels\TeamMemberViewModel.cs" />
+    <Compile Include="ViewModels\TeamViewModel.cs" />
     <Compile Include="Views\Popup\DisplayOptionsControl.xaml.cs">
       <DependentUpon>DisplayOptionsControl.xaml</DependentUpon>
     </Compile>
@@ -239,8 +254,17 @@
     <Compile Include="Views\UserPages\InputDialogWindow.xaml.cs">
       <DependentUpon>InputDialogWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\UserPages\InviteUserControl.xaml.cs">
+      <DependentUpon>InviteUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserPages\NotificationsPage.xaml.cs">
+      <DependentUpon>NotificationsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\UserPages\RegPage.xaml.cs">
       <DependentUpon>RegPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserPages\TeamManagementControl.xaml.cs">
+      <DependentUpon>TeamManagementControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UserPages\UserPage.xaml.cs">
       <DependentUpon>UserPage.xaml</DependentUpon>
@@ -353,9 +377,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\UserPages\InviteUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserPages\NotificationsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\UserPages\RegPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserPages\TeamManagementControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\UserPages\UserPage.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -396,9 +432,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="AdminContent\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Resources\Icon\logo001.png" />
   </ItemGroup>

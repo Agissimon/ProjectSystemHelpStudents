@@ -12,29 +12,26 @@ namespace ProjectSystemHelpStudents
     using System;
     using System.Collections.Generic;
     
-    public partial class Project
+    public partial class Team
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Project()
+        public Team()
         {
-            this.Task = new HashSet<Task>();
-            this.Section = new HashSet<Section>();
+            this.TeamInvitation = new HashSet<TeamInvitation>();
+            this.TeamMember = new HashSet<TeamMember>();
+            this.Project = new HashSet<Project>();
         }
     
-        public int ProjectId { get; set; }
+        public int TeamId { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
-        public Nullable<System.DateTime> StartDate { get; set; }
-        public Nullable<System.DateTime> EndDate { get; set; }
-        public Nullable<int> TeamId { get; set; }
-        public Nullable<int> OwnerId { get; set; }
-        public bool IsCompleted { get; set; }
+        public int LeaderId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Task> Task { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Section> Section { get; set; }
-        public virtual Team Team { get; set; }
+        public virtual ICollection<TeamInvitation> TeamInvitation { get; set; }
         public virtual Users Users { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<TeamMember> TeamMember { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Project> Project { get; set; }
     }
 }

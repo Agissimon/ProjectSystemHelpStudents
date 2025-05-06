@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using ProjectSystemHelpStudents.Helper;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -19,11 +20,13 @@ namespace ProjectSystemHelpStudents
         public TaskDetailsWindow(TaskViewModel task)
         {
             InitializeComponent();
+
             using (var ctx = new TaskManagementEntities1())
             {
                 var dbTask = ctx.Task
                     .Include(t => t.Status)
                     .FirstOrDefault(t => t.IdTask == task.IdTask);
+
                 if (dbTask != null)
                 {
                     task.Title = dbTask.Title;
@@ -31,7 +34,9 @@ namespace ProjectSystemHelpStudents
                     task.EndDate = dbTask.EndDate;
                     task.ProjectId = dbTask.ProjectId ?? 0;
                     task.PriorityId = dbTask.PriorityId;
-                    task.IsCompleted = dbTask.Status != null && dbTask.Status.Name == "Завершено";
+                    task.IsCompleted = dbTask.Status?.Name == "Завершено";
+
+                    task.IdUser = dbTask.IdUser;
                 }
             }
 
@@ -39,7 +44,7 @@ namespace ProjectSystemHelpStudents
             DataContext = _task;
 
             InitializeComboBoxes();
-
+            LoadAssignees();
             LoadLabels();
             LoadComments();
             LoadTaskFiles();
@@ -102,6 +107,37 @@ namespace ProjectSystemHelpStudents
             }
         }
 
+        private void LoadAssignees()
+        {
+            int teamId = _task.ProjectId;
+
+            List<Users> all;
+            using (var ctx = new TaskManagementEntities1())
+            {
+                var members = (from tm in ctx.TeamMember
+                               join u in ctx.Users on tm.UserId equals u.IdUser
+                               where tm.TeamId == teamId
+                               select u).ToList();
+
+                var invites = (from ti in ctx.TeamInvitation
+                               join u in ctx.Users on ti.InviteeId equals u.IdUser
+                               where ti.TeamId == teamId
+                                     && (ti.Status == "Pending" || ti.Status == "Accepted")
+                               select u).ToList();
+
+                all = members
+                      .Union(invites, new UserComparer())
+                      .ToList();
+
+                var current = ctx.Users.Find(_task.IdUser);
+                if (current != null && !all.Any(u => u.IdUser == current.IdUser))
+                    all.Insert(0, current);
+            }
+
+            AssignedToComboBox.ItemsSource = all;
+            AssignedToComboBox.SelectedValue = _task.IdUser;
+        }
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -111,6 +147,7 @@ namespace ProjectSystemHelpStudents
                 _task.EndDate = EndDatePicker.SelectedDate ?? DateTime.Now;
                 _task.ProjectId = (int?)(ProjectComboBox.SelectedValue) ?? _task.ProjectId;
                 _task.PriorityId = (int?)(PriorityComboBox.SelectedValue) ?? _task.PriorityId;
+                _task.IdUser = (int?)(AssignedToComboBox.SelectedValue) ?? _task.IdUser;
 
                 using (var ctx = new TaskManagementEntities1())
                 {
@@ -120,14 +157,13 @@ namespace ProjectSystemHelpStudents
                     if (dbTask == null)
                         throw new InvalidOperationException("Задача не найдена в базе");
 
-                    // Обновляем поля
                     dbTask.Title = _task.Title;
                     dbTask.Description = _task.Description;
                     dbTask.EndDate = _task.EndDate;
                     dbTask.ProjectId = _task.ProjectId;
                     dbTask.PriorityId = _task.PriorityId;
+                    dbTask.IdUser = _task.IdUser;
 
-                    // Метки
                     ctx.TaskLabels.RemoveRange(dbTask.TaskLabels);
                     foreach (var labelVm in _task.AvailableLabels.Where(l => l.IsSelected))
                     {
@@ -310,6 +346,11 @@ namespace ProjectSystemHelpStudents
             {
                 MessageBox.Show($"Ошибка при удалении комментария: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+        private class UserComparer : IEqualityComparer<Users>
+        {
+            public bool Equals(Users x, Users y) => x?.IdUser == y?.IdUser;
+            public int GetHashCode(Users obj) => obj.IdUser.GetHashCode();
         }
     }
 }
