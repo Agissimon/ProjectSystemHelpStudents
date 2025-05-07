@@ -3,13 +3,15 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:ProjectSystemHelpStudents.Helper"
+      xmlns:local="clr-namespace:ProjectSystemHelpStudents.Helper" 
+      xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
       mc:Ignorable="d" 
       Background="#222"
       Title="MyProjectPage">
 
     <Page.Resources>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Page.Resources>
 
     <Grid Margin="10,0,0,10">
@@ -70,16 +72,36 @@
                                     <TextBlock Text="..." FontSize="16" Foreground="White"/>
                                     <Button.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Завершить проект" Click="MarkAsCompleted_Click" Tag="{Binding}" />
-                                            <MenuItem Header="Изменить" Click="EditProject_Click" Tag="{Binding}"/>
-                                            <MenuItem Header="Добавить в избранное" Click="AddToFavorites_Click" Tag="{Binding}"/>
+                                            <MenuItem Header="Завершить проект" Click="MarkAsCompleted_Click" Tag="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <fa:IconImage Icon="CheckCircle" Width="15" Height="15" Foreground="#444"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Активировать проект" Click="ActivateProject_Click" Tag="{Binding}"
+                                                Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <MenuItem.Icon>
+                                                    <fa:IconImage Icon="Redo" Width="15" Height="15" Foreground="#444"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator />
+                                            <MenuItem Header="Изменить" Click="EditProject_Click" Tag="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <fa:IconImage Icon="Edit" Width="15" Height="15" Foreground="#444"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Добавить в избранное" Click="AddToFavorites_Click" Tag="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <fa:IconImage Icon="Star" Width="15" Height="15" Foreground="#444"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
                                             <MenuItem Header="Удалить" Click="DeleteProject_Click" Tag="{Binding}">
                                                 <MenuItem.Icon>
-                                                    <Image Source="/Resources/Icon/red_trash_can.png"/>
+                                                    <fa:IconImage Icon="Trash" Width="15" Height="15" Foreground="#444"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
                                         </ContextMenu>
                                     </Button.ContextMenu>
+
                                 </Button>
                             </StackPanel>
                         </DataTemplate>

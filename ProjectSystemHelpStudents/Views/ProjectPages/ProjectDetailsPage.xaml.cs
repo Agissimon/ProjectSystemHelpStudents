@@ -11,6 +11,7 @@ namespace ProjectSystemHelpStudents.UsersContent
     public partial class ProjectDetailsPage : Page
     {
         private int _projectId;
+        private bool _isProjectCompleted;
 
         public ProjectDetailsPage(int projectId)
         {
@@ -30,9 +31,11 @@ namespace ProjectSystemHelpStudents.UsersContent
                     ProjectTitle.Text = project.Name;
                     ProjectDescription.Text = project.Description;
                     ProjectDates.Text = $"С {project.StartDate:dd.MM.yyyy} по {project.EndDate:dd.MM.yyyy}";
+                    _isProjectCompleted = project.IsCompleted == true;
                 }
             }
         }
+
 
         private void RefreshTasks()
         {
@@ -142,6 +145,12 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void AddTaskToSection_Click(object sender, RoutedEventArgs e)
         {
+            if (_isProjectCompleted)
+            {
+                MessageBox.Show("Невозможно добавить задачу: проект завершён.");
+                return;
+            }
+
             if (sender is Button button && button.Tag is int sectionId)
             {
                 var addTaskWindow = new AddTaskWindow(_projectId, sectionId);
@@ -152,6 +161,12 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void AddSection_Click(object sender, RoutedEventArgs e)
         {
+            if (_isProjectCompleted)
+            {
+                MessageBox.Show("Невозможно добавить раздел: проект завершён.");
+                return;
+            }
+
             var dialog = new InputDialog("Введите название раздела:");
             if (dialog.ShowDialog() == true)
             {
@@ -186,6 +201,13 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void ConfirmAddSection_Click(object sender, RoutedEventArgs e)
         {
+            if (_isProjectCompleted)
+            {
+                MessageBox.Show("Невозможно добавить раздел: проект завершён.");
+                AddSectionPopup.IsOpen = false;
+                return;
+            }
+
             var sectionName = SectionNameTextBox.Text.Trim();
             if (!string.IsNullOrWhiteSpace(sectionName))
             {

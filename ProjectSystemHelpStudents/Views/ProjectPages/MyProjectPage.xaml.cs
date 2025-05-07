@@ -260,5 +260,27 @@ namespace ProjectSystemHelpStudents.UsersContent
                 }
             }
         }
+        private void ActivateProject_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
+            {
+                using (var ctx = new TaskManagementEntities1())
+                {
+                    var dbProject = ctx.Project.FirstOrDefault(p => p.ProjectId == project.ProjectId);
+                    if (dbProject != null && dbProject.IsCompleted)
+                    {
+                        dbProject.IsCompleted = false;
+                        ctx.SaveChanges();
+
+                        MessageBox.Show($"Проект «{project.Name}» активирован.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        RefreshProjects();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Проект уже активен или не найден.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+            }
+        }
     }
 }
