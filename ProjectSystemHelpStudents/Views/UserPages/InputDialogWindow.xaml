@@ -1,9 +1,10 @@
 ﻿<Window x:Class="ProjectSystemHelpStudents.InputDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Ввод данных" 
+        Title="MyTask" 
         Height="200" 
         Width="400" 
+        Icon="/Resources/Icon/logo001.png"
         WindowStartupLocation="CenterScreen"
         Style="{StaticResource BaseDarkStyle}">
 

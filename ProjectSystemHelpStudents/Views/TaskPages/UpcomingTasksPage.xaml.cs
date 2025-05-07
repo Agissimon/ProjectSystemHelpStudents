@@ -89,7 +89,12 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                 // Метки
                 var labels = ctx.Labels
-                    .Select(l => new LabelViewModel { Id = l.Id, Name = l.Name })
+                    .Select(l => new LabelViewModel
+                    {
+                        Id = l.Id,
+                        Name = l.Name,
+                        HexColor = l.Color
+                    })
                     .OrderBy(l => l.Id)
                     .ToList();
                 labels.Insert(0, new LabelViewModel { Id = 0, Name = "Все" });
@@ -163,11 +168,13 @@ namespace ProjectSystemHelpStudents.UsersContent
                                 IsCompleted = t.Status?.Name == "Завершено",
                                 EndDateFormatted = hdr,
                                 AvailableLabels = new ObservableCollection<LabelViewModel>(
-                                    t.TaskLabels.Select(l => new LabelViewModel
-                                    {
-                                        Id = l.LabelId,
-                                        Name = l.Labels.Name
-                                    }))
+                                        t.TaskLabels.Select(l => new LabelViewModel
+                                        {
+                                            Id = l.Labels.Id,
+                                            Name = l.Labels.Name,
+                                            HexColor = l.Labels.Color
+                                        }))
+
                             };
                         })
                         .ToList();

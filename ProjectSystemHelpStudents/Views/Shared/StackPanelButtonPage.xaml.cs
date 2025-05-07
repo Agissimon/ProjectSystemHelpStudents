@@ -65,9 +65,9 @@ namespace ProjectSystemHelpStudents.UsersContent
             int count;
             using (var ctx = new TaskManagementEntities1())
             {
-                // считаем Pending приглашения
+                // считаем В ожидании приглашения
                 count = ctx.TeamInvitation
-                           .Count(ti => ti.InviteeId == currentUserId && ti.Status == "Pending");
+                           .Count(ti => ti.InviteeId == currentUserId && ti.Status == "В ожидании");
             }
 
             if (count > 0)
@@ -180,9 +180,12 @@ namespace ProjectSystemHelpStudents.UsersContent
                 Width = 800,
                 Height = 600,
                 Title = "MyTask",
-                //Icon = new BitmapImage(new Uri("/Resources/Icon/logo001.png", UriKind.Relative)),
+                Icon = new BitmapImage(new Uri(
+                    "pack://application:,,,/ProjectSystemHelpStudents;component/Resources/Icon/logo001.png",
+                    UriKind.Absolute)),
                 WindowStartupLocation = WindowStartupLocation.CenterScreen
             };
+            window.Show();
 
             window.Show();
         }

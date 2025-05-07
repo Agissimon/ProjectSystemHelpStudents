@@ -7,13 +7,12 @@ namespace ProjectSystemHelpStudents.Helper
 {
     public class StatusToVisibilityConverter : IValueConverter
     {
-        // value — это строка Status ("Member", "Pending" и т.п.)
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var status = value as string;
-            return status == "Member"
-                ? Visibility.Visible
-                : Visibility.Collapsed;
+            string status = value as string;
+            if (status == "Участник" || status == "В ожидании")
+                return Visibility.Visible;
+            return Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -21,4 +20,5 @@ namespace ProjectSystemHelpStudents.Helper
             throw new NotImplementedException();
         }
     }
+
 }
