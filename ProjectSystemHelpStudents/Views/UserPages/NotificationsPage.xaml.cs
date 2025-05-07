@@ -23,7 +23,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                 var invites = ctx.TeamInvitation
                                  .Where(ti =>
                                      ti.InviteeId == currentUserId &&
-                                     ti.Status == "Pending")
+                                     ti.Status == "В ожидании")
                                  .OrderByDescending(ti => ti.CreatedAt)
                                  .ToList();
 

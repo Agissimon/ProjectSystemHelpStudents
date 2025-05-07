@@ -11,30 +11,39 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0"
-             Margin="0,0,0,10"
-             Style="{StaticResource InputFieldStyle}"
-             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock x:Name="txtTeamName"
+                   Grid.Row="0"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Foreground="White"
+                   Margin="0 0 0 10"
+                   Style="{StaticResource NormalTextBlockStyle}" />
 
-        <Border Grid.Row="1">
+        <TextBox Grid.Row="1"
+                 Margin="0,0,0,10"
+                 Style="{StaticResource InputFieldStyle}"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Border Grid.Row="2">
             <ListBox ItemsSource="{Binding Users}"
-               Style="{StaticResource TransparentListBoxStyle}"
-               SelectedItem="{Binding SelectedUser}"
-               BorderThickness="0"
-               ScrollViewer.VerticalScrollBarVisibility="Auto">
+                     Style="{StaticResource TransparentListBoxStyle}"
+                     SelectedItem="{Binding SelectedUser}"
+                     BorderThickness="0"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <Image Width="32" Height="32" Margin="0,0,8,0" Source="{Binding AvatarUrl}" />
                             <StackPanel>
                                 <TextBlock Text="{Binding Name}"
-                           Style="{StaticResource NormalTextBlockStyle}" FontSize="18" Foreground="White"/>
+                                           Style="{StaticResource NormalTextBlockStyle}" FontSize="18" Foreground="White"/>
                                 <TextBlock Text="{Binding Login}"
-                           Style="{StaticResource SmallTextBlockStyle}"/>
+                                           Style="{StaticResource SmallTextBlockStyle}"/>
                             </StackPanel>
                         </StackPanel>
                     </DataTemplate>
@@ -42,21 +51,21 @@
             </ListBox>
         </Border>
 
-        <StackPanel Grid.Row="2"
-                Orientation="Horizontal"
-                HorizontalAlignment="Right"
-                Margin="0,10,0,0">
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0">
             <Button Content="Отмена"
-              Width="80" Margin="0,0,10,0"
-              Command="{Binding CancelCommand}"
-              Style="{StaticResource LoginButtonStyle}"/>
+                    Width="80" Margin="0,0,10,0"
+                    Command="{Binding CancelCommand}"
+                    Style="{StaticResource LoginButtonStyle}"/>
             <Button Content="{Binding AddButtonText}"
-              Width="120"
-              IsEnabled="{Binding IsUserSelected}"
-              Command="{Binding ConfirmCommand}"
-              Style="{StaticResource LoginButtonStyle}"
-              Background="{StaticResource AccentBrush}"
-              Foreground="White"/>
+                    Width="120"
+                    IsEnabled="{Binding IsUserSelected}"
+                    Command="{Binding ConfirmCommand}"
+                    Style="{StaticResource LoginButtonStyle}"
+                    Background="{StaticResource AccentBrush}"
+                    Foreground="White"/>
         </StackPanel>
     </Grid>
 </UserControl>

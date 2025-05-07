@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using ProjectSystemHelpStudents.Helper;
 using ProjectSystemHelpStudents.ViewModels;
 
@@ -15,11 +16,13 @@ namespace ProjectSystemHelpStudents.Views.UserPages
     {
         private readonly TaskManagementEntities1 _ctx = new TaskManagementEntities1();
         private TeamViewModel _selectedTeam;
+
         private class ParticipantItem
         {
             public int UserId { get; set; }
             public string Name { get; set; }
             public string Status { get; set; }
+            public bool IsInvitation { get; set; }
         }
 
         public TeamManagementControl()
@@ -30,9 +33,12 @@ namespace ProjectSystemHelpStudents.Views.UserPages
 
         private void LoadTeams()
         {
+            int currentUserId = UserSession.IdUser;
             int? selectedId = _selectedTeam?.TeamId;
 
             var teams = (from t in _ctx.Team
+                         where t.LeaderId == currentUserId
+                               || _ctx.TeamMember.Any(tm => tm.TeamId == t.TeamId && tm.UserId == currentUserId)
                          join u in _ctx.Users on t.LeaderId equals u.IdUser into lu
                          from leader in lu.DefaultIfEmpty()
                          select new TeamViewModel
@@ -40,8 +46,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                              TeamId = t.TeamId,
                              Name = t.Name,
                              LeaderName = leader != null ? leader.Name : "<нет лидера>"
-                         })
-                         .ToList();
+                         }).ToList();
 
             TeamsListView.ItemsSource = teams;
 
@@ -68,7 +73,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
             int teamId = _selectedTeam.TeamId;
             var participantList = new List<ParticipantItem>();
 
-            // Лидер команды
+            // Лидер
             var teamEntity = _ctx.Team.Find(teamId);
             if (teamEntity != null)
             {
@@ -79,12 +84,13 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                     {
                         UserId = leaderUser.IdUser,
                         Name = leaderUser.Name,
-                        Status = "Leader"
+                        Status = "Лидер",
+                        IsInvitation = false
                     });
                 }
             }
 
-            // члены команды
+            // Участники
             var members = (from tm in _ctx.TeamMember
                            join u in _ctx.Users on tm.UserId equals u.IdUser
                            where tm.TeamId == teamId
@@ -92,34 +98,37 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                            {
                                UserId = u.IdUser,
                                Name = u.Name,
-                               Status = "Member"
-                           })
-                          .ToList();
+                               Status = "Участник",
+                               IsInvitation = false
+                           }).ToList();
+
             participantList.AddRange(members);
 
-            // приглашения
-            var allInvites = (from ti in _ctx.TeamInvitation
-                              join u in _ctx.Users on ti.InviteeId equals u.IdUser
-                              where ti.TeamId == teamId
-                              select new ParticipantItem
-                              {
-                                  UserId = u.IdUser,
-                                  Name = u.Name,
-                                  Status = ti.Status
-                              }).ToList();
+            // Приглашения
+            var invites = (from ti in _ctx.TeamInvitation
+                           join u in _ctx.Users on ti.InviteeId equals u.IdUser
+                           where ti.TeamId == teamId
+                           select new ParticipantItem
+                           {
+                               UserId = u.IdUser,
+                               Name = u.Name,
+                               Status = ti.Status,
+                               IsInvitation = true
+                           }).ToList();
 
-            var invites = allInvites
-                          .Where(inv => !participantList.Any(p => p.UserId == inv.UserId))
-                          .ToList();
+            // Только те приглашения, кто не в списке участников
+            var filteredInvites = invites
+                .Where(i => !participantList.Any(p => p.UserId == i.UserId))
+                .ToList();
 
-            participantList.AddRange(invites);
+            participantList.AddRange(filteredInvites);
 
             MembersList.ItemsSource = participantList;
         }
 
         private void NewTeam_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new InputDialog("Введите название новой команды:", "Новая команда");
+            var dlg = new InputDialog("Введите название новой команды:", "MyTask");
             if (dlg.ShowDialog() == true)
             {
                 var team = new Team { Name = dlg.InputText, LeaderId = UserSession.IdUser };
@@ -142,7 +151,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
         {
             if (_selectedTeam == null) return;
 
-            var dlg = new InputDialog("Введите новое название:", "Редактировать команду");
+            var dlg = new InputDialog("Введите новое название:", "MyTask");
             dlg.InputText = _selectedTeam.Name;
             if (dlg.ShowDialog() == true)
             {
@@ -186,14 +195,20 @@ namespace ProjectSystemHelpStudents.Views.UserPages
             if (_selectedTeam == null) return;
 
             var inviteControl = new InviteUserControl();
+            inviteControl.TeamName = _selectedTeam.Name;
+
             var win = new Window
             {
-                Title = "Пригласить в " + _selectedTeam.Name,
+                Title = "MyTask",
                 Content = inviteControl,
                 SizeToContent = SizeToContent.WidthAndHeight,
+                Icon = new BitmapImage(new Uri(
+                    "pack://application:,,,/ProjectSystemHelpStudents;component/Resources/Icon/logo001.png",
+                    UriKind.Absolute)),
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Owner = Window.GetWindow(this)
             };
+
 
             inviteControl.Confirmed += (s, user) =>
             {
@@ -217,7 +232,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                 bool exists = ctx.TeamInvitation.Any(ti =>
                     ti.TeamId == _selectedTeam.TeamId &&
                     ti.InviteeId == targetUser.IdUser &&
-                    ti.Status == "Pending");
+                    ti.Status == "В ожидании");
 
                 if (exists)
                 {
@@ -232,7 +247,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                     TeamId = _selectedTeam.TeamId,
                     InviterId = UserSession.IdUser,
                     InviteeId = targetUser.IdUser,
-                    Status = "Pending",
+                    Status = "В ожидании",
                     CreatedAt = DateTime.Now
                 };
                 ctx.TeamInvitation.Add(invite);
@@ -247,15 +262,39 @@ namespace ProjectSystemHelpStudents.Views.UserPages
             if (_selectedTeam == null) return;
 
             var btn = (Button)sender;
-            if (btn.DataContext is Users user)
+            if (btn.DataContext is ParticipantItem item)
             {
-                var link = _ctx.TeamMember.FirstOrDefault(tm => tm.TeamId == _selectedTeam.TeamId &&
-                                                                 tm.UserId == user.IdUser);
-                if (link != null)
+                if (item.Status == "Лидер")
                 {
-                    _ctx.TeamMember.Remove(link);
-                    _ctx.SaveChanges();
-                    LoadTeams();
+                    MessageBox.Show("Нельзя удалить лидера команды.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (item.IsInvitation)
+                {
+                    // Удалить приглашение
+                    var invite = _ctx.TeamInvitation.FirstOrDefault(ti =>
+                        ti.TeamId == _selectedTeam.TeamId && ti.InviteeId == item.UserId);
+
+                    if (invite != null)
+                    {
+                        _ctx.TeamInvitation.Remove(invite);
+                        _ctx.SaveChanges();
+                        LoadTeams();
+                    }
+                }
+                else
+                {
+                    // Удалить участника
+                    var member = _ctx.TeamMember.FirstOrDefault(tm =>
+                        tm.TeamId == _selectedTeam.TeamId && tm.UserId == item.UserId);
+
+                    if (member != null)
+                    {
+                        _ctx.TeamMember.Remove(member);
+                        _ctx.SaveChanges();
+                        LoadTeams();
+                    }
                 }
             }
         }
