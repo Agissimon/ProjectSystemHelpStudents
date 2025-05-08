@@ -8,6 +8,10 @@
         Width="700" 
         Style="{StaticResource SmallWindowStyle}"  
         WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <local:TimeOnlyConverter x:Key="TimeOnlyConverter"/>
+    </Window.Resources>
     
     <Grid Margin="10">
         <StackPanel Orientation="Horizontal">
@@ -130,8 +134,23 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-
                 </StackPanel>
+
+                <TextBlock Text="Дата напоминания" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,0"/>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                    <DatePicker x:Name="dpEditRemindDate"
+                          SelectedDate="{Binding ReminderDate, Mode=TwoWay}"
+                          Width="120"/>
+
+                    <TextBox x:Name="tbEditRemindTime"
+                         Style="{StaticResource InputFieldStyle}"
+                         Width="49" Margin="5,0,0,0"
+                         Text="{Binding ReminderDate,
+                        Converter={StaticResource TimeOnlyConverter},
+                        Mode=OneWay}"
+                        ToolTip="чч:мм"/>
+                </StackPanel>
+
                 <Button Content="Сохранить" Click="SaveButton_Click" Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Center" Margin="0,10,0,5"/>
             </StackPanel>
         </StackPanel>

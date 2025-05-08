@@ -1,19 +1,10 @@
 ﻿using ProjectSystemHelpStudents.Helper;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Configuration;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -31,25 +22,41 @@ namespace ProjectSystemHelpStudents.UsersContent
         }
         private void btnMail_Click(object sender, RoutedEventArgs e)
         {
-            var clientEmail = txbForPass.Text;
-            var user = DBClass.entities.Users.Where(i => i.Mail == clientEmail).FirstOrDefault();
+            var clientEmail = txbForPass.Text.Trim();
 
-            if (user == null)
+            if (string.IsNullOrEmpty(clientEmail) || !clientEmail.Contains("@"))
             {
-                MessageBox.Show("Пользователь с такой электронной почтой не найден");
+                MessageBox.Show("Введите корректный email.");
                 return;
             }
 
-            SmtpClient client = new SmtpClient("smtp.mail.ru", 587)
+            var user = DBClass.entities.Users.FirstOrDefault(i => i.Mail == clientEmail);
+
+            if (user == null)
+            {
+                MessageBox.Show("Пользователь с такой электронной почтой не найден.");
+                return;
+            }
+
+            string fromEmail = ConfigurationManager.AppSettings["EmailFrom"];
+            string fromPassword = ConfigurationManager.AppSettings["EmailPassword"];
+
+            if (string.IsNullOrWhiteSpace(fromEmail) || string.IsNullOrWhiteSpace(fromPassword))
+            {
+                MessageBox.Show("Email отправителя или пароль не настроены в App.config.");
+                return;
+            }
+
+            SmtpClient client = new SmtpClient("smtp.gmail.com", 587)
             {
                 EnableSsl = true,
-                Credentials = new NetworkCredential("kozinog@mail.ru", "9iJRbHr0AZxBLrCz0rHU")
+                Credentials = new NetworkCredential(fromEmail, fromPassword)
             };
 
             var mailMessage = new MailMessage
             {
-                From = new MailAddress("kozinog@mail.ru"),
-                Subject = "Восстановление пароля: Гастроном",
+                From = new MailAddress(fromEmail),
+                Subject = "Восстановление пароля",
                 Body = $"Ваш пароль: {user.Password}",
                 IsBodyHtml = false
             };
@@ -59,11 +66,15 @@ namespace ProjectSystemHelpStudents.UsersContent
             try
             {
                 client.Send(mailMessage);
-                MessageBox.Show("Пароль был отправлен на ваш почтовый ящик");
+                MessageBox.Show("Пароль был отправлен на ваш почтовый ящик.");
+            }
+            catch (SmtpException smtpEx)
+            {
+                MessageBox.Show($"Ошибка отправки письма: {smtpEx.Message}");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show($"Неожиданная ошибка: {ex.Message}");
             }
         }
     }

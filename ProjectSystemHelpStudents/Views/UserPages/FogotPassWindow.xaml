@@ -15,7 +15,7 @@
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Text="Введите e-mail:" Style="{StaticResource NormalTextBlockStyle}"/>
-            <TextBox x:Name="txbForPass" Style="{StaticResource NormalTextBoxStyle}"/>
+            <TextBox x:Name="txbForPass" Style="{StaticResource InputFieldStyle}"/>
             <Button x:Name="btnMail" Content="Выслать пароль" Style="{StaticResource NormalButtonStyle}" Click="btnMail_Click"/>
         </StackPanel>
     </Grid>

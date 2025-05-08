@@ -23,14 +23,26 @@ namespace ProjectSystemHelpStudents.Helper
         private int _IdLabel;
 
         public int IdUser { get; set; }
-
         public bool IsPinned { get; set; }
-
         public int? SectionId { get; set; }
         public string Section { get; set; } 
 
         public string EndDateFormatted { get; set; }
         public int IdTask { get; set; }
+
+        private DateTime? _reminderDate;
+        public DateTime? ReminderDate
+        {
+            get => _reminderDate;
+            set
+            {
+                if (_reminderDate != value)
+                {
+                    _reminderDate = value;
+                    OnPropertyChanged(nameof(ReminderDate));
+                }
+            }
+        }
 
         public int Id
         {
