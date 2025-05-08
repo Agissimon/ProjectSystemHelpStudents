@@ -48,10 +48,18 @@ namespace ProjectSystemHelpStudents
                                .ToList();
             }
             cmbAssignedTo.ItemsSource = _allUsers;
-
             cmbAssignedTo.SelectedValue = UserSession.IdUser;
         }
 
+        /// <summary>
+        /// Позволяет программно установить дату завершения до открытия окна
+        /// </summary>
+        public void SetPreselectedDate(DateTime date)
+        {
+            _preselectedDate = date;
+            if (IsLoaded)
+                dpEndDate.SelectedDate = date;
+        }
 
         private void LoadTags()
         {
@@ -61,13 +69,9 @@ namespace ProjectSystemHelpStudents
             lstTags.ItemsSource = _labelViewModels;
         }
 
-        public void SetPreselectedDate(DateTime date)
-        {
-            dpEndDate.SelectedDate = date;
-        }
-
         private void SaveTask_Click(object sender, RoutedEventArgs e)
         {
+            // валидация
             if (string.IsNullOrWhiteSpace(txtTitle.Text))
             {
                 MessageBox.Show("Введите название задачи.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -79,54 +83,72 @@ namespace ProjectSystemHelpStudents
                 return;
             }
 
+            // собираем EndDate и ReminderDate
+            var endDate = dpEndDate.SelectedDate.Value.Date;
+            if (!TimeSpan.TryParse(tbEndTime.Text, out var endTs))
+                endTs = new TimeSpan(12, 0, 0);
+            DateTime endDateTime = endDate + endTs;
+
+            DateTime? remindDateTime = null;
+            if (dpRemindDate.SelectedDate.HasValue
+             && TimeSpan.TryParse(tbRemindTime.Text, out var remTs))
+                remindDateTime = dpRemindDate.SelectedDate.Value.Date + remTs;
+
             try
             {
                 using (var ctx = new TaskManagementEntities1())
                 {
+                    // обеспечиваем существование проекта "Входящие"
+                    var inboxProject = ctx.Project.FirstOrDefault(p => p.Name == "Входящие");
+                    if (inboxProject == null)
+                    {
+                        inboxProject = new Project { Name = "Входящие" };
+                        ctx.Project.Add(inboxProject);
+                        ctx.SaveChanges();
+                    }
+
+                    // выбор проекта
                     int projectIdToUse;
                     if (_projectId.HasValue && ctx.Project.Any(p => p.ProjectId == _projectId.Value))
                         projectIdToUse = _projectId.Value;
                     else
-                    {
-                        var inbox = ctx.Project.FirstOrDefault(p => p.Name == "Входящие");
-                        if (inbox == null)
-                            throw new InvalidOperationException("Не найден проект 'Входящие'");
-                        projectIdToUse = inbox.ProjectId;
-                    }
+                        projectIdToUse = inboxProject.ProjectId;
 
+                    // приоритет
                     var priorityName = (cmbPriority.SelectedItem as ComboBoxItem)?.Content?.ToString();
                     var pr = ctx.Priority.FirstOrDefault(p => p.Name == priorityName);
                     int priorityIdToUse = pr?.PriorityId
                                           ?? ctx.Priority.OrderBy(p => p.PriorityId).First().PriorityId;
 
+                    // статус
                     var undone = ctx.Status.FirstOrDefault(s => s.Name == "Не завершено")
                                 ?? throw new InvalidOperationException("Не найден статус 'Не завершено'");
 
+                    // секция
                     int? sectionIdToUse = (_sectionId.HasValue && ctx.Section.Any(s => s.IdSection == _sectionId.Value))
                                           ? _sectionId.Value
                                           : (int?)null;
 
+                    // создаём задачу
                     var newTask = new Task
                     {
                         Title = txtTitle.Text.Trim(),
                         Description = txtDescription.Text.Trim(),
-                        EndDate = dpEndDate.SelectedDate.Value,
+                        EndDate = endDateTime,
                         StatusId = undone.StatusId,
                         IdUser = UserSession.IdUser,
                         PriorityId = priorityIdToUse,
                         ProjectId = projectIdToUse,
-                        SectionId = sectionIdToUse
+                        SectionId = sectionIdToUse,
+                        ReminderDate = remindDateTime
                     };
                     ctx.Task.Add(newTask);
                     ctx.SaveChanges();
 
+                    // сохраняем метки
                     foreach (var lbl in _labelViewModels.Where(l => l.IsSelected))
                     {
-                        ctx.TaskLabels.Add(new TaskLabels
-                        {
-                            TaskId = newTask.IdTask,
-                            LabelId = lbl.Id
-                        });
+                        ctx.TaskLabels.Add(new TaskLabels { TaskId = newTask.IdTask, LabelId = lbl.Id });
                     }
                     ctx.SaveChanges();
                 }

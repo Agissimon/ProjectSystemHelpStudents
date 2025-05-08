@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="SortOption" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="ExecutorFilter" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -18,10 +18,10 @@
       <Value Profile="(Default)">List</Value>
     </Setting>
     <Setting Name="ExpandersState" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="DetachedProjects" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="SearchHistory" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)" />

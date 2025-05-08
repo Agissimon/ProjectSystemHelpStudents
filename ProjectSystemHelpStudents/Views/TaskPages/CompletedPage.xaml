@@ -10,7 +10,7 @@
       Background="#222">
 
     <Grid Margin="10,0,0,10">
-        <ScrollViewer >
+        <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" Style="{StaticResource MinimalDarkScrollViewer}">
             <StackPanel Margin="10">
                 <TextBlock Text="Выполнено" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
                 <Separator Height="1" Background="Gray" Margin="0,0,0,10"/>

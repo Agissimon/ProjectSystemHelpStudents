@@ -35,8 +35,8 @@ namespace ProjectSystemHelpStudents
                     task.ProjectId = dbTask.ProjectId ?? 0;
                     task.PriorityId = dbTask.PriorityId;
                     task.IsCompleted = dbTask.Status?.Name == "Завершено";
-
                     task.IdUser = dbTask.IdUser;
+                    task.ReminderDate = dbTask.ReminderDate;
                 }
             }
 
@@ -148,15 +148,22 @@ namespace ProjectSystemHelpStudents
                 _task.ProjectId = (int?)(ProjectComboBox.SelectedValue) ?? _task.ProjectId;
                 _task.PriorityId = (int?)(PriorityComboBox.SelectedValue) ?? _task.PriorityId;
                 _task.IdUser = (int?)(AssignedToComboBox.SelectedValue) ?? _task.IdUser;
+                DateTime? newReminder = null;
+                if (dpEditRemindDate.SelectedDate.HasValue
+                    && TimeSpan.TryParse(tbEditRemindTime.Text, out var ts))
+                {
+                    newReminder = dpEditRemindDate.SelectedDate.Value.Date + ts;
+                }
 
                 using (var ctx = new TaskManagementEntities1())
                 {
                     var dbTask = ctx.Task
-                        .Include(t => t.TaskLabels)
-                        .FirstOrDefault(t => t.IdTask == _task.IdTask);
+                                .Include(t => t.TaskLabels)
+                                .FirstOrDefault(t => t.IdTask == _task.IdTask);
                     if (dbTask == null)
                         throw new InvalidOperationException("Задача не найдена в базе");
 
+                    dbTask.ReminderDate = newReminder;
                     dbTask.Title = _task.Title;
                     dbTask.Description = _task.Description;
                     dbTask.EndDate = _task.EndDate;

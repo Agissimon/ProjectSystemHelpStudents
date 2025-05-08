@@ -65,20 +65,19 @@ namespace ProjectSystemHelpStudents.UsersContent
                             //FrmClass.frmContentUser.Content = adminPage;
 
                         }
-                        else if (user.RoleUser == 2)
+                        if (user != null && user.RoleUser == 2)
                         {
                             UserSession.IdUser = user.IdUser;
                             UserSession.NotifyUserNameUpdated(user.Name);
                             MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
 
                             var mainWindow = Application.Current.MainWindow as MainWindow;
-
                             if (mainWindow != null)
                             {
                                 mainWindow.frmAuth.Content = null;
 
-                                mainWindow.frmContentUser.Navigate(new UpcomingTasksPage());
-                                mainWindow.frmStackPanelButton.Navigate(new StackPanelButtonPage());
+                                mainWindow.frmContentUser.Content = new UpcomingTasksPage();
+                                mainWindow.frmStackPanelButton.Content = new StackPanelButtonPage();
                             }
                         }
                     }

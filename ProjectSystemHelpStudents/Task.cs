@@ -31,6 +31,7 @@ namespace ProjectSystemHelpStudents
         public int IdUser { get; set; }
         public Nullable<int> ProjectId { get; set; }
         public Nullable<int> SectionId { get; set; }
+        public Nullable<System.DateTime> ReminderDate { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Comment> Comment { get; set; }

@@ -4,7 +4,7 @@
         Title="Добавить задачу"
         Height="Auto"
         Width="Auto"
-        MaxHeight="350"
+        MaxHeight="480"
         WindowStartupLocation="CenterScreen"
         Icon="/Resources/Icon/logo001.png"
         Style="{StaticResource SmallWindowStyle}">
@@ -26,11 +26,20 @@
 
             <WrapPanel HorizontalAlignment="Left" Margin="0,10,0,0" Orientation="Horizontal" Width="Auto" >
 
-                <TextBlock Text="Срок" Style="{StaticResource NormalTextBlockStyle}"/>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="📅" FontSize="16" VerticalAlignment="Center"/>
-                    <DatePicker x:Name="dpEndDate" Width="120" Margin="5,0,0,0"/>
-                </StackPanel>
+                <WrapPanel Margin="0,10,0,0" VerticalAlignment="Top">
+                    <!-- Срок -->
+                    <TextBlock Text="Срок" Style="{StaticResource NormalTextBlockStyle}" Margin="0,0,5,0"/>
+                    <DatePicker x:Name="dpEndDate" Width="120"/>
+                    <TextBox x:Name="tbEndTime" Width="60" Margin="5,0,0,0"
+                         Text="12:00" ToolTip="чч:мм"/>
+
+                    <!-- ПРИМЕЩЕНИЕ: здесь добавляем напоминание -->
+                    <TextBlock Text="Напомнить" Style="{StaticResource NormalTextBlockStyle}"
+                           Margin="20,0,5,0"/>
+                    <DatePicker x:Name="dpRemindDate" Width="120"/>
+                    <TextBox x:Name="tbRemindTime" Width="60" Margin="5,0,0,0"
+                         Text="09:00" ToolTip="чч:мм"/>
+                </WrapPanel>
 
                 <TextBlock Text="Приоритет" Style="{StaticResource NormalTextBlockStyle}"/>
                 <ComboBox x:Name="cmbPriority" Width="140" Style="{StaticResource ComboBoxStyle}">
@@ -49,19 +58,35 @@
                   DisplayMemberPath="Name"
                   SelectedValuePath="IdUser"/>
                 </StackPanel>
-                
-                <TextBlock Style="{StaticResource NormalTextBlockStyle}" Text="Метки:" Margin="0,10,0,0"/>
-                <ListBox x:Name="lstTags"
-                                 SelectionMode="Multiple"
-                         Style="{StaticResource TransparentListBoxStyle}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected}" Foreground="White"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-
             </WrapPanel>
+
+            <StackPanel Orientation="Vertical">
+                <TextBlock
+        Text="Метки"
+        Style="{StaticResource TransparentTextBlockStyle}"
+        Margin="0,10,0,5"/>
+
+                <ScrollViewer
+        MaxHeight="90"
+        Style="{StaticResource MinimalDarkScrollViewer}">
+
+                    <ListBox
+            x:Name="lstTags"
+            ItemsSource="{Binding AvailableLabels}"
+            Style="{StaticResource DarkListBoxStyle}">
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                        Content="{Binding Name}"
+                        IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                        Foreground="White"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+
+                    </ListBox>
+                </ScrollViewer>
+            </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
                 <Button Content="Отмена" Style="{StaticResource ChipButtonStyle}" Margin="0,0,5,0" Click="Cancel_Click"/>

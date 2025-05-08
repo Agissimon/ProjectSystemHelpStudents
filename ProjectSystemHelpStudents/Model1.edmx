@@ -101,6 +101,7 @@
           <Property Name="IdUser" Type="int" Nullable="false" />
           <Property Name="ProjectId" Type="int" />
           <Property Name="SectionId" Type="int" />
+          <Property Name="ReminderDate" Type="datetime" />
         </EntityType>
         <EntityType Name="TaskLabels">
           <Key>
@@ -580,6 +581,7 @@
           <NavigationProperty Name="TaskLabels" Relationship="TaskManagementModel.FK__TaskLabel__TaskI__3E1D39E1" FromRole="Task" ToRole="TaskLabels" />
           <Property Name="SectionId" Type="Int32" />
           <NavigationProperty Name="Section" Relationship="TaskManagementModel.FK__Task__SectionId__503BEA1C" FromRole="Task" ToRole="Section" />
+          <Property Name="ReminderDate" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
@@ -1090,6 +1092,7 @@
           <EntitySetMapping Name="Task">
             <EntityTypeMapping TypeName="TaskManagementModel.Task">
               <MappingFragment StoreEntitySet="Task">
+                <ScalarProperty Name="ReminderDate" ColumnName="ReminderDate" />
                 <ScalarProperty Name="SectionId" ColumnName="SectionId" />
                 <ScalarProperty Name="IdTask" ColumnName="IdTask" />
                 <ScalarProperty Name="Title" ColumnName="Title" />
