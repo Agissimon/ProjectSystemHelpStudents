@@ -56,7 +56,6 @@
                 </Setter>
             </Style>
 
-            <!-- Кастомный ScrollViewer со стрелками -->
             <Style TargetType="ScrollViewer" x:Key="MinimalDarkScrollViewer">
                 <Setter Property="OverridesDefaultStyle" Value="True"/>
                 <Setter Property="Template">
@@ -68,14 +67,12 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Контент -->
                                 <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
                                                 Grid.Column="0"
                                                 Content="{TemplateBinding Content}"
                                                 ContentTemplate="{TemplateBinding ContentTemplate}"
                                                 CanContentScroll="{TemplateBinding CanContentScroll}"/>
 
-                                <!-- Вертикальный ScrollBar со стрелками -->
                                 <Grid Grid.Column="1">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -83,7 +80,6 @@
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <!-- Стрелка вверх -->
                                     <RepeatButton Grid.Row="0"
                                           Command="ScrollBar.LineUpCommand"
                                           Height="10" Width="10"
@@ -95,7 +91,6 @@
                                       HorizontalAlignment="Center"/>
                                     </RepeatButton>
 
-                                    <!-- Сам скроллбар -->
                                     <ScrollBar x:Name="PART_VerticalScrollBar"
                                        Grid.Row="1"
                                        Orientation="Vertical"
@@ -105,7 +100,6 @@
                                        Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
                                        Style="{StaticResource MinimalDarkScrollBar}"/>
 
-                                    <!-- Стрелка вниз -->
                                     <RepeatButton Grid.Row="2"
                                           Command="ScrollBar.LineDownCommand"
                                           Height="10" Width="10"
