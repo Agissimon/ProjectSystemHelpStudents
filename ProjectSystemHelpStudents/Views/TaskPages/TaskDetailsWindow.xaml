@@ -122,18 +122,24 @@
                       DisplayMemberPath="Name"
                       SelectedValuePath="IdUser"
                       SelectedValue="{Binding IdUser, Mode=TwoWay}" />
-                
+
                 <StackPanel Orientation="Vertical">
                     <TextBlock Text="Метки" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,5"/>
-                    <ListBox x:Name="LabelsListBox" 
-                         Style="{StaticResource DarkListBoxStyle}" 
-                         ItemsSource="{Binding AvailableLabels}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox Foreground="White" Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+
+                    <ScrollViewer MaxHeight="90"
+                  Style="{StaticResource MinimalDarkScrollViewer}">
+                        <ListBox x:Name="LabelsListBox"
+                 Style="{StaticResource DarkListBoxStyle}"
+                 ItemsSource="{Binding AvailableLabels}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Foreground="White"
+                              Content="{Binding Name}"
+                              IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </ScrollViewer>
                 </StackPanel>
 
                 <TextBlock Text="Дата напоминания" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,0"/>

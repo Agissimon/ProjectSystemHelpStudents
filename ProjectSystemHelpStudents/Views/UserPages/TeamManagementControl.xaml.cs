@@ -203,7 +203,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                 Content = inviteControl,
                 SizeToContent = SizeToContent.WidthAndHeight,
                 Icon = new BitmapImage(new Uri(
-                    "pack://application:,,,/ProjectSystemHelpStudents;component/Resources/Icon/logo001.png",
+                    "pack://application:,,,/ProjectSystemHelpStudents;component/Resources/Icon/logo001.ico",
                     UriKind.Absolute)),
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Owner = Window.GetWindow(this)

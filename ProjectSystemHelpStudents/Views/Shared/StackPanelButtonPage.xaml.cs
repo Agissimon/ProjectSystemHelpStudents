@@ -181,7 +181,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                 Height = 600,
                 Title = "MyTask",
                 Icon = new BitmapImage(new Uri(
-                    "pack://application:,,,/ProjectSystemHelpStudents;component/Resources/Icon/logo001.png",
+                    "pack://application:,,,/ProjectSystemHelpStudents;component/Resources/Icon/logo001.ico",
                     UriKind.Absolute)),
                 WindowStartupLocation = WindowStartupLocation.CenterScreen
             };

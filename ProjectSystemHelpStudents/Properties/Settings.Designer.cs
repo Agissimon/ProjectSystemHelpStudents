@@ -25,6 +25,7 @@ namespace ProjectSystemHelpStudents.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public int SortOption {
             get {
                 return ((int)(this["SortOption"]));
@@ -84,7 +85,7 @@ namespace ProjectSystemHelpStudents.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public string ExpandersState {
             get {
                 return ((string)(this["ExpandersState"]));
@@ -96,7 +97,7 @@ namespace ProjectSystemHelpStudents.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public string DetachedProjects {
             get {
                 return ((string)(this["DetachedProjects"]));

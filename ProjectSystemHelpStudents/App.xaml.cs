@@ -20,6 +20,16 @@ namespace ProjectSystemHelpStudents
         private WinForms.NotifyIcon _notifyIcon;
         private CancellationTokenSource _cts;
         private bool _isReallyClosing;
+        public App()
+        {
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+        }
+
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            MessageBox.Show($"Ошибка: {e.Exception.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            e.Handled = true;
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {

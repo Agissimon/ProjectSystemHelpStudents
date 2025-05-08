@@ -154,7 +154,7 @@
                 </Grid>
 
                 <!-- ОСНОВНОЙ КОНТЕНТ -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" CanContentScroll="True" Style="{StaticResource MinimalDarkScrollViewer}">
                     <Grid Margin="10,0,0,10">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
 

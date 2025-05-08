@@ -6,7 +6,7 @@
       Title="Сегодня"
       Background="#222">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" Style="{StaticResource MinimalDarkScrollViewer}">
         <Grid Margin="10,0,0,10">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" MinWidth="650">
                 <TextBlock Text="Сегодня" FontSize="28" Foreground="White" FontWeight="Bold" Margin="0,0,0,20"/>
