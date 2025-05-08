@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Data.Entity;                
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Threading;
 using System.Windows;
-using System.Windows.Resources;         
-using WinForms = System.Windows.Forms;   
-using Drawing = System.Drawing;         
-using STT = System.Threading.Tasks.Task; 
+using System.Windows.Resources;
+using WinForms = System.Windows.Forms;
+using Drawing = System.Drawing;
 using Model = ProjectSystemHelpStudents;
 using System.Configuration;
 
@@ -17,11 +16,23 @@ namespace ProjectSystemHelpStudents
 {
     public partial class App : Application
     {
+        private static Mutex _singleInstanceMutex;
         private WinForms.NotifyIcon _notifyIcon;
-        private CancellationTokenSource _cts;
+        private Timer _reminderTimer;
         private bool _isReallyClosing;
+
         public App()
         {
+            // Проверка на единственный экземпляр
+            bool isNew;
+            _singleInstanceMutex = new Mutex(true, "MyTaskSingletonMutex", out isNew);
+            if (!isNew)
+            {
+                // Если уже запущен, фокусируем существующий и завершаем этот экземпляр
+                MessageBox.Show("Приложение уже запущено.", "MyTask", MessageBoxButton.OK, MessageBoxImage.Information);
+                Environment.Exit(0);
+            }
+
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
         }
 
@@ -35,6 +46,7 @@ namespace ProjectSystemHelpStudents
         {
             base.OnStartup(e);
 
+            // Иконка
             var uri = new Uri(
                 "pack://application:,,,/ProjectSystemHelpStudents;component/Resources/Icon/logo001.ico",
                 UriKind.Absolute);
@@ -42,7 +54,6 @@ namespace ProjectSystemHelpStudents
             if (sri == null)
                 throw new FileNotFoundException("Не найден ресурс logo001.ico", uri.ToString());
 
-            // Создаём и настраиваем NotifyIcon
             _notifyIcon = new WinForms.NotifyIcon
             {
                 Icon = new Drawing.Icon(sri.Stream),
@@ -55,11 +66,18 @@ namespace ProjectSystemHelpStudents
             _notifyIcon.ContextMenuStrip = menu;
             _notifyIcon.DoubleClick += (s, a) => ShowMainWindow();
 
-            // Запускаем фоновый цикл напоминаний
-            _cts = new CancellationTokenSource();
-            STT.Run(() => ReminderLoop(_cts.Token));
+            // Таймер напоминаний
+            _reminderTimer = new Timer(
+                _ =>
+                {
+                    try { CheckReminders(); }
+                    catch { /* лог */ }
+                },
+                null,
+                TimeSpan.Zero,
+                TimeSpan.FromMinutes(1));
 
-            // Создаём и показываем главное окно, перехватывая крестик
+            // Главное окно
             MainWindow = new MainWindow();
             MainWindow.Closing += MainWindow_Closing;
             MainWindow.Show();
@@ -69,6 +87,7 @@ namespace ProjectSystemHelpStudents
         {
             if (!_isReallyClosing)
             {
+                // скрываем в трей
                 e.Cancel = true;
                 MainWindow.Hide();
             }
@@ -80,14 +99,10 @@ namespace ProjectSystemHelpStudents
             {
                 MainWindow = new MainWindow();
                 MainWindow.Closing += MainWindow_Closing;
-                MainWindow.Show();
             }
-            else
-            {
-                MainWindow.Show();
-                MainWindow.WindowState = WindowState.Normal;
-                MainWindow.Activate();
-            }
+            MainWindow.Show();
+            MainWindow.WindowState = WindowState.Normal;
+            MainWindow.Activate();
         }
 
         private void ExitApplication()
@@ -95,24 +110,19 @@ namespace ProjectSystemHelpStudents
             _isReallyClosing = true;
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();
-            _cts.Cancel();
+
+            _reminderTimer?.Dispose();
+            _singleInstanceMutex?.ReleaseMutex();
+
             Shutdown();
         }
 
-        private async STT ReminderLoop(CancellationToken token)
+        protected override void OnExit(ExitEventArgs e)
         {
-            while (!token.IsCancellationRequested)
-            {
-                try
-                {
-                    CheckReminders();
-                }
-                catch
-                {
-                    // TODO: логировать
-                }
-                await STT.Delay(TimeSpan.FromMinutes(1), token);
-            }
+            _reminderTimer?.Dispose();
+            _notifyIcon?.Dispose();
+            _singleInstanceMutex?.ReleaseMutex();
+            base.OnExit(e);
         }
 
         private void CheckReminders()
@@ -133,7 +143,7 @@ namespace ProjectSystemHelpStudents
                     _notifyIcon.ShowBalloonTip(
                         5000,
                         "Напоминание: " + t.Title,
-                        t.Description ?? "",
+                        t.Description ?? string.Empty,
                         WinForms.ToolTipIcon.Info);
                     SendEmailReminder(t);
                 }
@@ -147,12 +157,10 @@ namespace ProjectSystemHelpStudents
                 string to;
                 using (var ctx = new Model.TaskManagementEntities1())
                 {
-                    var user = ctx.Users.Find(t.IdUser);
-                    to = user?.Mail;
+                    to = ctx.Users.Find(t.IdUser)?.Mail;
                 }
-                if (string.IsNullOrWhiteSpace(to)) return;
+                if (string.IsNullOrEmpty(to)) return;
 
-                // Получаем данные из App.config
                 var from = ConfigurationManager.AppSettings["EmailFrom"];
                 var pass = ConfigurationManager.AppSettings["EmailPassword"];
 
@@ -160,7 +168,6 @@ namespace ProjectSystemHelpStudents
                 {
                     smtp.Credentials = new NetworkCredential(from, pass);
                     smtp.EnableSsl = true;
-
                     var msg = new MailMessage(from, to)
                     {
                         Subject = $"Напоминание: {t.Title}",
@@ -174,13 +181,6 @@ namespace ProjectSystemHelpStudents
             {
                 MessageBox.Show($"Ошибка отправки почты: {ex.Message}");
             }
-        }
-
-        protected override void OnExit(ExitEventArgs e)
-        {
-            _cts.Cancel();
-            _notifyIcon.Dispose();
-            base.OnExit(e);
         }
     }
 }

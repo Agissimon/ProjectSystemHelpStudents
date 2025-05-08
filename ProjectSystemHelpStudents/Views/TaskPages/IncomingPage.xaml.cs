@@ -1,4 +1,5 @@
-﻿using ProjectSystemHelpStudents.Helper;
+﻿// IncomingPage.xaml.cs
+using ProjectSystemHelpStudents.Helper;
 using System;
 using System.Linq;
 using System.Windows;
@@ -12,7 +13,31 @@ namespace ProjectSystemHelpStudents.UsersContent
         public IncomingPage()
         {
             InitializeComponent();
+            EnsureInboxProjectExists();
             LoadTasks();
+        }
+
+        /// <summary>
+        /// Проверяем и создаём (если нужно) проект "Входящие"
+        /// </summary>
+        private void EnsureInboxProjectExists()
+        {
+            try
+            {
+                using (var ctx = new TaskManagementEntities1())
+                {
+                    if (!ctx.Project.Any(p => p.Name == "Входящие"))
+                    {
+                        ctx.Project.Add(new Project { Name = "Входящие" });
+                        ctx.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Не удалось убедиться в наличии проекта 'Входящие': " + ex.Message,
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LoadTasks()
@@ -25,7 +50,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                         .Include(t => t.Status)
                         .Include(t => t.Project)
                         .Where(t =>
-                            t.Project != null &&
                             t.Project.Name == "Входящие" &&
                             t.IdUser == UserSession.IdUser)
                         .ToList();
@@ -36,11 +60,11 @@ namespace ProjectSystemHelpStudents.UsersContent
                             IdTask = t.IdTask,
                             Title = t.Title,
                             Description = t.Description,
-                            IsCompleted = t.Status != null && t.Status.Name == "Завершено",
+                            IsCompleted = t.Status?.Name == "Завершено",
                             EndDate = t.EndDate,
                             EndDateFormatted = t.EndDate != DateTime.MinValue
-                                ? t.EndDate.ToString("dd MMMM yyyy")
-                                : "Без срока"
+                                              ? t.EndDate.ToString("dd MMMM yyyy")
+                                              : "Без срока"
                         })
                         .Where(vm => !vm.IsCompleted)
                         .ToList();
@@ -50,33 +74,28 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при загрузке задач: " + ex.Message);
+                MessageBox.Show("Ошибка при загрузке задач: " + ex.Message,
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void ToggleTaskStatus_Click(object sender, RoutedEventArgs e)
         {
-            var cb = sender as CheckBox;
-            var task = cb?.DataContext as TaskViewModel;
-            if (task == null) return;
-
-            using (var ctx = new TaskManagementEntities1())
+            if (sender is CheckBox cb && cb.DataContext is TaskViewModel task)
             {
-                var dbTask = ctx.Task.FirstOrDefault(t => t.IdTask == task.IdTask);
-                if (dbTask != null)
+                using (var ctx = new TaskManagementEntities1())
                 {
-                    var done = ctx.Status.First(s => s.Name == "Завершено");
-                    var undone = ctx.Status.First(s => s.Name == "Не завершено");
-
-                    dbTask.StatusId = cb.IsChecked == true
-                        ? done.StatusId
-                        : undone.StatusId;
-
-                    ctx.SaveChanges();
+                    var dbTask = ctx.Task.Find(task.IdTask);
+                    if (dbTask != null)
+                    {
+                        var done = ctx.Status.First(s => s.Name == "Завершено");
+                        var undone = ctx.Status.First(s => s.Name == "Не завершено");
+                        dbTask.StatusId = cb.IsChecked == true ? done.StatusId : undone.StatusId;
+                        ctx.SaveChanges();
+                    }
                 }
+                LoadTasks();
             }
-
-            LoadTasks();
         }
 
         private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -48,10 +48,18 @@ namespace ProjectSystemHelpStudents
                                .ToList();
             }
             cmbAssignedTo.ItemsSource = _allUsers;
-
             cmbAssignedTo.SelectedValue = UserSession.IdUser;
         }
 
+        /// <summary>
+        /// Позволяет программно установить дату завершения до открытия окна
+        /// </summary>
+        public void SetPreselectedDate(DateTime date)
+        {
+            _preselectedDate = date;
+            if (IsLoaded)
+                dpEndDate.SelectedDate = date;
+        }
 
         private void LoadTags()
         {
@@ -61,14 +69,9 @@ namespace ProjectSystemHelpStudents
             lstTags.ItemsSource = _labelViewModels;
         }
 
-        public void SetPreselectedDate(DateTime date)
-        {
-            dpEndDate.SelectedDate = date;
-        }
-
         private void SaveTask_Click(object sender, RoutedEventArgs e)
         {
-            // Валидация обязательных полей
+            // валидация
             if (string.IsNullOrWhiteSpace(txtTitle.Text))
             {
                 MessageBox.Show("Введите название задачи.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -80,51 +83,53 @@ namespace ProjectSystemHelpStudents
                 return;
             }
 
-            // Составляем DateTime для конца задачи
-            var endDate = dpEndDate.SelectedDate.Value;
+            // собираем EndDate и ReminderDate
+            var endDate = dpEndDate.SelectedDate.Value.Date;
             if (!TimeSpan.TryParse(tbEndTime.Text, out var endTs))
                 endTs = new TimeSpan(12, 0, 0);
-            DateTime endDateTime = endDate.Date + endTs;
+            DateTime endDateTime = endDate + endTs;
 
-            // Составляем DateTime для напоминания (если задано)
             DateTime? remindDateTime = null;
-            if (dpRemindDate.SelectedDate.HasValue && TimeSpan.TryParse(tbRemindTime.Text, out var remTs))
-            {
+            if (dpRemindDate.SelectedDate.HasValue
+             && TimeSpan.TryParse(tbRemindTime.Text, out var remTs))
                 remindDateTime = dpRemindDate.SelectedDate.Value.Date + remTs;
-            }
 
             try
             {
                 using (var ctx = new TaskManagementEntities1())
                 {
-                    // Определяем проект
+                    // обеспечиваем существование проекта "Входящие"
+                    var inboxProject = ctx.Project.FirstOrDefault(p => p.Name == "Входящие");
+                    if (inboxProject == null)
+                    {
+                        inboxProject = new Project { Name = "Входящие" };
+                        ctx.Project.Add(inboxProject);
+                        ctx.SaveChanges();
+                    }
+
+                    // выбор проекта
                     int projectIdToUse;
                     if (_projectId.HasValue && ctx.Project.Any(p => p.ProjectId == _projectId.Value))
                         projectIdToUse = _projectId.Value;
                     else
-                    {
-                        var inbox = ctx.Project.FirstOrDefault(p => p.Name == "Входящие");
-                        if (inbox == null)
-                            throw new InvalidOperationException("Не найден проект 'Входящие'");
-                        projectIdToUse = inbox.ProjectId;
-                    }
+                        projectIdToUse = inboxProject.ProjectId;
 
-                    // Определяем приоритет
+                    // приоритет
                     var priorityName = (cmbPriority.SelectedItem as ComboBoxItem)?.Content?.ToString();
                     var pr = ctx.Priority.FirstOrDefault(p => p.Name == priorityName);
                     int priorityIdToUse = pr?.PriorityId
                                           ?? ctx.Priority.OrderBy(p => p.PriorityId).First().PriorityId;
 
-                    // Статус «Не завершено»
+                    // статус
                     var undone = ctx.Status.FirstOrDefault(s => s.Name == "Не завершено")
                                 ?? throw new InvalidOperationException("Не найден статус 'Не завершено'");
 
-                    // Секция (если задана)
+                    // секция
                     int? sectionIdToUse = (_sectionId.HasValue && ctx.Section.Any(s => s.IdSection == _sectionId.Value))
                                           ? _sectionId.Value
                                           : (int?)null;
 
-                    // Создаём задачу
+                    // создаём задачу
                     var newTask = new Task
                     {
                         Title = txtTitle.Text.Trim(),
@@ -140,14 +145,10 @@ namespace ProjectSystemHelpStudents
                     ctx.Task.Add(newTask);
                     ctx.SaveChanges();
 
-                    // Сохраняем метки
+                    // сохраняем метки
                     foreach (var lbl in _labelViewModels.Where(l => l.IsSelected))
                     {
-                        ctx.TaskLabels.Add(new TaskLabels
-                        {
-                            TaskId = newTask.IdTask,
-                            LabelId = lbl.Id
-                        });
+                        ctx.TaskLabels.Add(new TaskLabels { TaskId = newTask.IdTask, LabelId = lbl.Id });
                     }
                     ctx.SaveChanges();
                 }
