@@ -52,11 +52,37 @@ namespace ProjectSystemHelpStudents
 
         private void InitializeComboBoxes()
         {
+            int currentUser = UserSession.IdUser;
             using (var ctx = new TaskManagementEntities1())
             {
-                ProjectComboBox.ItemsSource = ctx.Project.ToList();
+                var personal = ctx.Project
+                                  .Where(p => p.OwnerId == currentUser)
+                                  .ToList();
+
+                var teamIds = ctx.TeamMember
+                                 .Where(tm => tm.UserId == currentUser)
+                                 .Select(tm => tm.TeamId)
+                                 .Union(
+                                    ctx.Team
+                                       .Where(t => t.LeaderId == currentUser)
+                                       .Select(t => t.TeamId)
+                                 )
+                                 .Distinct()
+                                 .ToList();
+
+                var teamProjects = ctx.Project
+                                      .Where(p => p.TeamId != null && teamIds.Contains(p.TeamId.Value))
+                                      .ToList();
+
+                var allowedProjects = personal
+                    .Union(teamProjects)
+                    .Distinct()
+                    .ToList();
+
+                ProjectComboBox.ItemsSource = allowedProjects;
                 PriorityComboBox.ItemsSource = ctx.Priority.ToList();
             }
+
             ProjectComboBox.SelectedValue = _task.ProjectId;
             PriorityComboBox.SelectedValue = _task.PriorityId;
         }
@@ -109,34 +135,58 @@ namespace ProjectSystemHelpStudents
 
         private void LoadAssignees()
         {
-            int teamId = _task.ProjectId;
+            int currentUser = UserSession.IdUser;
 
-            List<Users> all;
             using (var ctx = new TaskManagementEntities1())
             {
-                var members = (from tm in ctx.TeamMember
-                               join u in ctx.Users on tm.UserId equals u.IdUser
-                               where tm.TeamId == teamId
-                               select u).ToList();
+                var memberTeamIds = ctx.TeamMember
+                    .Where(tm => tm.UserId == currentUser)
+                    .Select(tm => tm.TeamId);
 
-                var invites = (from ti in ctx.TeamInvitation
-                               join u in ctx.Users on ti.InviteeId equals u.IdUser
-                               where ti.TeamId == teamId
-                                     && (ti.Status == "Pending" || ti.Status == "Accepted")
-                               select u).ToList();
+                var leaderTeamIds = ctx.Team
+                    .Where(t => t.LeaderId == currentUser)
+                    .Select(t => t.TeamId);
 
-                all = members
-                      .Union(invites, new UserComparer())
-                      .ToList();
+                var teamIds = memberTeamIds
+                    .Union(leaderTeamIds)
+                    .ToList();
 
-                var current = ctx.Users.Find(_task.IdUser);
-                if (current != null && !all.Any(u => u.IdUser == current.IdUser))
-                    all.Insert(0, current);
+                var memberIds = ctx.TeamMember
+                    .Where(tm => teamIds.Contains(tm.TeamId))
+                    .Select(tm => tm.UserId);
+
+                var leaderIds = ctx.Team
+                    .Where(t => teamIds.Contains(t.TeamId))
+                    .Select(t => t.LeaderId);
+
+                var allowedIds = memberIds
+                    .Union(leaderIds)
+                    .Distinct()       
+                    .ToList();
+
+                var allowedUsers = ctx.Users
+                    .Where(u => allowedIds.Contains(u.IdUser))
+                    .ToList();
+
+                var currentAssignee = ctx.Users.Find(_task.IdUser);
+                if (currentAssignee != null
+                 && !allowedUsers.Any(u => u.IdUser == currentAssignee.IdUser))
+                {
+                    allowedUsers.Insert(0, currentAssignee);
+                }
+
+                AssignedToComboBox.ItemsSource = allowedUsers;
             }
 
-            AssignedToComboBox.ItemsSource = all;
             AssignedToComboBox.SelectedValue = _task.IdUser;
         }
+
+        private class UserComparer : IEqualityComparer<Users>
+        {
+            public bool Equals(Users x, Users y) => x?.IdUser == y?.IdUser;
+            public int GetHashCode(Users obj) => obj.IdUser.GetHashCode();
+        }
+
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -353,11 +403,6 @@ namespace ProjectSystemHelpStudents
             {
                 MessageBox.Show($"Ошибка при удалении комментария: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-        private class UserComparer : IEqualityComparer<Users>
-        {
-            public bool Equals(Users x, Users y) => x?.IdUser == y?.IdUser;
-            public int GetHashCode(Users obj) => obj.IdUser.GetHashCode();
         }
     }
 }

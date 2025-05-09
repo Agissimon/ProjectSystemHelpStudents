@@ -129,5 +129,41 @@ namespace ProjectSystemHelpStudents.Properties {
                 this["OverdueExpanderExpanded"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool OverdueExpanded {
+            get {
+                return ((bool)(this["OverdueExpanded"]));
+            }
+            set {
+                this["OverdueExpanded"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CalendarMonthOffset {
+            get {
+                return ((int)(this["CalendarMonthOffset"]));
+            }
+            set {
+                this["CalendarMonthOffset"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int BoardWeekOffset {
+            get {
+                return ((int)(this["BoardWeekOffset"]));
+            }
+            set {
+                this["BoardWeekOffset"] = value;
+            }
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using ProjectSystemHelpStudents;
-using ProjectSystemHelpStudents.Helper;
+﻿using ProjectSystemHelpStudents.Helper;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,217 +13,203 @@ namespace ProjectSystemHelpStudents.Views
 {
     public class TaskCalendarView
     {
-        public static Grid CreateCalendarView(IEnumerable<TaskViewModel> allTasks)
+        public static DockPanel CreateCalendarView(IEnumerable<TaskViewModel> tasks)
         {
-            Grid calendarGrid = new Grid { Margin = new Thickness(10), Tag = allTasks };
+            int offset = Properties.Settings.Default.CalendarMonthOffset;
+            DateTime baseMonth = DateTime.Today.AddMonths(offset);
 
-            for (int i = 0; i < 7; i++)
-                calendarGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            var calendarGrid = new Grid { Tag = tasks, Margin = new Thickness(5) };
+            SetupGridStructure(calendarGrid);
+            RefreshCalendar(calendarGrid, tasks, baseMonth);
 
-            for (int i = 0; i < 6; i++)
-                calendarGrid.RowDefinitions.Add(new RowDefinition());
+            var nav = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new Thickness(0, 0, 0, 5)
+            };
+            var style = (Style)Application.Current.FindResource("TransparentButtonStyle");
 
-            RefreshCalendar(calendarGrid, allTasks);
-            return calendarGrid;
+            var prev = new Button { Content = "⟨", Style = style, Margin = new Thickness(2) };
+            var todayBtn = new Button { Content = "Сегодня", Style = style, Margin = new Thickness(2) };
+            var next = new Button { Content = "⟩", Style = style, Margin = new Thickness(2) };
+
+            var monthLabel = new TextBlock
+            {
+                Text = baseMonth.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU")),
+                FontSize = 16,
+                FontWeight = FontWeights.Bold,
+                Foreground = Brushes.White,
+                Margin = new Thickness(2)
+            };
+
+            prev.Click += (s, e) => ChangeMonthOffset(-1, calendarGrid, tasks, monthLabel);
+            next.Click += (s, e) => ChangeMonthOffset(+1, calendarGrid, tasks, monthLabel);
+            todayBtn.Click += (s, e) =>
+            {
+                Properties.Settings.Default.CalendarMonthOffset = 0;
+                Properties.Settings.Default.Save();
+                DateTime today = DateTime.Today;
+                RefreshCalendar(calendarGrid, tasks, today);
+                monthLabel.Text = today.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"));
+            };
+
+            nav.Children.Add(prev);
+            nav.Children.Add(monthLabel);
+            nav.Children.Add(todayBtn);
+            nav.Children.Add(next);
+
+            var root = new DockPanel();
+            DockPanel.SetDock(nav, Dock.Top);
+            root.Children.Add(nav);
+            root.Children.Add(calendarGrid);
+            return root;
         }
 
-        private static void RefreshCalendar(Grid grid, IEnumerable<TaskViewModel> allTasks)
+        private static void ChangeMonthOffset(int delta, Grid grid, IEnumerable<TaskViewModel> tasks, TextBlock label)
+        {
+            int off = Properties.Settings.Default.CalendarMonthOffset + delta;
+            Properties.Settings.Default.CalendarMonthOffset = off;
+            Properties.Settings.Default.Save();
+
+            DateTime m = DateTime.Today.AddMonths(off);
+            RefreshCalendar(grid, tasks, m);
+            label.Text = m.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"));
+        }
+
+        private static void SetupGridStructure(Grid grid)
+        {
+            grid.ColumnDefinitions.Clear();
+            grid.RowDefinitions.Clear();
+            for (int c = 0; c < 7; c++)
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            for (int r = 0; r < 6; r++)
+                grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        }
+
+        private static void RefreshCalendar(Grid grid, IEnumerable<TaskViewModel> tasks, DateTime baseMonth)
         {
             grid.Children.Clear();
-
             var today = DateTime.Today;
-            var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
-            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-            int daysInMonth = (lastDayOfMonth - firstDayOfMonth).Days + 1;
-            int offset = (int)firstDayOfMonth.DayOfWeek;
+            var first = new DateTime(baseMonth.Year, baseMonth.Month, 1);
+            int offset = ((int)first.DayOfWeek + 6) % 7;
+            int days = DateTime.DaysInMonth(baseMonth.Year, baseMonth.Month);
 
-            for (int dayIndex = 0; dayIndex < daysInMonth; dayIndex++)
+            for (int d = 0; d < days; d++)
             {
-                DateTime currentDate = firstDayOfMonth.AddDays(dayIndex);
-                int cellIndex = offset + dayIndex;
-                int row = cellIndex / 7;
-                int col = cellIndex % 7;
+                DateTime date = first.AddDays(d);
+                int idx = offset + d;
+                int row = idx / 7, col = idx % 7;
 
-                // Выбираем только невыполненные задачи для данного дня
-                var dayTasks = allTasks
-                    .Where(t => !t.IsCompleted && t.EndDate.Date == currentDate.Date)
-                    .ToList();
-
-                var dayCell = new Border
-                {
-                    BorderBrush = new SolidColorBrush(Color.FromRgb(60, 60, 60)),
-                    BorderThickness = new Thickness(1),
-                    Background = new SolidColorBrush(Color.FromRgb(30, 30, 30)),
-                    Margin = new Thickness(1),
-                    Tag = currentDate
-                };
-
-                var dayStack = new StackPanel { Margin = new Thickness(4) };
-
-                var dayLabel = new TextBlock
-                {
-                    Text = currentDate.Day.ToString(),
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    Foreground = currentDate == today ? Brushes.Red : Brushes.White,
-                    FontWeight = currentDate == today ? FontWeights.Bold : FontWeights.Normal
-                };
-
-                dayStack.Children.Add(dayLabel);
-
-                foreach (var task in dayTasks)
-                {
-                    // Создаем представление задачи и добавляем его в ячейку
-                    var taskPanel = new StackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Margin = new Thickness(0, 0, 0, 0)
-                    };
-
-                    var circle = new Ellipse
-                    {
-                        Width = 12,
-                        Height = 12,
-                        Stroke = Brushes.Gray,
-                        StrokeThickness = 2,
-                        Fill = task.IsCompleted ? Brushes.Green : Brushes.Transparent,
-                        Margin = new Thickness(0, 2, 6, 0),
-                        Cursor = Cursors.Hand
-                    };
-
-                    var taskText = new TextBlock
-                    {
-                        Text = task.Title,
-                        FontSize = 12,
-                        Foreground = Brushes.White,
-                        Background = new SolidColorBrush(Color.FromRgb(50, 50, 50)),
-                        Padding = new Thickness(6, 3, 6, 3),
-                        TextWrapping = TextWrapping.Wrap
-                    };
-
-                    var taskBorder = new Border
-                    {
-                        CornerRadius = new CornerRadius(6),
-                        Background = new SolidColorBrush(Color.FromRgb(45, 45, 45)),
-                        Margin = new Thickness(0, 4, 0, 0),
-                        BorderThickness = new Thickness(1),
-                        BorderBrush = new SolidColorBrush(Color.FromRgb(80, 80, 80)),
-                        Child = taskPanel,
-                        Cursor = Cursors.Hand
-                    };
-
-                    taskPanel.Children.Add(circle);
-                    taskPanel.Children.Add(taskText);
-
-                    // Обработчик завершения задачи – клик по кружочку
-                    circle.MouseLeftButtonUp += (s, e) =>
-                    {
-                        var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.IdTask == task.IdTask);
-                        if (dbTask != null)
-                        {
-                            var completedStatus = DBClass.entities.Status.FirstOrDefault(sos => sos.Name == "Завершено");
-                            if (completedStatus != null)
-                                dbTask.StatusId = completedStatus.StatusId;
-
-                            DBClass.entities.SaveChanges();
-
-                            var updatedTasks = DBClass.entities.Task
-                                .Where(t => t.Status.Name != "Завершено")
-                                .ToList()
-                                .Select(t => new TaskViewModel
-                                {
-                                    IdTask = t.IdTask,
-                                    Title = t.Title,
-                                    Description = t.Description,
-                                    EndDate = t.EndDate,
-                                    Status = t.Status?.Name,
-                                    IsCompleted = t.Status?.Name == "Завершено",
-                                    AvailableLabels = new System.Collections.ObjectModel.ObservableCollection<LabelViewModel>(
-                                                            t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
-                                    EndDateFormatted = t.EndDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
-                                })
-                                .ToList();
-
-                            grid.Tag = updatedTasks;
-                            RefreshCalendar(grid, updatedTasks);
-                        }
-                        e.Handled = true;
-                    };
-
-                    // Обработчик открытия окна с деталями задачи
-                    taskBorder.MouseLeftButtonUp += (s, e) =>
-                    {
-                        if (e.OriginalSource is Ellipse)
-                            return;
-
-                        var detailsWindow = new TaskDetailsWindow(task);
-                        if (detailsWindow.ShowDialog() == true)
-                        {
-                            var updatedTasks = DBClass.entities.Task
-                                .Where(t => t.Status.Name != "Завершено")
-                                .ToList()
-                                .Select(t => new TaskViewModel
-                                {
-                                    IdTask = t.IdTask,
-                                    Title = t.Title,
-                                    Description = t.Description,
-                                    EndDate = t.EndDate,
-                                    Status = t.Status?.Name,
-                                    IsCompleted = t.Status?.Name == "Завершено",
-                                    AvailableLabels = new System.Collections.ObjectModel.ObservableCollection<LabelViewModel>(
-                                                            t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
-                                    EndDateFormatted = t.EndDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
-                                })
-                                .ToList();
-
-                            grid.Tag = updatedTasks;
-                            RefreshCalendar(grid, updatedTasks);
-                        }
-                        e.Handled = true;
-                    };
-
-                    dayStack.Children.Add(taskBorder);
-                }
-
-                dayCell.Child = dayStack;
-
-                // Обработчик создания новой задачи по клику по пустой ячейке
-                dayCell.MouseLeftButtonUp += (s, e) =>
-                {
-                    if (e.OriginalSource is Ellipse ||
-                        (e.OriginalSource is TextBlock text && !char.IsDigit(text.Text.FirstOrDefault())))
-                        return;
-
-                    var cell = (Border)s;
-                    var date = (DateTime)cell.Tag;
-                    var addWindow = new AddTaskWindow(date);
-                    if (addWindow.ShowDialog() == true)
-                    {
-                        var updatedTasks = DBClass.entities.Task
-                            .Where(t => t.Status.Name != "Завершено")
-                            .ToList()
-                            .Select(t => new TaskViewModel
-                            {
-                                IdTask = t.IdTask,
-                                Title = t.Title,
-                                Description = t.Description,
-                                EndDate = t.EndDate,
-                                Status = t.Status?.Name,
-                                IsCompleted = t.Status?.Name == "Завершено",
-                                AvailableLabels = new System.Collections.ObjectModel.ObservableCollection<LabelViewModel>(
-                                                            t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
-                                EndDateFormatted = t.EndDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
-                            })
-                            .ToList();
-
-                        grid.Tag = updatedTasks;
-                        RefreshCalendar(grid, updatedTasks);
-                    }
-                };
-
-                Grid.SetRow(dayCell, row);
-                Grid.SetColumn(dayCell, col);
-                grid.Children.Add(dayCell);
+                var cell = CreateDayCell(date, tasks, grid);
+                Grid.SetRow(cell, row);
+                Grid.SetColumn(cell, col);
+                grid.Children.Add(cell);
             }
+        }
+
+        private static Border CreateDayCell(DateTime date, IEnumerable<TaskViewModel> tasks, Grid grid)
+        {
+            var cell = new Border
+            {
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(1),
+                Background = new SolidColorBrush(Color.FromRgb(30, 30, 30)),
+                Margin = new Thickness(1),
+                Tag = date
+            };
+
+            var panel = new StackPanel { Margin = new Thickness(4) };
+
+            panel.Children.Add(new TextBlock
+            {
+                Text = date.Day.ToString(),
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Foreground = date == DateTime.Today ? Brushes.Red : Brushes.White,
+                FontWeight = date == DateTime.Today ? FontWeights.Bold : FontWeights.Normal
+            });
+
+            // Список карточек
+            foreach (var t in tasks.Where(t => !t.IsCompleted && t.EndDate.Date == date))
+                panel.Children.Add(CreateTaskCard(t, grid, tasks));
+
+            var scroll = new ScrollViewer
+            {
+                Content = panel,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+            };
+            cell.Child = scroll;
+
+            cell.MouseLeftButtonUp += (s, e) =>
+            {
+                if (e.OriginalSource is Border || e.OriginalSource is ScrollViewer || e.OriginalSource is TextBlock && ((TextBlock)e.OriginalSource).Text == date.Day.ToString())
+                {
+                    var win = new AddTaskWindow(date);
+                    if (win.ShowDialog() == true)
+                    {
+                        int off = Properties.Settings.Default.CalendarMonthOffset;
+                        DateTime bm = DateTime.Today.AddMonths(off);
+                        RefreshCalendar(grid, tasks, bm);
+                    }
+                }
+            };
+
+            return cell;
+        }
+
+        private static UIElement CreateTaskCard(TaskViewModel t, Grid grid, IEnumerable<TaskViewModel> tasks)
+        {
+            var cb = new CheckBox
+            {
+                Margin = new Thickness(0, 2, 6, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+                BorderThickness = new Thickness(2)
+            };
+            cb.Checked += (s, e) =>
+            {
+                // Меняем статус в БД
+                var dbt = DBClass.entities.Task.Find(t.IdTask);
+                var done = DBClass.entities.Status.First(st => st.Name == "Завершено");
+                dbt.StatusId = done.StatusId;
+                DBClass.entities.SaveChanges();
+                // Перерисовываем календарь
+                int off = Properties.Settings.Default.CalendarMonthOffset;
+                DateTime bm = DateTime.Today.AddMonths(off);
+                RefreshCalendar(grid, tasks, bm);
+            };
+
+            var title = new TextBlock
+            {
+                Text = t.Title,
+                Foreground = Brushes.White,
+                FontSize = 14,
+                VerticalAlignment = VerticalAlignment.Center,
+                TextWrapping = TextWrapping.Wrap
+            };
+
+            var stack = new StackPanel { Orientation = Orientation.Horizontal };
+            stack.Children.Add(cb);
+            stack.Children.Add(title);
+
+            var border = new Border
+            {
+                CornerRadius = new CornerRadius(6),
+                Background = new SolidColorBrush(Color.FromRgb(50, 50, 50)),
+                Margin = new Thickness(0, 4, 0, 0),
+                Padding = new Thickness(6),
+                Child = stack,
+                Cursor = Cursors.Hand
+            };
+
+            border.MouseLeftButtonUp += (s, e) =>
+            {
+                if (e.OriginalSource is CheckBox) return;
+
+                var wnd = new TaskDetailsWindow(t);
+                wnd.ShowDialog();
+            };
+
+            return border;
         }
     }
 }
