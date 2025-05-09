@@ -23,6 +23,8 @@ namespace ProjectSystemHelpStudents.UsersContent
     public partial class AuthPage : Page
     {
         int logCount = 0;
+        private int correctCaptchaAnswer;
+
         public AuthPage()
         {
             InitializeComponent();
@@ -40,49 +42,70 @@ namespace ProjectSystemHelpStudents.UsersContent
                 MessageBox.Show("Вы не ввели пароль пользователя");
                 logCount++;
             }
-            else
-            {
-                var user = DBClass.entities.Users.Where(i => i.Login == txbLogin.Text && i.Password == psbPassword.Password).FirstOrDefault();
 
-                if (logCount == 4)
+            if (logCount >= 4)
+            {
+                if (CaptchaPanel.Visibility != Visibility.Visible)
                 {
-                    MessageBox.Show("Вы превысили лимит попыток входа. Аккаунт заблокирован.");
-                    // Добавить капчу что-ли
+                    MessageBox.Show("Вы превысили лимит попыток. Подтвердите, что вы не робот.");
+                    GenerateCaptcha();
+                    CaptchaPanel.Visibility = Visibility.Visible;
+                    return;
+                }
+
+                if (int.TryParse(CaptchaAnswer.Text, out int userAnswer) && userAnswer == correctCaptchaAnswer)
+                {
+                    AttemptLogin();
                 }
                 else
                 {
-                    if (user == null)
+                    MessageBox.Show("Капча введена неверно.");
+                }
+            }
+            else
+            {
+                AttemptLogin();
+            }
+        }
+
+        private void AttemptLogin()
+        {
+            string hashedPassword = PasswordHelper.HashPassword(psbPassword.Password);
+
+            var user = DBClass.entities.Users
+                .FirstOrDefault(i => i.Login == txbLogin.Text && i.Password == hashedPassword);
+
+            if (user == null)
+            {
+                MessageBox.Show("Неверный логин или пароль");
+                logCount++;
+            }
+            else
+            {
+                if (user.RoleUser == 2)
+                {
+                    UserSession.IdUser = user.IdUser;
+                    UserSession.NotifyUserNameUpdated(user.Name);
+                    MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
+
+                    var mainWindow = Application.Current.MainWindow as MainWindow;
+                    if (mainWindow != null)
                     {
-                        MessageBox.Show("Неверный логин или пароль");
-                        logCount++;
-                    }
-                    else
-                    {
-                        if (user.RoleUser == 1)
-                        {
-                            //MessageBox.Show("Здравствуйте, " + user.Name);
-                            //AdminPage adminPage = new AdminPage();
-                            //FrmClass.frmContentUser.Content = adminPage;
-
-                        }
-                        if (user != null && user.RoleUser == 2)
-                        {
-                            UserSession.IdUser = user.IdUser;
-                            UserSession.NotifyUserNameUpdated(user.Name);
-                            MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
-
-                            var mainWindow = Application.Current.MainWindow as MainWindow;
-                            if (mainWindow != null)
-                            {
-                                mainWindow.frmAuth.Content = null;
-
-                                mainWindow.frmContentUser.Content = new UpcomingTasksPage();
-                                mainWindow.frmStackPanelButton.Content = new StackPanelButtonPage();
-                            }
-                        }
+                        mainWindow.frmAuth.Content = null;
+                        mainWindow.frmContentUser.Content = new UpcomingTasksPage();
+                        mainWindow.frmStackPanelButton.Content = new StackPanelButtonPage();
                     }
                 }
             }
+        }
+
+        private void GenerateCaptcha()
+        {
+            Random rnd = new Random();
+            int a = rnd.Next(1, 10);
+            int b = rnd.Next(1, 10);
+            correctCaptchaAnswer = a + b;
+            CaptchaQuestion.Text = $"{a} + {b} = ?";
         }
 
         private void btnReg_Click(object sender, RoutedEventArgs e)

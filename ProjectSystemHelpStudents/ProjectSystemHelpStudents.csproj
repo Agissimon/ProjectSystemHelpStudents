@@ -130,6 +130,7 @@
     <Compile Include="Helper\FileItem.cs" />
     <Compile Include="Helper\NullToBoolConverter.cs" />
     <Compile Include="Helper\NullToVisibilityConverter.cs" />
+    <Compile Include="Helper\PasswordHelper.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
     <Compile Include="Helper\StatusToVisibilityConverter.cs" />
     <Compile Include="Helper\TaskLabel.cs" />

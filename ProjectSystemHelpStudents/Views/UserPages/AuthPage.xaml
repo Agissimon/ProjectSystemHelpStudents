@@ -17,6 +17,11 @@
             <TextBox x:Name="txbPassword" Style="{StaticResource InputFieldStyle}" Visibility="Collapsed"/>
             <PasswordBox x:Name="psbPassword" Style="{StaticResource PasswordInputFieldStyle}" Visibility="Visible"/>
             <CheckBox x:Name="chkShowPassword" Content="Показать пароль" Style="{StaticResource CheckboxStyle}" Checked="chkShowPassword_Checked" Unchecked="chkShowPassword_Unchecked"/>
+            <StackPanel x:Name="CaptchaPanel" Visibility="Collapsed" Margin="0,10,0,10">
+                <TextBlock Text="Введите число: " FontWeight="Bold" Style="{StaticResource NormalTextBlockStyle}"/>
+                <TextBlock x:Name="CaptchaQuestion" FontSize="16" Margin="0,5,0,0" Style="{StaticResource NormalTextBlockStyle}"/>
+                <TextBox x:Name="CaptchaAnswer" Width="100" Margin="0,5,0,0" Style="{StaticResource InputFieldStyle}"/>
+            </StackPanel>
             <Button x:Name="btnLogIn" Content="Войти" Style="{StaticResource LoginButtonStyle}" IsDefault="True" Click="btnLogIn_Click"/>
             <Button x:Name="btnReg" Content="Зарегистрироваться" Style="{StaticResource NavigationButtonStyle}" Click="btnReg_Click"/>
             <Button x:Name="btnForget" Content="Забыл пароль" Style="{StaticResource NavigationButtonStyle}" Click="btnFogot_Click"/>
