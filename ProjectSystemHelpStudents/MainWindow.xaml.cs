@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows.Navigation;
 using ProjectSystemHelpStudents.UsersContent;
 using ProjectSystemHelpStudents.Helper;
+using System.Windows.Interop;
+using System.Windows;
+using System;
 
 namespace ProjectSystemHelpStudents
 {
@@ -35,9 +25,23 @@ namespace ProjectSystemHelpStudents
             FrmClass.frmContentAdmin = frmContentAdmin;
         }
 
-        private void frmStackPanelButton_Navigated(object sender, NavigationEventArgs e)
+        protected override void OnSourceInitialized(EventArgs e)
         {
+            base.OnSourceInitialized(e);
+            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
+            source.AddHook(WndProc);
+        }
 
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == 0x8001)
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+                this.Activate();
+                handled = true;
+            }
+            return IntPtr.Zero;
         }
     }
 }

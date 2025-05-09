@@ -13,6 +13,7 @@ using Model = ProjectSystemHelpStudents;
 using System.Configuration;
 using ProjectSystemHelpStudents.Helper;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace ProjectSystemHelpStudents
 {
@@ -23,6 +24,13 @@ namespace ProjectSystemHelpStudents
         private Timer _reminderTimer;
         private Timer _dailySummaryTimer;
         private bool _isReallyClosing;
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        private const int WM_SHOWAPP = 0x8001;
 
         public App()
         {
@@ -30,8 +38,12 @@ namespace ProjectSystemHelpStudents
             _singleInstanceMutex = new Mutex(true, "MyTaskSingletonMutex", out isNew);
             if (!isNew)
             {
-                MessageBox.Show("Приложение уже запущено.", "MyTask",
-                                MessageBoxButton.OK, MessageBoxImage.Information);
+                // Найти главное окно уже запущенного экземпляра и послать ему сообщение
+                IntPtr otherWnd = FindWindow(null, "MyTask");
+                if (otherWnd != IntPtr.Zero)
+                {
+                    PostMessage(otherWnd, WM_SHOWAPP, IntPtr.Zero, IntPtr.Zero);
+                }
                 Environment.Exit(0);
             }
 
