@@ -98,9 +98,7 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void GenerateProjectButtons()
         {
-            var projectStackPanel = new StackPanel();
             var projects = GetProjects();
-
             var detachedProjects = UserSettingsHelper.GetDetachedProjects();
             ProjectStackPanel.Children.Clear();
 
@@ -111,17 +109,26 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                 StackPanel projectPanel = new StackPanel { Orientation = Orientation.Horizontal };
 
-                // Кнопка проекта
                 Button projectButton = new Button
                 {
-                    Content = project.Name,
                     Style = (Style)FindResource("TransparentButtonStyle"),
                     Margin = new Thickness(10, 5, 0, 0),
-                    Tag = project.ProjectId
+                    Tag = project.ProjectId,
+                    ToolTip = project.Name 
                 };
+
+                TextBlock textBlock = new TextBlock
+                {
+                    Text = project.Name,
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                    MaxWidth = 150,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                projectButton.Content = textBlock;
+
                 projectButton.Click += ProjectButton_Click;
 
-                // Кнопка открепить
                 Button detachButton = new Button
                 {
                     Content = "⨉",
@@ -136,11 +143,8 @@ namespace ProjectSystemHelpStudents.UsersContent
                 projectPanel.Children.Add(projectButton);
                 projectPanel.Children.Add(detachButton);
 
-                projectStackPanel.Children.Add(projectPanel);
+                ProjectStackPanel.Children.Add(projectPanel);
             }
-
-            ProjectStackPanel.Children.Clear();
-            ProjectStackPanel.Children.Add(projectStackPanel);
         }
 
         private void UserNameButton_Click(object sender, RoutedEventArgs e)

@@ -59,7 +59,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                             Name = name,
                             Surname = surname,
                             Patronymic = patronymic,
-                            Password = password,
+                            Password = PasswordHelper.HashPassword(password),
                             RoleUser = 2,
                             Mail = mail
                         };
