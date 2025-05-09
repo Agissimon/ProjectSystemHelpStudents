@@ -23,7 +23,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             InitializeComponent();
             _groupedTasks = new ObservableCollection<TaskGroupViewModel>();
             TasksListView.ItemsSource = _groupedTasks;
-            _startOfWeek = DateTime.Today;
+            _startOfWeek = StartOfWeek(DateTime.Today);
             Loaded += UpcomingTasksPage_Loaded;
         }
         private void MonthDayPicker_CalendarClosed(object sender, RoutedEventArgs e)
@@ -69,17 +69,14 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             using (var ctx = new TaskManagementEntities1())
             {
-                // Сортировка
                 SortComboBox.ItemsSource = new List<string> { "Умная", "Дата", "Приоритет" };
 
-                // Исполнители
                 var executors = ctx.Users
                     .Select(u => new ExecutorViewModel { IdUser = u.IdUser, FullName = u.Name })
                     .ToList();
                 executors.Insert(0, new ExecutorViewModel { IdUser = 0, FullName = "Все" });
                 ExecutorComboBox.ItemsSource = executors;
 
-                // Приоритеты
                 var priorities = ctx.Priority
                     .Select(p => new PriorityViewModel { PriorityId = p.PriorityId, Name = p.Name })
                     .OrderBy(p => p.PriorityId)
@@ -87,7 +84,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                 priorities.Insert(0, new PriorityViewModel { PriorityId = 0, Name = "Все" });
                 PriorityComboBox.ItemsSource = priorities;
 
-                // Метки
                 var labels = ctx.Labels
                     .Select(l => new LabelViewModel
                     {
@@ -279,7 +275,7 @@ namespace ProjectSystemHelpStudents.UsersContent
         private DateTime StartOfWeek(DateTime date)
         {
             int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
-            return date.AddDays(-1 * diff).Date;
+            return date.AddDays(-diff).Date;
         }
 
         private void UpdateTodayDateText()
@@ -344,7 +340,7 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void Today_Click(object sender, RoutedEventArgs e)
         {
-            _startOfWeek = DateTime.Today;
+            _startOfWeek = StartOfWeek(DateTime.Today);
             RefreshPage();
         }
 

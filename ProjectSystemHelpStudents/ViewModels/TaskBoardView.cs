@@ -13,262 +13,286 @@ namespace ProjectSystemHelpStudents.Views
 {
     public class TaskBoardView
     {
-        // Создает и возвращает Grid-доску, заполненную задачами.
-        public static Grid CreateBoardView(IEnumerable<TaskViewModel> tasks)
+        /// <summary>
+        /// Создаёт всю панель доски вместе с навигацией.
+        /// </summary>
+        public static DockPanel CreateBoardView(IEnumerable<TaskViewModel> tasks)
         {
+            // Получаем смещение недель из настроек
+            int weekOffset = Properties.Settings.Default.BoardWeekOffset;
+            // Находим текущий понедельник с учётом смещения
+            var refDate = DateTime.Today.AddDays(weekOffset * 7);
+            int mondayDelta = ((int)refDate.DayOfWeek + 6) % 7;
+            DateTime monday = refDate.AddDays(-mondayDelta);
+
             var boardGrid = new Grid { Tag = tasks };
-            RefreshBoard(boardGrid, tasks);
-            return boardGrid;
+            RefreshBoard(boardGrid, tasks, monday);
+
+            var navBar = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new Thickness(0, 5, 5, 5)
+            };
+            var btnStyle = (Style)Application.Current.FindResource("TransparentButtonStyle");
+
+            var prev = new Button { Content = "⟨", Style = btnStyle, Margin = new Thickness(2) };
+            var btnToday = new Button { Content = "Сегодня", Style = btnStyle, Margin = new Thickness(2) };
+            var next = new Button { Content = "⟩", Style = btnStyle, Margin = new Thickness(2) };
+
+            prev.Click += (s, e) => ChangeWeekOffset(-1, boardGrid, tasks);
+            next.Click += (s, e) => ChangeWeekOffset(+1, boardGrid, tasks);
+            btnToday.Click += (s, e) =>
+            {
+                Properties.Settings.Default.BoardWeekOffset = 0;
+                Properties.Settings.Default.Save();
+
+                var today = DateTime.Today;
+                int mondayDeltaToday = ((int)today.DayOfWeek + 6) % 7;
+                DateTime mondayToday = today.AddDays(-mondayDeltaToday);
+
+                RefreshBoard(boardGrid, tasks, mondayToday);
+            };
+
+            navBar.Children.Add(prev);
+            navBar.Children.Add(btnToday);
+            navBar.Children.Add(next);
+
+            var root = new DockPanel();
+            DockPanel.SetDock(navBar, Dock.Top);
+            root.Children.Add(navBar);
+            root.Children.Add(boardGrid);
+            return root;
         }
 
-        // Перестраивает доску, заполняя её данными из tasks.
-        private static void RefreshBoard(Grid boardGrid, IEnumerable<TaskViewModel> tasks)
+        private static void ChangeWeekOffset(int delta, Grid grid, IEnumerable<TaskViewModel> tasks)
         {
-            boardGrid.Children.Clear();
-            boardGrid.ColumnDefinitions.Clear();
+            int off = Properties.Settings.Default.BoardWeekOffset + delta;
+            Properties.Settings.Default.BoardWeekOffset = off;
+            Properties.Settings.Default.Save();
+
+            var refDate = DateTime.Today.AddDays(off * 7);
+            int mondayDelta = ((int)refDate.DayOfWeek + 6) % 7;
+            DateTime monday = refDate.AddDays(-mondayDelta);
+            RefreshBoard(grid, tasks, monday);
+        }
+
+        private static void RefreshBoard(Grid grid, IEnumerable<TaskViewModel> tasks, DateTime monday)
+        {
+            grid.Children.Clear();
+            grid.ColumnDefinitions.Clear();
 
             DateTime today = DateTime.Today;
+            bool isCurrentWeek = Properties.Settings.Default.BoardWeekOffset == 0;
+            bool overdueExpanded = Properties.Settings.Default.OverdueExpanded;
 
-            for (int i = 0; i < 8; i++)
+            // Собираем список 
+            var columns = new List<(int index, DateTime? date, IEnumerable<TaskViewModel> tasks)>();
+
+            columns.Add((0, null, tasks.Where(t => t.EndDate.Date < today)));
+
+            // Затем — 7 дней недели
+            for (int i = 1; i <= 7; i++)
             {
-                boardGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(250) });
+                var dt = monday.AddDays(i - 1);
+
+                if (isCurrentWeek && dt < today)
+                    continue;
+
+                var dayTasks = tasks.Where(t => t.EndDate.Date == dt);
+                columns.Add((i, dt, dayTasks));
             }
 
-            for (int i = 0; i < 8; i++)
+            foreach (var _ in columns)
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            for (int colIdx = 0; colIdx < columns.Count; colIdx++)
             {
-                string headerText;
-                IEnumerable<TaskViewModel> columnTasks;
-                DateTime columnDate = today.AddDays(i - 1);
+                var (i, columnDate, columnTasks) = columns[colIdx];
+                var panel = new StackPanel { Margin = new Thickness(3) };
 
                 if (i == 0)
                 {
-                    headerText = "Просрочено";
-                    columnTasks = tasks.Where(t => t.EndDate < today);
+                    var exp = new Expander
+                    {
+                        Header = $"Просрочено ({columnTasks.Count()})",
+                        IsExpanded = overdueExpanded,
+                        FontSize = 16,
+                        FontWeight = FontWeights.Bold,
+                        Foreground = Brushes.White
+                    };
+                    exp.Expanded += (s, e) => SaveOverdueState(true);
+                    exp.Collapsed += (s, e) => SaveOverdueState(false);
+
+                    var inner = new StackPanel();
+                    foreach (var t in columnTasks.OrderBy(t => t.EndDate))
+                        inner.Children.Add(CreateTaskCard(t, grid, tasks, monday));
+
+                    exp.Content = new ScrollViewer
+                    {
+                        Content = inner,
+                        VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                        MaxHeight = 400,
+                        Style = (Style)Application.Current.FindResource("MinimalDarkScrollViewer")
+                    };
+                    panel.Children.Add(exp);
                 }
                 else
                 {
-                    string label = GetRelativeLabel(columnDate, today);
-                    headerText = $"{columnDate:dd MMMM} ‧ {label}";
-                    columnTasks = tasks.Where(t => t.EndDate.Date == columnDate.Date);
+                    DateTime dt = columnDate.Value;
+                    string label = GetRelativeLabel(dt, today);
+                    panel.Children.Add(new TextBlock
+                    {
+                        Text = $"{dt:dd MMMM} ‧ {label}",
+                        FontSize = 16,
+                        FontWeight = dt == today ? FontWeights.Bold : FontWeights.Normal,
+                        Foreground = dt == today ? Brushes.Red : Brushes.White,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Margin = new Thickness(0, 5, 0, 5)
+                    });
+
+                    var dayInner = new StackPanel();
+                    foreach (var t in columnTasks.OrderBy(t => t.EndDate))
+                        dayInner.Children.Add(CreateTaskCard(t, grid, tasks, monday));
+
+                    panel.Children.Add(new ScrollViewer
+                    {
+                        Content = dayInner,
+                        VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                    });
                 }
 
-                var columnStack = new StackPanel();
-                columnStack.Children.Add(new TextBlock
-                {
-                    Text = headerText,
-                    FontWeight = FontWeights.Bold,
-                    FontSize = 18,
-                    Margin = new Thickness(5),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    Foreground = Brushes.White
-                });
-
-                //// Создание Expander для колонки
-                //var expander = new Expander
-                //{
-                //    Header = headerText,  // Заголовок для каждой группы задач
-                //    IsExpanded = ExpanderStateManager.GetState(headerText), // Восстановление состояния
-                //    Margin = new Thickness(0, 0, 0, 10)
-                //};
-
-                //// Добавление задач в Expander
-                //foreach (var task in columnTasks.OrderBy(t => t.EndDate))
-                //{
-                //    expander.Content = CreateTaskCard(task, boardGrid); // Добавляем задачи внутрь Expander
-                //}
-
-                //columnStack.Children.Add(expander); // Добавляем Expander в колонку
-
-
-                // Добавляем карточки задач для данной колонки
-                foreach (var task in columnTasks.OrderBy(t => t.EndDate))
-                {
-                    columnStack.Children.Add(CreateTaskCard(task, boardGrid));
-                }
-
-                // Кнопка добавления задачи
-                var addButton = new Button
+                int idx = i;
+                var btn = new Button
                 {
                     Content = "+ Добавить задачу",
-                    Margin = new Thickness(5),
-                    Style = Application.Current.FindResource("AddTaskButtonStyle") as Style
+                    Margin = new Thickness(3),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Style = (Style)Application.Current.FindResource("AddTaskButtonStyle"),
                 };
-
-                addButton.Click += (s, e) =>
+                btn.Click += (s, e) =>
                 {
-                    var window = new AddTaskWindow();
-                    window.SetPreselectedDate(i == 0 ? today.AddDays(-1) : columnDate);
-                    if (window.ShowDialog() == true)
-                    {
-                        // Получаем только задачи, которые не завершены
-                        var updatedTasks = DBClass.entities.Task
-                            .Where(t => t.Status.Name != "Завершено")
-                            .ToList()
-                            .Select(t => new TaskViewModel
-                            {
-                                IdTask = t.IdTask,
-                                Title = t.Title,
-                                Description = t.Description,
-                                EndDate = t.EndDate,
-                                Status = t.Status?.Name,
-                                IsCompleted = t.Status?.Name == "Завершено",
-                                AvailableLabels = new System.Collections.ObjectModel.ObservableCollection<LabelViewModel>(
-                                                      t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
-                                EndDateFormatted = t.EndDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
-                            })
-                            .ToList();
-
-                        boardGrid.Tag = updatedTasks;
-                        RefreshBoard(boardGrid, updatedTasks);
-                    }
+                    var w = new AddTaskWindow();
+                    DateTime pre = (idx == 0) ? today.AddDays(-1) : monday.AddDays(idx - 1);
+                    w.SetPreselectedDate(pre);
+                    if (w.ShowDialog() == true)
+                        RefreshBoard(grid, tasks, monday);
                 };
+                panel.Children.Add(btn);
 
-                columnStack.Children.Add(addButton);
-
-                var scrollViewer = new ScrollViewer
+                var sv = new ScrollViewer
                 {
-                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                    HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                    Content = columnStack
+                    Content = panel,
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto
                 };
-
-                Grid.SetColumn(scrollViewer, i);
-                boardGrid.Children.Add(scrollViewer);
+                Grid.SetColumn(sv, colIdx);
+                grid.Children.Add(sv);
             }
+        }
+
+        private static void SaveOverdueState(bool expanded)
+        {
+            Properties.Settings.Default.OverdueExpanded = expanded;
+            Properties.Settings.Default.Save();
         }
 
         private static string GetRelativeLabel(DateTime date, DateTime today)
         {
-            if (date == today)
-                return "Сегодня";
-            if (date == today.AddDays(1))
-                return "Завтра";
-            if (date == today.AddDays(-1))
-                return "Вчера";
-
+            if (date == today) return "Сегодня";
+            if (date == today.AddDays(1)) return "Завтра";
+            if (date == today.AddDays(-1)) return "Вчера";
             return CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.GetDayName(date.DayOfWeek);
         }
 
-        private static Border CreateTaskCard(TaskViewModel task, Grid boardGrid)
+        private static Border CreateTaskCard(
+            TaskViewModel t,
+            Grid boardGrid,
+            IEnumerable<TaskViewModel> tasks,
+            DateTime monday)
         {
-            var circle = new Ellipse
+            var check = new CheckBox
             {
-                Width = 12,
-                Height = 12,
-                Stroke = Brushes.Gray,
-                StrokeThickness = 2,
-                Fill = task.Status == "Завершено" ? Brushes.Green : Brushes.Transparent,
-                Margin = new Thickness(0, 0, 8, 0),
-                VerticalAlignment = VerticalAlignment.Center,
-                Cursor = Cursors.Hand
+                IsChecked = t.IsCompleted,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(0, 0, 6, 0),
+                BorderThickness = new Thickness(2)
             };
+            check.Checked += (s, e) => OnTaskToggled(t, boardGrid, tasks, monday);
+            check.Unchecked += (s, e) => OnTaskToggled(t, boardGrid, tasks, monday);
 
-            var titleText = new TextBlock
+            var info = new StackPanel { Orientation = Orientation.Vertical };
+            info.Children.Add(new TextBlock
             {
-                Text = task.Title,
+                Text = t.Title,
                 FontWeight = FontWeights.Bold,
                 Foreground = Brushes.White,
                 FontSize = 14
-            };
-
-            var dateText = new TextBlock
+            });
+            if (!string.IsNullOrWhiteSpace(t.Description))
+                info.Children.Add(new TextBlock
+                {
+                    Text = t.Description,
+                    Foreground = Brushes.LightGray,
+                    FontSize = 12,
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(0, 2, 0, 0)
+                });
+            info.Children.Add(new TextBlock
             {
-                Text = task.EndDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU")),
-                Foreground = Brushes.LightGray,
-                FontSize = 12
-            };
+                Text = t.EndDate.ToString("dd MMM yyyy HH:mm", CultureInfo.GetCultureInfo("ru-RU")),
+                Foreground = Brushes.LightBlue,
+                FontSize = 11,
+                Margin = new Thickness(0, 2, 0, 0)
+            });
+            if (t.AvailableLabels?.Any() == true)
+            {
+                var lbls = string.Join(", ", t.AvailableLabels.Select(l => l.Name));
+                info.Children.Add(new TextBlock
+                {
+                    Text = $"Метки: {lbls}",
+                    Foreground = Brushes.LightGreen,
+                    FontSize = 11,
+                    Margin = new Thickness(0, 2, 0, 0)
+                });
+            }
 
-            var taskInfo = new StackPanel();
-            taskInfo.Children.Add(titleText);
-            taskInfo.Children.Add(dateText);
-
-            var taskPanel = new StackPanel { Orientation = Orientation.Horizontal };
-            taskPanel.Children.Add(circle);
-            taskPanel.Children.Add(taskInfo);
+            var panel = new StackPanel { Orientation = Orientation.Horizontal };
+            panel.Children.Add(check);
+            panel.Children.Add(info);
 
             var border = new Border
             {
-                Margin = new Thickness(5),
-                Background = Brushes.DimGray,
                 CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(8),
-                Cursor = Cursors.Hand,
-                Child = taskPanel
+                Background = new SolidColorBrush(Color.FromRgb(50, 50, 50)),
+                Margin = new Thickness(0, 4, 0, 0),
+                Padding = new Thickness(6),
+                Child = panel,
+                Cursor = Cursors.Hand
             };
 
-            border.MouseEnter += (s, e) => border.Background = new SolidColorBrush(Color.FromRgb(80, 80, 80));
-            border.MouseLeave += (s, e) => border.Background = Brushes.DimGray;
-
-            // Обработчик клика по кружочку для смены статуса задачи
-            circle.MouseLeftButtonUp += (s, e) =>
-            {
-                var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.IdTask == task.IdTask);
-                if (dbTask != null)
-                {
-                    var newStatusName = dbTask.Status.Name == "Завершено" ? "Не начато" : "Завершено";
-                    var newStatus = DBClass.entities.Status.FirstOrDefault(st => st.Name == newStatusName);
-                    if (newStatus != null)
-                    {
-                        dbTask.StatusId = newStatus.StatusId;
-                        DBClass.entities.SaveChanges();
-
-                        var updatedTasks = DBClass.entities.Task
-                            .Where(t => t.Status.Name != "Завершено")
-                            .ToList()
-                            .Select(t => new TaskViewModel
-                            {
-                                IdTask = t.IdTask,
-                                Title = t.Title,
-                                Description = t.Description,
-                                EndDate = t.EndDate,
-                                Status = t.Status?.Name,
-                                IsCompleted = t.Status?.Name == "Завершено",
-                                AvailableLabels = new System.Collections.ObjectModel.ObservableCollection<LabelViewModel>(
-                                                        t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
-                                EndDateFormatted = t.EndDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
-                            })
-                            .ToList();
-
-                        boardGrid.Tag = updatedTasks;
-                        RefreshBoard(boardGrid, updatedTasks);
-                    }
-                }
-                e.Handled = true;
-            };
-
-            // Обработчик клика по задаче (открытие окна с деталями)
             border.MouseLeftButtonUp += (s, e) =>
             {
-                if (e.OriginalSource is Ellipse)
-                    return;
-
-                var detailsWindow = new TaskDetailsWindow(task);
-                if (detailsWindow.ShowDialog() == true)
-                {
-                    var updatedTasks = DBClass.entities.Task
-                        .Where(t => t.Status.Name != "Завершено")
-                        .ToList()
-                        .Select(t => new TaskViewModel
-                        {
-                            IdTask = t.IdTask,
-                            Title = t.Title,
-                            Description = t.Description,
-                            EndDate = t.EndDate,
-                            Status = t.Status?.Name,
-                            IsCompleted = t.Status?.Name == "Завершено",
-                            AvailableLabels = new System.Collections.ObjectModel.ObservableCollection<LabelViewModel>(
-                                                        t.TaskLabels.Select(l => new LabelViewModel { Name = l.Labels.Name })),
-                            EndDateFormatted = t.EndDate.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"))
-                        })
-                        .ToList();
-
-                    boardGrid.Tag = updatedTasks;
-                    RefreshBoard(boardGrid, updatedTasks);
-                }
-                e.Handled = true;
+                if (e.OriginalSource is CheckBox) return;
+                var wnd = new TaskDetailsWindow(t);
+                if (wnd.ShowDialog() == true)
+                    RefreshBoard(boardGrid, tasks, monday);
             };
 
             return border;
+        }
+
+        private static void OnTaskToggled(
+            TaskViewModel t,
+            Grid boardGrid,
+            IEnumerable<TaskViewModel> tasks,
+            DateTime monday)
+        {
+            var db = DBClass.entities.Task.First(x => x.IdTask == t.IdTask);
+            var newStatusName = t.IsCompleted ? "Завершено" : "Не завершено";
+            db.StatusId = DBClass.entities.Status.First(st => st.Name == newStatusName).StatusId;
+            DBClass.entities.SaveChanges();
+
+            RefreshBoard(boardGrid, tasks, monday);
         }
     }
 }
