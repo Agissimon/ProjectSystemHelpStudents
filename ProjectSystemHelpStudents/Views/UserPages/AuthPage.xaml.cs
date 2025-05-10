@@ -1,25 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ProjectSystemHelpStudents.Helper;
+using System;
 using System.Linq;
-using System.Security.RightsManagement;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using ProjectSystemHelpStudents.Helper;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
-    /// <summary>
-    /// Логика взаимодействия для AuthPage.xaml
-    /// </summary>
     public partial class AuthPage : Page
     {
         int logCount = 0;
@@ -36,11 +22,14 @@ namespace ProjectSystemHelpStudents.UsersContent
             {
                 MessageBox.Show("Вы не ввели логин пользователя");
                 logCount++;
+                return;
             }
-            else if (string.IsNullOrWhiteSpace(psbPassword.Password))
+
+            if (string.IsNullOrWhiteSpace(psbPassword.Password))
             {
                 MessageBox.Show("Вы не ввели пароль пользователя");
                 logCount++;
+                return;
             }
 
             if (logCount >= 4)
@@ -53,19 +42,16 @@ namespace ProjectSystemHelpStudents.UsersContent
                     return;
                 }
 
-                if (int.TryParse(CaptchaAnswer.Text, out int userAnswer) && userAnswer == correctCaptchaAnswer)
-                {
-                    AttemptLogin();
-                }
-                else
+                // Проверяем ответ на капчу
+                if (!int.TryParse(CaptchaAnswer.Text, out int userAnswer)
+                    || userAnswer != correctCaptchaAnswer)
                 {
                     MessageBox.Show("Капча введена неверно.");
+                    return;
                 }
             }
-            else
-            {
-                AttemptLogin();
-            }
+
+            AttemptLogin();
         }
 
         private void AttemptLogin()
@@ -79,31 +65,51 @@ namespace ProjectSystemHelpStudents.UsersContent
             {
                 MessageBox.Show("Неверный логин или пароль");
                 logCount++;
+                return;
             }
-            else
-            {
-                if (user.RoleUser == 2)
-                {
-                    UserSession.IdUser = user.IdUser;
-                    UserSession.NotifyUserNameUpdated(user.Name);
-                    MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
 
-                    var mainWindow = Application.Current.MainWindow as MainWindow;
-                    if (mainWindow != null)
-                    {
-                        mainWindow.frmAuth.Content = null;
-                        mainWindow.frmContentUser.Content = new UpcomingTasksPage();
-                        mainWindow.frmStackPanelButton.Content = new StackPanelButtonPage();
-                    }
+            if (user.MustChangePassword.GetValueOrDefault())
+            {
+                UserSession.IdUser = user.IdUser;
+                UserSession.NotifyUserNameUpdated(user.Name);
+
+                var mainWin = Application.Current.MainWindow as MainWindow;
+                   if (mainWin != null)
+                   {
+                    mainWin.frmAuth.Content = null;
+                          
+                    mainWin.frmContentUser.Content = new UserPage(true);
+
+                    mainWin.frmStackPanelButton.Content = new StackPanelButtonPage();
+                   }
+                else
+                {
+                    this.NavigationService?.Navigate(new UserPage());
+                }
+
+                return;
+            }
+
+            if (user.RoleUser == 2)
+            {
+                UserSession.IdUser = user.IdUser;
+                UserSession.NotifyUserNameUpdated(user.Name);
+                MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
+
+                var mainWindow = Application.Current.MainWindow as MainWindow;
+                if (mainWindow != null)
+                {
+                    mainWindow.frmAuth.Content = null;
+                    mainWindow.frmContentUser.Content = new UpcomingTasksPage();
+                    mainWindow.frmStackPanelButton.Content = new StackPanelButtonPage();
                 }
             }
         }
 
         private void GenerateCaptcha()
         {
-            Random rnd = new Random();
-            int a = rnd.Next(1, 10);
-            int b = rnd.Next(1, 10);
+            var rnd = new Random();
+            int a = rnd.Next(1, 10), b = rnd.Next(1, 10);
             correctCaptchaAnswer = a + b;
             CaptchaQuestion.Text = $"{a} + {b} = ?";
         }

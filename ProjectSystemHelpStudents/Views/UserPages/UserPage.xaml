@@ -21,6 +21,52 @@
 
                 <TextBlock Text="Email:" Style="{StaticResource TransparentTextBlockStyle}"/>
                 <TextBox x:Name="UserEmailTextBox" Style="{StaticResource InputFieldStyle}"/>
+                
+                <TextBlock Text="Новый пароль:" Style="{StaticResource TransparentTextBlockStyle}"/>
+                <Grid>
+                    <PasswordBox x:Name="NewPasswordBox"
+                                 Style="{StaticResource PasswordInputFieldStyle}"
+                                 PasswordChanged="NewPasswordBox_PasswordChanged"/>
+                    <TextBox x:Name="NewPasswordTextBox"
+                             Margin ="0,5,0,5"
+                             Style="{StaticResource InputFieldStyle}"
+                             Visibility="Collapsed"
+                             TextChanged="NewPasswordTextBox_TextChanged"/>
+
+                    <ToggleButton x:Name="NewPwdToggle"
+                                  Style="{StaticResource ToggleSidebarStyle}"
+                                  Width="24" Height="24"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Right"
+                                  Margin="0,0,8,0"
+                                  Checked="NewPwdToggle_Checked"
+                                  Unchecked="NewPwdToggle_Unchecked">
+                        <TextBlock Text="👁" FontSize="16"/>
+                    </ToggleButton>
+                </Grid>
+
+                <TextBlock Text="Подтвердите пароль:" Style="{StaticResource TransparentTextBlockStyle}"/>
+                <Grid>
+                    <PasswordBox x:Name="ConfirmPasswordBox"
+                                 Style="{StaticResource PasswordInputFieldStyle}"
+                                 PasswordChanged="ConfirmPasswordBox_PasswordChanged"/>
+                    <TextBox x:Name="ConfirmPasswordTextBox"
+                             Margin ="0,5,0,5"
+                             Style="{StaticResource InputFieldStyle}"
+                             Visibility="Collapsed"
+                             TextChanged="ConfirmPasswordTextBox_TextChanged"/>
+
+                    <ToggleButton x:Name="ConfirmPwdToggle"
+                                  Style="{StaticResource ToggleSidebarStyle}"
+                                  Width="24" Height="24"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Right"
+                                  Margin="0,0,8,0"
+                                  Checked="ConfirmPwdToggle_Checked"
+                                  Unchecked="ConfirmPwdToggle_Unchecked">
+                        <TextBlock Text="👁" FontSize="16"/>
+                    </ToggleButton>
+                </Grid>
 
                 <Button Content="Сохранить" Style="{StaticResource DisplayOptionsButtonStyle}" Click="SaveButton_Click"/>
             </StackPanel>

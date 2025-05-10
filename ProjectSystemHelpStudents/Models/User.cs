@@ -16,6 +16,7 @@ namespace ProjectSystemHelpStudents.Helper
         public string Login { get; set; }
         public string Password { get; set; }
         public string Mail { get; set; }
+        public bool MustChangePassword { get; set; }
 
         public string UserFIO => $"{Surname} {Name} {Patronymic}";
 
