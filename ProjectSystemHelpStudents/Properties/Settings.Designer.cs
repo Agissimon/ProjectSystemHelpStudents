@@ -165,5 +165,16 @@ namespace ProjectSystemHelpStudents.Properties {
                 this["BoardWeekOffset"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringDictionary PasswordResetTimestamps {
+            get {
+                return ((global::System.Collections.Specialized.StringDictionary)(this["PasswordResetTimestamps"]));
+            }
+            set {
+                this["PasswordResetTimestamps"] = value;
+            }
+        }
     }
 }

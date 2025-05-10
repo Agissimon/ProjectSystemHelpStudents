@@ -1,81 +1,133 @@
 ﻿using ProjectSystemHelpStudents.Helper;
 using System;
-using System.Linq;
-using System.Net.Mail;
-using System.Net;
-using System.Windows;
+using System.Collections.Specialized;
 using System.Configuration;
+using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Windows;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
-    /// <summary>
-    /// Логика взаимодействия для FogotPassWindow.xaml
-    /// </summary>
-    public partial class FogotPassWindow : System.Windows.Window
+    public partial class FogotPassWindow : Window
     {
         public FogotPassWindow()
         {
             InitializeComponent();
-            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            this.ResizeMode = ResizeMode.NoResize;
-            this.WindowStyle = WindowStyle.SingleBorderWindow;
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            ResizeMode = ResizeMode.NoResize;
+            WindowStyle = WindowStyle.SingleBorderWindow;
         }
+
         private void btnMail_Click(object sender, RoutedEventArgs e)
         {
-            var clientEmail = txbForPass.Text.Trim();
-
-            if (string.IsNullOrEmpty(clientEmail) || !clientEmail.Contains("@"))
+            string rawEmail = txbForPass.Text;
+            if (string.IsNullOrWhiteSpace(rawEmail) || !rawEmail.Contains("@"))
             {
                 MessageBox.Show("Введите корректный email.");
                 return;
             }
+            string clientEmail = rawEmail.Trim().ToLower();
 
-            var user = DBClass.entities.Users.FirstOrDefault(i => i.Mail == clientEmail);
-
-            if (user == null)
-            {
-                MessageBox.Show("Пользователь с такой электронной почтой не найден.");
-                return;
-            }
+            int cooldownMinutes;
+            if (!int.TryParse(ConfigurationManager.AppSettings["ResetCooldownMinutes"], out cooldownMinutes))
+                cooldownMinutes = 15;
+            TimeSpan resetCooldown = TimeSpan.FromMinutes(cooldownMinutes);
 
             string fromEmail = ConfigurationManager.AppSettings["EmailFrom"];
             string fromPassword = ConfigurationManager.AppSettings["EmailPassword"];
-
             if (string.IsNullOrWhiteSpace(fromEmail) || string.IsNullOrWhiteSpace(fromPassword))
             {
                 MessageBox.Show("Email отправителя или пароль не настроены в App.config.");
                 return;
             }
 
-            SmtpClient client = new SmtpClient("smtp.gmail.com", 587)
+            using (var context = new TaskManagementEntities1())
             {
-                EnableSsl = true,
-                Credentials = new NetworkCredential(fromEmail, fromPassword)
-            };
+                var user = context.Users
+                    .FirstOrDefault(u =>
+                        u.Mail != null &&
+                        u.Mail.Trim().ToLower() == clientEmail);
 
-            var mailMessage = new MailMessage
-            {
-                From = new MailAddress(fromEmail),
-                Subject = "Восстановление пароля",
-                Body = $"Ваш пароль: {user.Password}",
-                IsBodyHtml = false
-            };
+                if (user == null)
+                {
+                    MessageBox.Show("Пользователь с такой электронной почтой не найден.");
+                    return;
+                }
 
-            mailMessage.To.Add(clientEmail);
+                int userId = user.IdUser;
 
-            try
-            {
-                client.Send(mailMessage);
-                MessageBox.Show("Пароль был отправлен на ваш почтовый ящик.");
+                StringDictionary timestamps = Properties.Settings.Default.PasswordResetTimestamps;
+                if (timestamps == null)
+                {
+                    timestamps = new StringDictionary();
+                    Properties.Settings.Default.PasswordResetTimestamps = timestamps;
+                }
+
+                if (timestamps.ContainsKey(userId.ToString()))
+                {
+                    if (long.TryParse(timestamps[userId.ToString()], out long ticks))
+                    {
+                        DateTime lastRequest = new DateTime(ticks);
+                        if (DateTime.Now - lastRequest < resetCooldown)
+                        {
+                            DateTime nextAllowed = lastRequest.Add(resetCooldown);
+                            MessageBox.Show(
+                                "Новый временный пароль можно запросить не раньше, чем в " +
+                                nextAllowed.ToString("HH:mm:ss") + ".");
+                            return;
+                        }
+                    }
+                }
+
+                string tempPassword = GenerateTemporaryPassword();
+                user.Password = PasswordHelper.HashPassword(tempPassword);
+                user.MustChangePassword = true;
+                context.SaveChanges();
+
+                timestamps[userId.ToString()] = DateTime.Now.Ticks.ToString();
+                Properties.Settings.Default.Save();
+
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)
+                {
+                    EnableSsl = true,
+                    Credentials = new NetworkCredential(fromEmail, fromPassword)
+                };
+
+                MailMessage msg = new MailMessage
+                {
+                    From = new MailAddress(fromEmail),
+                    Subject = "Восстановление пароля",
+                    Body = "Ваш временный пароль: " + tempPassword + Environment.NewLine +
+                                 "Он действителен в течение " + cooldownMinutes +
+                                 " минут. Пожалуйста, смените его после входа.",
+                    IsBodyHtml = false
+                };
+                msg.To.Add(user.Mail.Trim());
+
+                try
+                {
+                    smtp.Send(msg);
+                    MessageBox.Show("Временный пароль был отправлен на ваш почтовый ящик.");
+                    this.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка при отправке письма: " + ex.Message);
+                }
             }
-            catch (SmtpException smtpEx)
+        }
+
+        private string GenerateTemporaryPassword()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            Random rnd = new Random();
+            char[] buffer = new char[8];
+            for (int i = 0; i < buffer.Length; i++)
             {
-                MessageBox.Show($"Ошибка отправки письма: {smtpEx.Message}");
+                buffer[i] = chars[rnd.Next(chars.Length)];
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Неожиданная ошибка: {ex.Message}");
-            }
+            return new string(buffer);
         }
     }
 }

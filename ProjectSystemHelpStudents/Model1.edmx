@@ -151,6 +151,7 @@
           <Property Name="Patronymic" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="RoleUser" Type="int" Nullable="false" />
           <Property Name="Mail" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="MustChangePassword" Type="bit" />
         </EntityType>
         <Association Name="FK__Filters__UserId__41EDCAC5">
           <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
@@ -603,6 +604,7 @@
           <NavigationProperty Name="TeamInvitation1" Relationship="TaskManagementModel.FK_Invitation_Inviter" FromRole="Users" ToRole="TeamInvitation" />
           <NavigationProperty Name="TeamMember" Relationship="TaskManagementModel.FK_TeamMember_User" FromRole="Users" ToRole="TeamMember" />
           <NavigationProperty Name="Project" Relationship="TaskManagementModel.FK_Project_Users" FromRole="Users" ToRole="Project" />
+          <Property Name="MustChangePassword" Type="Boolean" />
         </EntityType>
         <Association Name="FK_Comment_Task">
           <End Role="Task" Type="Self.Task" Multiplicity="0..1">
@@ -1108,6 +1110,7 @@
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="TaskManagementModel.Users">
               <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="MustChangePassword" ColumnName="MustChangePassword" />
                 <ScalarProperty Name="IdUser" ColumnName="IdUser" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Surname" ColumnName="Surname" />

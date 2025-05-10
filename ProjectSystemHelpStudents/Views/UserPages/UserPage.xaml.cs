@@ -8,13 +8,13 @@ namespace ProjectSystemHelpStudents.UsersContent
 {
     public partial class UserPage : Page
     {
-        public delegate void UserNameUpdatedHandler(string newName);
+        private ProjectSystemHelpStudents.Users currentUser;
+        private bool _forcedChange;
 
-        private User currentUser;
-
-        public UserPage()
+        public UserPage(bool forcedChange = false)
         {
             InitializeComponent();
+            _forcedChange = forcedChange;
             LoadUserData();
         }
 
@@ -22,70 +22,111 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             int userId = UserSession.IdUser;
             var user = DBClass.entities.Users.FirstOrDefault(u => u.IdUser == userId);
-            if (user != null)
-            {
-                currentUser = new User
-                {
-                    IdUser = user.IdUser,
-                    Name = user.Name,
-                    Surname = user.Surname,
-                    Patronymic = user.Patronymic,
-                    Login = user.Login,
-                    Password = user.Password,
-                    Mail = user.Mail
-                };
-                UserNameTextBox.Text = currentUser.Name;
-                UserSurnameTextBox.Text = currentUser.Surname;
-                UserPatronymicTextBox.Text = currentUser.Patronymic;
-                UserEmailTextBox.Text = currentUser.Mail;
-            }
-            else
+            if (user == null)
             {
                 MessageBox.Show("Ошибка: Пользователь не найден.");
+                return;
             }
+
+            currentUser = user;
+            UserNameTextBox.Text = user.Name;
+            UserSurnameTextBox.Text = user.Surname;
+            UserPatronymicTextBox.Text = user.Patronymic;
+            UserEmailTextBox.Text = user.Mail;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            try
+            currentUser.Name = UserNameTextBox.Text.Trim();
+            currentUser.Surname = UserSurnameTextBox.Text.Trim();
+            currentUser.Patronymic = UserPatronymicTextBox.Text.Trim();
+            currentUser.Mail = UserEmailTextBox.Text.Trim();
+
+            string newPwd = NewPasswordBox.Visibility == Visibility.Visible
+                ? NewPasswordBox.Password
+                : NewPasswordTextBox.Text;
+            string confirmPwd = ConfirmPasswordBox.Visibility == Visibility.Visible
+                ? ConfirmPasswordBox.Password
+                : ConfirmPasswordTextBox.Text;
+
+            if (!string.IsNullOrWhiteSpace(newPwd))
             {
-                if (currentUser != null)
+                if (newPwd != confirmPwd)
                 {
-                    currentUser.Name = UserNameTextBox.Text;
-                    currentUser.Surname = UserSurnameTextBox.Text;
-                    currentUser.Patronymic = UserPatronymicTextBox.Text;
-                    currentUser.Mail = UserEmailTextBox.Text;
-
-                    SaveUserDataToDatabase();
-
-                    // Передаем только имя пользователя
-                    string newName = currentUser.Name;
-                    UserSession.NotifyUserNameUpdated(newName);
-
-                    MessageBox.Show("Данные пользователя успешно сохранены.");
+                    MessageBox.Show("Пароли не совпадают.");
+                    return;
                 }
-                else
-                {
-                    MessageBox.Show("Ошибка: Пользователь не найден.");
-                }
+
+                currentUser.Password = PasswordHelper.HashPassword(newPwd);
+                currentUser.MustChangePassword = false;
             }
-            catch (Exception ex)
+
+            DBClass.entities.SaveChanges();
+            UserSession.NotifyUserNameUpdated(currentUser.Name);
+            MessageBox.Show("Данные успешно сохранены.");
+
+            if (_forcedChange)
             {
-                MessageBox.Show("Ошибка при сохранении данных пользователя: " + ex.Message);
+                var main = Application.Current.MainWindow as MainWindow;
+                if (main != null)
+                {
+                    main.frmAuth.Content = null;
+                    main.frmContentUser.Content = new UpcomingTasksPage();
+                    main.frmStackPanelButton.Content = new StackPanelButtonPage();
+                }
             }
         }
 
-        private void SaveUserDataToDatabase()
+        private void NewPwdToggle_Checked(object sender, RoutedEventArgs e)
         {
-            var user = DBClass.entities.Users.FirstOrDefault(u => u.IdUser == currentUser.IdUser);
-            if (user != null)
-            {
-                user.Name = currentUser.Name;
-                user.Surname = currentUser.Surname;
-                user.Patronymic = currentUser.Patronymic;
-                user.Mail = currentUser.Mail;
-                DBClass.entities.SaveChanges();
-            }
+            NewPasswordTextBox.Text = NewPasswordBox.Password;
+            NewPasswordBox.Visibility = Visibility.Collapsed;
+            NewPasswordTextBox.Visibility = Visibility.Visible;
+        }
+
+        private void NewPwdToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            NewPasswordBox.Password = NewPasswordTextBox.Text;
+            NewPasswordBox.Visibility = Visibility.Visible;
+            NewPasswordTextBox.Visibility = Visibility.Collapsed;
+        }
+
+        private void NewPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (NewPwdToggle.IsChecked == true)
+                NewPasswordTextBox.Text = NewPasswordBox.Password;
+        }
+
+        private void NewPasswordTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (NewPwdToggle.IsChecked == false)
+                NewPasswordBox.Password = NewPasswordTextBox.Text;
+        }
+
+        private void ConfirmPwdToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            ConfirmPasswordTextBox.Text = ConfirmPasswordBox.Password;
+            ConfirmPasswordBox.Visibility = Visibility.Collapsed;
+            ConfirmPasswordTextBox.Visibility = Visibility.Visible;
+        }
+
+        private void ConfirmPwdToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            ConfirmPasswordBox.Password = ConfirmPasswordTextBox.Text;
+            ConfirmPasswordBox.Visibility = Visibility.Visible;
+            ConfirmPasswordTextBox.Visibility = Visibility.Collapsed;
+        }
+
+        private void ConfirmPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (ConfirmPwdToggle.IsChecked == true)
+                ConfirmPasswordTextBox.Text = ConfirmPasswordBox.Password;
+        }
+
+        private void ConfirmPasswordTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ConfirmPwdToggle.IsChecked == false)
+                ConfirmPasswordBox.Password = ConfirmPasswordTextBox.Text;
         }
     }
 }

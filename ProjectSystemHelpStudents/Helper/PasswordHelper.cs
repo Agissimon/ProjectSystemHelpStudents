@@ -9,7 +9,7 @@ public static class PasswordHelper
         using (SHA256 sha = SHA256.Create())
         {
             byte[] hashBytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return BitConverter.ToString(hashBytes).Replace("-", "").ToLower(); // hex string
+            return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
         }
     }
 }
