@@ -79,7 +79,7 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-
+                
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
                     <TextBox x:Name="CommentTextBox" Style="{StaticResource InputFieldStyle}" TextWrapping="Wrap" AcceptsReturn="True" Width="415"/>
                     <Button Width="43" Height="43" Background="Transparent" Foreground="Gray" BorderBrush="Transparent" Click="AddFileButton_Click">

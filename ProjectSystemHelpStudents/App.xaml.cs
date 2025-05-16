@@ -148,7 +148,7 @@ namespace ProjectSystemHelpStudents
                 overdue = ctx.Task
                     .Include(t => t.Status)
                     .Where(t =>
-                        t.IdUser == userId &&
+                        t.CreatorId == userId &&
                         t.Status.Name != "Завершено" &&
                         DbFunctions.TruncateTime(t.EndDate) < today)
                     .ToList();
@@ -236,7 +236,7 @@ namespace ProjectSystemHelpStudents
                 string to;
                 using (var ctx = new Model.TaskManagementEntities1())
                 {
-                    to = ctx.Users.Find(t.IdUser)?.Mail;
+                    to = ctx.Users.Find(t.CreatorId)?.Mail;
                 }
                 if (string.IsNullOrWhiteSpace(to)) return;
 

@@ -52,7 +52,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                 {
                     var allTasks = context.Task
                         .Include("Status")
-                        .Where(t => t.IdUser == UserSession.IdUser)
+                        .Where(t => t.CreatorId == UserSession.IdUser)
                         .ToList();
 
                     var vms = allTasks.Select(t => new TaskViewModel
