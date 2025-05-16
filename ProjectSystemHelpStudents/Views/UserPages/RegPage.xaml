@@ -3,26 +3,58 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:ProjectSystemHelpStudents.UsersContent"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
       Title="RegPage">
 
+    <Page.Resources>
+        <SolidColorBrush x:Key="ErrorBrush" Color="#FF5555"/>
+    </Page.Resources>
+
     <Grid>
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="Вход в систему" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center"/>
-            <TextBlock Text="Введите логин:" Style="{StaticResource NormalTextBlockStyle}"/>
-            <TextBox x:Name="txbLogin" Style="{StaticResource InputFieldStyle}" TextChanged="txbLogin_TextChanged" />
-            <TextBlock Text="Введите пароль:" Style="{StaticResource NormalTextBlockStyle}"/>
-            <TextBox x:Name="txbPassword" Style="{StaticResource InputFieldStyle}" Visibility="Collapsed"/>
-            <PasswordBox x:Name="psbPassword" Style="{StaticResource PasswordInputFieldStyle}" Visibility="Visible"/>
-            <CheckBox x:Name="chkShowPassword" Content="Показать пароль" Style="{StaticResource CheckboxStyle}" Checked="chkShowPassword_Checked" Unchecked="chkShowPassword_Unchecked"/>
-            <TextBlock Text="Введите ФИО:" Style="{StaticResource NormalTextBlockStyle}"/>
-            <TextBox x:Name="txbName" Style="{StaticResource InputFieldStyle}" TextChanged="txbName_TextChanged" />
-            <TextBlock Text="Введите почту:" Style="{StaticResource NormalTextBlockStyle}"/>
-            <TextBox x:Name="txbMail" Style="{StaticResource InputFieldStyle}" TextChanged="txbMail_TextChanged" />
-            <Button x:Name="btnLogIn" Content="Зарегистрироваться" Style="{StaticResource LoginButtonStyle}" Click="btnLogIn_Click"/>
-            <Button x:Name="btnBack" Content="Назад" Style="{StaticResource NavigationButtonStyle}" Click="btnBack_Click"/>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Width="300">
+            <TextBlock Text="Регистрация" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center"/>
+
+            <TextBlock Text="Логин:" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox x:Name="txbLogin"
+                     Style="{StaticResource InputFieldStyle}"
+                     TextChanged="txbLogin_TextChanged"/>
+
+            <TextBlock Text="Пароль:" Style="{StaticResource NormalTextBlockStyle}"/>
+            <PasswordBox x:Name="psbPassword"
+                         Style="{StaticResource PasswordInputFieldStyle}"
+                         PasswordChanged="psbPassword_PasswordChanged"/>
+
+            <TextBox x:Name="txbPassword"
+                     Style="{StaticResource InputFieldStyle}"
+                     Visibility="Collapsed"
+                     TextChanged="txbPassword_TextChanged"/>
+            
+            <CheckBox x:Name="chkShowPassword"
+                      Content="Показать пароль"
+                      Style="{StaticResource CheckboxStyle}"
+                      Checked="chkShowPassword_Checked"
+                      Unchecked="chkShowPassword_Unchecked"/>
+
+            <TextBlock Text="ФИО:" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox x:Name="txbName"
+                     Style="{StaticResource InputFieldStyle}"
+                     TextChanged="txbName_TextChanged"/>
+
+            <TextBlock Text="Email:" Style="{StaticResource NormalTextBlockStyle}"/>
+            <TextBox x:Name="txbMail"
+                     Style="{StaticResource InputFieldStyle}"
+                     TextChanged="txbMail_TextChanged"/>
+
+            <Button x:Name="btnLogIn"
+                    Content="Зарегистрироваться"
+                    Style="{StaticResource LoginButtonStyle}"
+                    Click="btnLogIn_Click"
+                    IsEnabled="{Binding CanRegister, RelativeSource={RelativeSource AncestorType=Page}}"/>
+
+            <Button x:Name="btnBack"
+                    Content="Назад"
+                    Style="{StaticResource NavigationButtonStyle}"
+                    Click="btnBack_Click"/>
         </StackPanel>
     </Grid>
 </Page>

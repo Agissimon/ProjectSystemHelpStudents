@@ -128,11 +128,13 @@
     </Compile>
     <Compile Include="Helper\ExpanderStateManager.cs" />
     <Compile Include="Helper\FileItem.cs" />
+    <Compile Include="Helper\InverseBoolConverter.cs" />
     <Compile Include="Helper\NullToBoolConverter.cs" />
     <Compile Include="Helper\NullToVisibilityConverter.cs" />
     <Compile Include="Helper\PasswordHelper.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
     <Compile Include="Helper\StatusToVisibilityConverter.cs" />
+    <Compile Include="Helper\TaskExtensions.cs" />
     <Compile Include="Helper\TaskLabel.cs" />
     <Compile Include="Helper\TimeOnlyConverter.cs" />
     <Compile Include="Labels.cs">
@@ -182,6 +184,9 @@
     <Compile Include="TaskAssignee.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="TaskFilters.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="TaskLabels.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -197,6 +202,7 @@
     <Compile Include="Users.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\AssigneeViewModel.cs" />
     <Compile Include="ViewModels\BoardViewControl.cs" />
     <Compile Include="ViewModels\CommentItem.cs" />
     <Compile Include="ViewModels\ExecutorViewModel.cs" />

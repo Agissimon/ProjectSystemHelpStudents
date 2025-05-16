@@ -12,22 +12,14 @@ namespace ProjectSystemHelpStudents
     using System;
     using System.Collections.Generic;
     
-    public partial class Filters
+    public partial class TaskFilters
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Filters()
-        {
-            this.TaskFilters = new HashSet<TaskFilters>();
-        }
-    
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Query { get; set; }
-        public Nullable<int> UserId { get; set; }
-        public string Color { get; set; }
+        public int FilterId { get; set; }
+        public int TaskId { get; set; }
+        public System.DateTime AppliedAt { get; set; }
     
-        public virtual Users Users { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<TaskFilters> TaskFilters { get; set; }
+        public virtual Filters Filters { get; set; }
+        public virtual Task Task { get; set; }
     }
 }

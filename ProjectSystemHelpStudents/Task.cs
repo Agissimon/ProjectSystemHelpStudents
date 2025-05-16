@@ -21,6 +21,7 @@ namespace ProjectSystemHelpStudents
             this.Files = new HashSet<Files>();
             this.TaskLabels = new HashSet<TaskLabels>();
             this.TaskAssignee = new HashSet<TaskAssignee>();
+            this.TaskFilters = new HashSet<TaskFilters>();
         }
     
         public int IdTask { get; set; }
@@ -47,5 +48,7 @@ namespace ProjectSystemHelpStudents
         public virtual Users Users { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaskAssignee> TaskAssignee { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<TaskFilters> TaskFilters { get; set; }
     }
 }

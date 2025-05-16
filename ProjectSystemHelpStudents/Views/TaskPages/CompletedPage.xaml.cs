@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Data.Entity;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -18,27 +19,33 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             try
             {
-                var completedTasks = DBClass.entities.Task
-                    .Where(t => t.Status != null && t.Status.Name == "Завершено" && t.CreatorId == UserSession.IdUser)
-                    .Select(t => new TaskViewModel
-                    {
-                        Title = t.Title,
-                        Description = t.Description,
-                        Status = t.Status.Name,
-                        EndDate = t.EndDate,
-                        IsCompleted = true
-                    })
-                    .ToList();
-
-                foreach (var task in completedTasks)
+                using (var ctx = new TaskManagementEntities1())
                 {
-                    task.EndDateFormatted = task.EndDate != DateTime.MinValue
-                        ? task.EndDate.ToString("dd MMMM yyyy")
-                        : "Без срока";
-                }
+                    int userId = UserSession.IdUser;
+                    var completedTasks = ctx.Task
+                        .Include("Status")
+                        .Include("TaskAssignee")
+                        .ForUser(userId)
+                        .Where(t => t.Status.Name == "Завершено")
+                        .Select(t => new TaskViewModel
+                        {
+                            IdTask = t.IdTask,
+                            CreatorId = t.CreatorId,
+                            Title = t.Title,
+                            Description = t.Description,
+                            Status = t.Status.Name,
+                            EndDate = t.EndDate,
+                            IsCompleted = true
+                        })
+                        .ToList();
 
-                TasksListView.ItemsSource = null;
-                TasksListView.ItemsSource = completedTasks;
+                    completedTasks.ForEach(vm =>
+                        vm.EndDateFormatted = vm.EndDate != DateTime.MinValue
+                            ? vm.EndDate.ToString("dd MMMM yyyy")
+                            : "Без срока");
+
+                    TasksListView.ItemsSource = completedTasks;
+                }
             }
             catch (Exception ex)
             {
@@ -46,26 +53,27 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
         }
 
-
         private void ToggleTaskStatus_Click(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;
-            var task = checkBox.DataContext as TaskViewModel;
+            var vm = checkBox?.DataContext as TaskViewModel;
+            if (vm == null) return;
 
-            if (task != null)
-            {
-                var dbTask = DBClass.entities.Task.FirstOrDefault(t => t.Title == task.Title);
-                if (dbTask != null)
-                {
-                    dbTask.StatusId = (int)(checkBox.IsChecked == true
-                        ? DBClass.entities.Status.FirstOrDefault(s => s.Name == "Завершено")?.StatusId
-                        : DBClass.entities.Status.FirstOrDefault(s => s.Name == "Не завершено")?.StatusId);
+            var dbTask = DBClass.entities.Task
+                             .FirstOrDefault(t => t.IdTask == vm.IdTask);
+            if (dbTask == null) return;
 
-                    DBClass.entities.SaveChanges();
+            var newStatusName = checkBox.IsChecked == true
+                                ? "Завершено"
+                                : "Не завершено";
+            var newStatus = DBClass.entities.Status
+                            .FirstOrDefault(s => s.Name == newStatusName);
+            if (newStatus == null) return;
 
-                    LoadTasks();
-                }
-            }
+            dbTask.StatusId = newStatus.StatusId;
+            DBClass.entities.SaveChanges();
+
+            LoadTasks();
         }
 
         private void DeleteHistory_Click(object sender, RoutedEventArgs e)
@@ -73,22 +81,30 @@ namespace ProjectSystemHelpStudents.UsersContent
             try
             {
                 var completedTasks = DBClass.entities.Task
-                    .Where(t => t.Status != null && t.Status.Name == "Завершено")
+                    .Where(t => t.Status != null
+                                && t.Status.Name == "Завершено"
+                                && t.CreatorId == UserSession.IdUser)
                     .ToList();
 
-                DBClass.entities.Task.RemoveRange(completedTasks);
-                DBClass.entities.SaveChanges();
-
-                MessageBox.Show("История завершенных задач очищена.");
+                if (completedTasks.Any())
+                {
+                    DBClass.entities.Task.RemoveRange(completedTasks);
+                    DBClass.entities.SaveChanges();
+                    MessageBox.Show("История ваших завершённых задач очищена.");
+                }
+                else
+                {
+                    MessageBox.Show("У вас нет завершённых задач для очистки.");
+                }
 
                 LoadTasks();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при удалении завершенных задач: " + ex.Message);
+                MessageBox.Show("Ошибка при удалении завершённых задач: " + ex.Message);
             }
         }
-    
+
         private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (sender is ListView listView && listView.SelectedItem is TaskViewModel selectedTask)

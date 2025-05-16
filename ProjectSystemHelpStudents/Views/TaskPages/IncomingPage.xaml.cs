@@ -46,35 +46,47 @@ namespace ProjectSystemHelpStudents.UsersContent
             {
                 using (var ctx = new TaskManagementEntities1())
                 {
+                    int userId = UserSession.IdUser;
+
+                    var inbox = ctx.Project
+                        .FirstOrDefault(p => p.Name == "Входящие" && p.OwnerId == userId);
+                    if (inbox == null)
+                    {
+                        inbox = new Project { Name = "Входящие", OwnerId = userId };
+                        ctx.Project.Add(inbox);
+                        ctx.SaveChanges();
+                    }
+                    int inboxId = inbox.ProjectId;
+
                     var incoming = ctx.Task
-                        .Include(t => t.Status)
-                        .Include(t => t.Project)
+                        .Include("Status")
+                        .Include("TaskAssignee")
+                        .ForUser(userId)
                         .Where(t =>
-                            t.Project.Name == "Входящие" &&
-                            t.CreatorId == UserSession.IdUser)
+                            (t.ProjectId.HasValue && t.ProjectId.Value == inboxId)
+                            || !t.ProjectId.HasValue
+                        )
+                        .Where(t => t.Status.Name != "Завершено")
                         .ToList();
 
-                    var vms = incoming
-                        .Select(t => new TaskViewModel
-                        {
-                            IdTask = t.IdTask,
-                            Title = t.Title,
-                            Description = t.Description,
-                            IsCompleted = t.Status?.Name == "Завершено",
-                            EndDate = t.EndDate,
-                            EndDateFormatted = t.EndDate != DateTime.MinValue
-                                              ? t.EndDate.ToString("dd MMMM yyyy")
-                                              : "Без срока"
-                        })
-                        .Where(vm => !vm.IsCompleted)
-                        .ToList();
+                    var vms = incoming.Select(t => new TaskViewModel
+                    {
+                        IdTask = t.IdTask,
+                        Title = t.Title,
+                        Description = t.Description,
+                        IsCompleted = false,
+                        EndDate = t.EndDate,
+                        EndDateFormatted = t.EndDate != DateTime.MinValue
+                                          ? t.EndDate.ToString("dd MMMM yyyy")
+                                          : "Без срока"
+                    }).ToList();
 
                     TasksListView.ItemsSource = vms;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при загрузке задач: " + ex.Message,
+                MessageBox.Show("Ошибка при загрузке входящих задач: " + ex.Message,
                                 "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

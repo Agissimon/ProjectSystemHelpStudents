@@ -26,19 +26,34 @@ namespace ProjectSystemHelpStudents
             {
                 var dbTask = ctx.Task
                     .Include(t => t.Status)
+                    .Include(t => t.TaskAssignee)
                     .FirstOrDefault(t => t.IdTask == task.IdTask);
 
-                if (dbTask != null)
+                if (dbTask == null)
                 {
-                    task.Title = dbTask.Title;
-                    task.Description = dbTask.Description;
-                    task.EndDate = dbTask.EndDate;
-                    task.ProjectId = dbTask.ProjectId ?? 0;
-                    task.PriorityId = dbTask.PriorityId;
-                    task.IsCompleted = dbTask.Status?.Name == "Завершено";
-                    task.IdUser = dbTask.CreatorId;
-                    task.ReminderDate = dbTask.ReminderDate;
+                    MessageBox.Show("Задача не найдена.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    this.Loaded += (_, __) => this.Close();
+                    return;
                 }
+
+                // проверяем, что либо вы — автор, либо ваша запись всё ещё в TaskAssignee
+                bool amIAssigned = dbTask.TaskAssignee.Any(ta => ta.UserId == UserSession.IdUser);
+                if (!amIAssigned && dbTask.CreatorId != UserSession.IdUser)
+                {
+                    MessageBox.Show("У вас нет прав на просмотр этой задачи.", "Доступ запрещён",
+                                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                    this.Loaded += (_, __) => this.Close();
+                    return;
+                }
+
+                task.Title = dbTask.Title;
+                task.Description = dbTask.Description;
+                task.EndDate = dbTask.EndDate;
+                task.ProjectId = dbTask.ProjectId ?? 0;
+                task.PriorityId = dbTask.PriorityId;
+                task.IsCompleted = dbTask.Status?.Name == "Завершено";
+                task.IdUser = dbTask.CreatorId;
+                task.ReminderDate = dbTask.ReminderDate;
             }
 
             _task = task;
@@ -56,17 +71,13 @@ namespace ProjectSystemHelpStudents
             int currentUser = UserSession.IdUser;
             using (var ctx = new TaskManagementEntities1())
             {
-                var personal = ctx.Project
-                                  .Where(p => p.OwnerId == currentUser)
-                                  .ToList();
+                var personal = ctx.Project.Where(p => p.OwnerId == currentUser).ToList();
 
                 var teamIds = ctx.TeamMember
                                  .Where(tm => tm.UserId == currentUser)
                                  .Select(tm => tm.TeamId)
                                  .Union(
-                                    ctx.Team
-                                       .Where(t => t.LeaderId == currentUser)
-                                       .Select(t => t.TeamId)
+                                    ctx.Team.Where(t => t.LeaderId == currentUser).Select(t => t.TeamId)
                                  )
                                  .Distinct()
                                  .ToList();
@@ -147,49 +158,44 @@ namespace ProjectSystemHelpStudents
         private void LoadAssignees()
         {
             int currentUser = UserSession.IdUser;
-
             using (var ctx = new TaskManagementEntities1())
             {
-                var memberTeamIds = ctx.TeamMember
-                    .Where(tm => tm.UserId == currentUser)
-                    .Select(tm => tm.TeamId);
+                // Все пользователи из вашей команды/проекта
+                var teamIds = ctx.TeamMember
+                                 .Where(tm => tm.UserId == currentUser)
+                                 .Select(tm => tm.TeamId)
+                                 .Union(ctx.Team.Where(t => t.LeaderId == currentUser).Select(t => t.TeamId))
+                                 .ToList();
 
-                var leaderTeamIds = ctx.Team
-                    .Where(t => t.LeaderId == currentUser)
-                    .Select(t => t.TeamId);
+                var allowedIds = ctx.TeamMember
+                                   .Where(tm => teamIds.Contains(tm.TeamId))
+                                   .Select(tm => tm.UserId)
+                               .Union(ctx.Team.Where(t => teamIds.Contains(t.TeamId)).Select(t => t.LeaderId))
+                                   .Distinct()
+                                   .ToList();
 
-                var teamIds = memberTeamIds
-                    .Union(leaderTeamIds)
-                    .ToList();
+                var users = ctx.Users.Where(u => allowedIds.Contains(u.IdUser)).ToList();
 
-                var memberIds = ctx.TeamMember
-                    .Where(tm => teamIds.Contains(tm.TeamId))
-                    .Select(tm => tm.UserId);
+                // Загрузка автора и уже назначенных
+                var dbTask = ctx.Task.Find(_task.IdTask);
+                var creatorId = dbTask.CreatorId;
+                var assignedIds = ctx.TaskAssignee
+                                     .Where(ta => ta.TaskId == _task.IdTask)
+                                     .Select(ta => ta.UserId)
+                                     .ToList();
 
-                var leaderIds = ctx.Team
-                    .Where(t => teamIds.Contains(t.TeamId))
-                    .Select(t => t.LeaderId);
-
-                var allowedIds = memberIds
-                    .Union(leaderIds)
-                    .Distinct()       
-                    .ToList();
-
-                var allowedUsers = ctx.Users
-                    .Where(u => allowedIds.Contains(u.IdUser))
-                    .ToList();
-
-                var currentAssignee = ctx.Users.Find(_task.IdUser);
-                if (currentAssignee != null
-                 && !allowedUsers.Any(u => u.IdUser == currentAssignee.IdUser))
+                _task.Assignees.Clear();
+                foreach (var u in users)
                 {
-                    allowedUsers.Insert(0, currentAssignee);
+                    _task.Assignees.Add(new AssigneeViewModel
+                    {
+                        UserId = u.IdUser,
+                        Name = u.Name,
+                        IsCreator = u.IdUser == creatorId,
+                        IsAssigned = assignedIds.Contains(u.IdUser) || u.IdUser == creatorId
+                    });
                 }
-
-                AssignedToComboBox.ItemsSource = allowedUsers;
             }
-
-            AssignedToComboBox.SelectedValue = _task.IdUser;
         }
 
         private class UserComparer : IEqualityComparer<Users>
@@ -208,55 +214,58 @@ namespace ProjectSystemHelpStudents
                 _task.EndDate = EndDatePicker.SelectedDate ?? DateTime.Now;
                 _task.ProjectId = (int?)(ProjectComboBox.SelectedValue) ?? _task.ProjectId;
                 _task.PriorityId = (int?)(PriorityComboBox.SelectedValue) ?? _task.PriorityId;
-                _task.IdUser = (int?)(AssignedToComboBox.SelectedValue) ?? _task.IdUser;
-                DateTime? newReminder = null;
+
+                DateTime? newRem = null;
                 if (dpEditRemindDate.SelectedDate.HasValue
                     && TimeSpan.TryParse(tbEditRemindTime.Text, out var ts))
                 {
-                    newReminder = dpEditRemindDate.SelectedDate.Value.Date + ts;
+                    newRem = dpEditRemindDate.SelectedDate.Value.Date + ts;
                 }
 
                 using (var ctx = new TaskManagementEntities1())
                 {
                     var dbTask = ctx.Task
-                                .Include(t => t.TaskLabels)
-                                .FirstOrDefault(t => t.IdTask == _task.IdTask);
-                    if (dbTask == null)
-                        throw new InvalidOperationException("Задача не найдена в базе");
+                        .Include(t => t.TaskLabels)
+                        .Include(t => t.TaskAssignee)
+                        .FirstOrDefault(t => t.IdTask == _task.IdTask);
 
-                    dbTask.ReminderDate = newReminder;
+                    if (dbTask == null)
+                        throw new InvalidOperationException("Задача не найдена");
+
                     dbTask.Title = _task.Title;
                     dbTask.Description = _task.Description;
                     dbTask.EndDate = _task.EndDate;
                     dbTask.ProjectId = _task.ProjectId;
                     dbTask.PriorityId = _task.PriorityId;
-                    dbTask.CreatorId = _task.IdUser;
+                    dbTask.ReminderDate = newRem;
 
                     ctx.TaskLabels.RemoveRange(dbTask.TaskLabels);
-                    foreach (var labelVm in _task.AvailableLabels.Where(l => l.IsSelected))
-                    {
-                        ctx.TaskLabels.Add(new TaskLabels
-                        {
-                            TaskId = _task.IdTask,
-                            LabelId = labelVm.Id
-                        });
-                    }
+                    foreach (var lab in _task.AvailableLabels.Where(l => l.IsSelected))
+                        ctx.TaskLabels.Add(new TaskLabels { TaskId = _task.IdTask, LabelId = lab.Id });
+
+                    // назначения не трогаем автора
+                    var toRemove = dbTask.TaskAssignee
+                        .Where(ta => !_task.Assignees.Any(vm => vm.IsAssigned && vm.UserId == ta.UserId)
+                                     && ta.UserId != dbTask.CreatorId)
+                        .ToList();
+                    ctx.TaskAssignee.RemoveRange(toRemove);
+
+                    var exist = dbTask.TaskAssignee.Select(ta => ta.UserId).ToList();
+                    var toAdd = _task.Assignees
+                        .Where(vm => vm.IsAssigned && !exist.Contains(vm.UserId))
+                        .Select(vm => new TaskAssignee { TaskId = _task.IdTask, UserId = vm.UserId });
+                    ctx.TaskAssignee.AddRange(toAdd);
 
                     ctx.SaveChanges();
                 }
 
-                MessageBox.Show("Задача успешно сохранена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Задача сохранена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 TaskUpdated?.Invoke();
                 Close();
             }
-            catch (DbUpdateException dbEx)
-            {
-                var msg = dbEx.InnerException?.InnerException?.Message ?? dbEx.Message;
-                MessageBox.Show($"Ошибка при сохранении в БД:\n{msg}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -269,13 +278,11 @@ namespace ProjectSystemHelpStudents
                 {
                     var dbTask = ctx.Task.FirstOrDefault(t => t.IdTask == _task.IdTask);
                     if (dbTask == null)
-                        throw new InvalidOperationException("Задача не найдена при смене статуса");
+                        throw new InvalidOperationException("Задача не найдена");
 
-                    var doneStatus = ctx.Status.FirstOrDefault(s => s.Name == "Завершено");
-                    var undoneStatus = ctx.Status.FirstOrDefault(s => s.Name == "Не завершено");
-                    dbTask.StatusId = isDone
-                        ? doneStatus?.StatusId ?? dbTask.StatusId
-                        : undoneStatus?.StatusId ?? dbTask.StatusId;
+                    var done = ctx.Status.First(s => s.Name == "Завершено");
+                    var undone = ctx.Status.First(s => s.Name == "Не завершено");
+                    dbTask.StatusId = isDone ? done.StatusId : undone.StatusId;
 
                     ctx.SaveChanges();
                 }
@@ -283,14 +290,9 @@ namespace ProjectSystemHelpStudents
                 _task.IsCompleted = isDone;
                 TaskUpdated?.Invoke();
             }
-            catch (DbUpdateException dbEx)
-            {
-                var msg = dbEx.InnerException?.InnerException?.Message ?? dbEx.Message;
-                MessageBox.Show($"Ошибка при обновлении статуса в БД:\n{msg}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка обновления статуса: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при смене статуса: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
