@@ -38,11 +38,10 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="5">
-                            <Image Width="32" Height="32" Margin="0,0,8,0" Source="{Binding AvatarUrl}" />
                             <StackPanel>
-                                <TextBlock Text="{Binding Name}"
-                                           Style="{StaticResource NormalTextBlockStyle}" FontSize="18" Foreground="White"/>
                                 <TextBlock Text="{Binding Login}"
+                                           Style="{StaticResource NormalTextBlockStyle}" FontSize="18" Foreground="White"/>
+                                <TextBlock Text="{Binding Mail}"
                                            Style="{StaticResource SmallTextBlockStyle}"/>
                             </StackPanel>
                         </StackPanel>

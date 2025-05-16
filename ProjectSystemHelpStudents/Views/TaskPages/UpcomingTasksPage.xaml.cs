@@ -108,70 +108,44 @@ namespace ProjectSystemHelpStudents.UsersContent
             {
                 using (var ctx = new TaskManagementEntities1())
                 {
-                    int selExecutor = (int)(ExecutorComboBox.SelectedValue ?? 0);
-                    int selPriority = (int)(PriorityComboBox.SelectedValue ?? 0);
-                    int selLabel = (int)(LabelComboBox.SelectedValue ?? 0);
-                    int sortOption = Properties.Settings.Default.SortOption;
-
+                    int userId = UserSession.IdUser;
                     var query = ctx.Task
                         .Include("Status")
-                        .Include("Priority")
                         .Include("TaskLabels.Labels")
-                        .Where(t => t.Status.Name != "Завершено"
-                                 && t.CreatorId == UserSession.IdUser);
+                        .Include("TaskAssignee")
+                        .ForUser(userId)
+                        .Where(t => t.Status.Name != "Завершено");
 
-                    //if (selExecutor > 0)
-                    //    query = query.Where(t => t.ExecutorId == selExecutor);
+                    // фильтры (по приоритету, метке и т.п.)
+                    int selPriority = (int)(PriorityComboBox.SelectedValue ?? 0);
+                    int selLabel = (int)(LabelComboBox.SelectedValue ?? 0);
                     if (selPriority > 0)
                         query = query.Where(t => t.PriorityId == selPriority);
                     if (selLabel > 0)
                         query = query.Where(t => t.TaskLabels.Any(tl => tl.LabelId == selLabel));
 
-                    switch (sortOption)
-                    {
-                        case 0:
-                            query = query.OrderBy(t => t.EndDate);
-                            break;
-                        case 1:
-                            query = query.OrderBy(t => t.Priority.PriorityId);
-                            break;
-                        default:
-                            query = query
-                                .OrderByDescending(t => t.EndDate)
-                                .ThenBy(t => t.Priority.PriorityId);
-                            break;
-                    }
+                    // сортировка
+                    query = query.OrderBy(t => t.EndDate);
 
                     var allTasks = query
                         .ToList()
-                        .Select(t =>
+                        .Select(t => new TaskViewModel
                         {
-                            string hdr;
-                            if (t.EndDate.Date == DateTime.Today)
-                                hdr = $"{DateTime.Today:dd MMMM} ‧ Сегодня ‧ {DateTime.Today:dddd}";
-                            else if (t.EndDate.Date == DateTime.Today.AddDays(1))
-                                hdr = $"{DateTime.Today.AddDays(1):dd MMMM} ‧ Завтра ‧ {DateTime.Today.AddDays(1):dddd}";
-                            else
-                                hdr = $"{t.EndDate:dd MMMM} ‧ {t.EndDate:dddd}";
-
-                            return new TaskViewModel
-                            {
-                                IdTask = t.IdTask,
-                                Title = t.Title,
-                                Description = t.Description,
-                                Status = t.Status?.Name,
-                                EndDate = t.EndDate,
-                                IsCompleted = t.Status?.Name == "Завершено",
-                                EndDateFormatted = hdr,
-                                AvailableLabels = new ObservableCollection<LabelViewModel>(
-                                        t.TaskLabels.Select(l => new LabelViewModel
-                                        {
-                                            Id = l.Labels.Id,
-                                            Name = l.Labels.Name,
-                                            HexColor = l.Labels.Color
-                                        }))
-
-                            };
+                            IdTask = t.IdTask,
+                            Title = t.Title,
+                            Description = t.Description,
+                            Status = t.Status.Name,
+                            EndDate = t.EndDate,
+                            EndDateFormatted = t.EndDate != DateTime.MinValue
+                                ? t.EndDate.ToString("dd MMMM yyyy")
+                                : "Без срока",
+                            AvailableLabels = new ObservableCollection<LabelViewModel>(
+                                t.TaskLabels.Select(l => new LabelViewModel
+                                {
+                                    Id = l.Labels.Id,
+                                    Name = l.Labels.Name,
+                                    HexColor = l.Labels.Color
+                                }))
                         })
                         .ToList();
 

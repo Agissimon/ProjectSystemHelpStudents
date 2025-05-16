@@ -48,35 +48,32 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             try
             {
-                using (var context = new TaskManagementEntities1())
+                using (var ctx = new TaskManagementEntities1())
                 {
-                    var allTasks = context.Task
+                    int userId = UserSession.IdUser;
+                    var all = ctx.Task
                         .Include("Status")
-                        .Where(t => t.CreatorId == UserSession.IdUser)
+                        .Include("TaskAssignee")
+                        .ForUser(userId)
                         .ToList();
 
-                    var vms = allTasks.Select(t => new TaskViewModel
+                    var vms = all.Select(t => new TaskViewModel
                     {
                         IdTask = t.IdTask,
                         Title = t.Title,
                         Description = t.Description,
-                        IsCompleted = t.Status != null && t.Status.Name == "Завершено",
+                        IsCompleted = t.Status.Name == "Завершено",
                         EndDate = t.EndDate,
                         EndDateFormatted = t.EndDate != DateTime.MinValue
-                            ? t.EndDate.ToString("dd MMMM yyyy")
-                            : "Без срока"
-                    })
-                    .ToList();
+                                              ? t.EndDate.ToString("dd MMMM yyyy")
+                                              : "Без срока"
+                    }).ToList();
 
                     var overdue = vms
-                        .Where(vm => vm.EndDate != DateTime.MinValue
-                                  && vm.EndDate.Date < DateTime.Today
-                                  && !vm.IsCompleted)
+                        .Where(vm => vm.EndDate.Date < DateTime.Today && !vm.IsCompleted)
                         .ToList();
-
                     var today = vms
-                        .Where(vm => vm.EndDate.Date == DateTime.Today
-                                  && !vm.IsCompleted)
+                        .Where(vm => vm.EndDate.Date == DateTime.Today && !vm.IsCompleted)
                         .ToList();
 
                     OverdueTasksListView.ItemsSource = overdue;
@@ -85,7 +82,8 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при загрузке задач: " + ex.Message);
+                MessageBox.Show("Ошибка при загрузке задач: " + ex.Message,
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

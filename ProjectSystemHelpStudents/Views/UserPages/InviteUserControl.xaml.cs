@@ -42,7 +42,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
             set => txtTeamName.Text = $"Пригласить в команду «{value}»";
         }
 
-        // Список найденных пользователей (EF entity Users)
+        // Список найденных пользователей
         public ObservableCollection<Users> Users { get; } = new ObservableCollection<Users>();
 
         private Users _selectedUser;

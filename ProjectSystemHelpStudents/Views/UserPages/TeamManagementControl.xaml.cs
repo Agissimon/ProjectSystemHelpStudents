@@ -173,11 +173,9 @@ namespace ProjectSystemHelpStudents.Views.UserPages
             var invites = _ctx.TeamInvitation.Where(ti => ti.TeamId == teamEntity.TeamId).ToList();
             _ctx.TeamInvitation.RemoveRange(invites);
 
-            // Удаляем участников
             var members = _ctx.TeamMember.Where(tm => tm.TeamId == teamEntity.TeamId).ToList();
             _ctx.TeamMember.RemoveRange(members);
 
-            // Наконец удаляем саму команду
             _ctx.Team.Remove(teamEntity);
 
             _ctx.SaveChanges();

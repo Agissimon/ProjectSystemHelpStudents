@@ -41,5 +41,6 @@ namespace ProjectSystemHelpStudents
         public virtual DbSet<TeamInvitation> TeamInvitation { get; set; }
         public virtual DbSet<TeamMember> TeamMember { get; set; }
         public virtual DbSet<Users> Users { get; set; }
+        public virtual DbSet<TaskFilters> TaskFilters { get; set; }
     }
 }

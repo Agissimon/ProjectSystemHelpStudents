@@ -1,4 +1,5 @@
 ﻿using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +10,9 @@ namespace ProjectSystemHelpStudents.Helper
 {
     public class TaskViewModel : INotifyPropertyChanged
     {
+        public ObservableCollection<AssigneeViewModel> Assignees { get; } =
+                new ObservableCollection<AssigneeViewModel>();
+
         public ObservableCollection<LabelViewModel> AvailableLabels { get; set; }
         public string LabelsFormatted => AvailableLabels != null
         ? string.Join(", ", AvailableLabels.Select(l => l.Name))
@@ -23,6 +27,7 @@ namespace ProjectSystemHelpStudents.Helper
         private int _IdLabel;
 
         public int IdUser { get; set; }
+        public int CreatorId { get; set; }
         public bool IsPinned { get; set; }
         public int? SectionId { get; set; }
         public string Section { get; set; } 
@@ -149,10 +154,7 @@ namespace ProjectSystemHelpStudents.Helper
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(string propertyName)
-        {
+        protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

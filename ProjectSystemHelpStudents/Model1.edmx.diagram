@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="512e58a077b2478082b47abcd8180283" Name="Diagram1" ZoomLevel="93">
+      <Diagram DiagramId="512e58a077b2478082b47abcd8180283" Name="Diagram1" ZoomLevel="60">
         <EntityTypeShape EntityType="TaskManagementModel1.Comment" Width="1.5" PointX="3" PointY="8.75" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel1.Files" Width="1.5" PointX="13" PointY="14.125" IsExpanded="true" />
         <EntityTypeShape EntityType="TaskManagementModel1.Filters" Width="1.5" PointX="3" PointY="12.375" IsExpanded="true" />
@@ -43,6 +43,9 @@
         <AssociationConnector Association="TaskManagementModel1.FK_Invitation_Invitee" ManuallyRouted="false" />
         <AssociationConnector Association="TaskManagementModel1.FK_Invitation_Inviter" ManuallyRouted="false" />
         <AssociationConnector Association="TaskManagementModel1.FK_TeamMember_User" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="TaskManagementModel1.TaskFilters" Width="1.5" PointX="16" PointY="13.875" />
+        <AssociationConnector Association="TaskManagementModel1.FK_TaskFilters_Filters" />
+        <AssociationConnector Association="TaskManagementModel1.FK_TaskFilters_Task" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

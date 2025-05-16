@@ -12,6 +12,7 @@
 
     <Window.Resources>
         <local:TimeOnlyConverter x:Key="TimeOnlyConverter"/>
+        <local:InverseBoolConverter x:Key="InverseBoolConverter"/>
     </Window.Resources>
     
     <Grid Margin="10">
@@ -32,18 +33,25 @@
                          TextWrapping="Wrap" AcceptsReturn="True" Width="492"/>
 
                 <TextBlock Text="Добавить комментарий" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,5"/>
-
                 <ListBox x:Name="CommentsListBox"
                          Style="{StaticResource DarkListBoxStyle}"
                          Background="Transparent"
                          BorderThickness="0"
                          Padding="0">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:CommentItem}">
-                            <Border Background="#2A2A2A"   
-                                CornerRadius="4"
-                                Padding="10"
-                                Margin="0,6">
+                            <Border Background="#2A2A2A"
+                                    CornerRadius="4"
+                                    Padding="10"
+                                    Margin="0,6">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition/>
@@ -55,7 +63,7 @@
                                             <TextBlock Text="{Binding UserName}"
                                                         FontWeight="Bold"
                                                         Foreground="White"/>
-                                            <TextBlock Text="{Binding CreatedAt, StringFormat='dd.MM.yyyy HH:mm'}"
+                                            <TextBlock Text="{Binding CreatedAt, StringFormat='dd.MM.yyyy HH:mm'}" Margin="5"
                                                         FontSize="10"
                                                         Foreground="#888"
                                                         DockPanel.Dock="Right"/>
@@ -78,9 +86,9 @@
                             </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
-                </ListBox>
-                
-                <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                    </ListBox>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
                     <TextBox x:Name="CommentTextBox" Style="{StaticResource InputFieldStyle}" TextWrapping="Wrap" AcceptsReturn="True" Width="415"/>
                     <Button Width="43" Height="43" Background="Transparent" Foreground="Gray" BorderBrush="Transparent" Click="AddFileButton_Click">
                         <Image Source="/Resources/Icon/iconscrepki.png" Width="30" Height="30" />
@@ -88,32 +96,31 @@
                     <Button Content=">" FontSize="30" Background="Transparent" Foreground="Gray" BorderBrush="Transparent" Width="43" Click="SendingCommentButton_Click" />
                 </StackPanel>
 
-                <StackPanel Orientation="Vertical" Margin="10">
-                    <TextBlock Text="Список файлов" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,5"/>
-                    <ListBox x:Name="FilesListBox" Style="{StaticResource DarkListBoxStyle}" MouseDoubleClick="FilesListBox_MouseDoubleClick">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel LastChildFill="True">
-                                    <Button Content="✖"
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <TextBlock Text="Список файлов" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,5"/>
+                        <ListBox x:Name="FilesListBox" Style="{StaticResource DarkListBoxStyle}" MouseDoubleClick="FilesListBox_MouseDoubleClick">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel LastChildFill="True">
+                                        <Button Content="✖"
                                         Click="DeleteFileButton_Click"
                                         Style="{StaticResource TransparentButtonStyle}"
                                         Width="20"
                                         HorizontalAlignment="Right"
                                         Margin="5"
                                         DockPanel.Dock="Right">
-                                        <Button.ToolTip>
-                                            Удалить этот файл
-                                        </Button.ToolTip>
-                                    </Button>
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding FileName}" Foreground="White" FontSize="14"/>
-                                    </StackPanel>
-                                </DockPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </StackPanel>
-
+                                            <Button.ToolTip>
+                                                Удалить этот файл
+                                            </Button.ToolTip>
+                                        </Button>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding FileName}" Foreground="White" FontSize="14"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
             </StackPanel>
 
             <StackPanel Orientation="Vertical" Width="177">
@@ -135,14 +142,20 @@
                       SelectedValuePath="PriorityId"
                       SelectedValue="{Binding PriorityId, Mode=TwoWay}"/>
 
-                <TextBlock Text="Исполнитель" 
-                        Style="{StaticResource TransparentTextBlockStyle}" 
-                        Margin="0,10,0,5"/>
-                <ComboBox x:Name="AssignedToComboBox"
-                      Style="{StaticResource ComboBoxStyle}"
-                      DisplayMemberPath="Name"
-                      SelectedValuePath="IdUser"
-                      SelectedValue="{Binding IdUser, Mode=TwoWay}" />
+                <TextBlock Text="Исполнители" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,5"/>
+                <ScrollViewer MaxHeight="100" Style="{StaticResource MinimalDarkScrollViewer}">
+                    <ListBox ItemsSource="{Binding Assignees}"
+                 Style="{StaticResource DarkListBoxStyle}"
+                 BorderThickness="0">       
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Name}" Foreground="White"
+                          IsChecked="{Binding IsAssigned, Mode=TwoWay}"
+                          IsEnabled="{Binding IsCreator, Converter={StaticResource InverseBoolConverter}}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </ScrollViewer>
 
                 <StackPanel Orientation="Vertical">
                     <TextBlock Text="Метки" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,5"/>

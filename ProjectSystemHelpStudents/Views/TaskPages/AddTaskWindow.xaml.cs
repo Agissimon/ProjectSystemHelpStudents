@@ -71,7 +71,7 @@ namespace ProjectSystemHelpStudents
 
         private void SaveTask_Click(object sender, RoutedEventArgs e)
         {
-            // валидация
+            // 1. Валидация
             if (string.IsNullOrWhiteSpace(txtTitle.Text))
             {
                 MessageBox.Show("Введите название задачи.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -83,76 +83,120 @@ namespace ProjectSystemHelpStudents
                 return;
             }
 
-            // собираем EndDate и ReminderDate
-            var endDate = dpEndDate.SelectedDate.Value.Date;
-            if (!TimeSpan.TryParse(tbEndTime.Text, out var endTs))
+            DateTime endDate = dpEndDate.SelectedDate.Value.Date;
+            TimeSpan endTs;
+            if (!TimeSpan.TryParse(tbEndTime.Text, out endTs))
                 endTs = new TimeSpan(12, 0, 0);
-            DateTime endDateTime = endDate + endTs;
+            DateTime endDateTime = endDate.Add(endTs);
 
             DateTime? remindDateTime = null;
-            if (dpRemindDate.SelectedDate.HasValue
-             && TimeSpan.TryParse(tbRemindTime.Text, out var remTs))
-                remindDateTime = dpRemindDate.SelectedDate.Value.Date + remTs;
+            if (dpRemindDate.SelectedDate.HasValue)
+            {
+                TimeSpan remTs;
+                if (TimeSpan.TryParse(tbRemindTime.Text, out remTs))
+                    remindDateTime = dpRemindDate.SelectedDate.Value.Date.Add(remTs);
+            }
 
             try
             {
                 using (var ctx = new TaskManagementEntities1())
                 {
-                    var inboxProject = ctx.Project.FirstOrDefault(p => p.Name == "Входящие");
-                    if (inboxProject == null)
+                    int userId = UserSession.IdUser;
+
+                    Project inbox = ctx.Project
+                        .FirstOrDefault(p => p.Name == "Входящие" && p.OwnerId == userId);
+                    if (inbox == null)
                     {
-                        inboxProject = new Project { Name = "Входящие" };
-                        ctx.Project.Add(inboxProject);
+                        inbox = new Project { Name = "Входящие", OwnerId = userId };
+                        ctx.Project.Add(inbox);
                         ctx.SaveChanges();
                     }
+                    int inboxId = inbox.ProjectId;
 
                     int projectIdToUse;
-                    if (_projectId.HasValue && ctx.Project.Any(p => p.ProjectId == _projectId.Value))
-                        projectIdToUse = _projectId.Value;
+                    if (_projectId.HasValue)
+                    {
+                        Project proj = ctx.Project
+                            .FirstOrDefault(p => p.ProjectId == _projectId.Value && p.OwnerId == userId);
+                        if (proj != null)
+                            projectIdToUse = proj.ProjectId;
+                        else
+                            projectIdToUse = inboxId;
+                    }
                     else
-                        projectIdToUse = inboxProject.ProjectId;
+                    {
+                        projectIdToUse = inboxId;
+                    }
 
-                    var priorityName = (cmbPriority.SelectedItem as ComboBoxItem)?.Content?.ToString();
-                    var pr = ctx.Priority.FirstOrDefault(p => p.Name == priorityName);
-                    int priorityIdToUse = pr?.PriorityId
-                                          ?? ctx.Priority.OrderBy(p => p.PriorityId).First().PriorityId;
+                    Status undoneStatus = ctx.Status
+                        .FirstOrDefault(s => s.Name == "Не завершено");
+                    if (undoneStatus == null)
+                        throw new InvalidOperationException("Не найден статус 'Не завершено'");
 
-                    var undone = ctx.Status.FirstOrDefault(s => s.Name == "Не завершено")
-                                ?? throw new InvalidOperationException("Не найден статус 'Не завершено'");
+                    int priorityIdToUse;
+                    if (cmbPriority.SelectedItem is ComboBoxItem comboItem
+                        && comboItem.Content != null)
+                    {
+                        string priorityName = comboItem.Content.ToString();
+                        Priority pr = ctx.Priority
+                            .FirstOrDefault(p => p.Name == priorityName);
+                        if (pr != null)
+                            priorityIdToUse = pr.PriorityId;
+                        else
+                            priorityIdToUse = ctx.Priority.OrderBy(p => p.PriorityId).First().PriorityId;
+                    }
+                    else
+                    {
+                        priorityIdToUse = ctx.Priority.OrderBy(p => p.PriorityId).First().PriorityId;
+                    }
 
-                    int? sectionIdToUse = (_sectionId.HasValue && ctx.Section.Any(s => s.IdSection == _sectionId.Value))
-                                          ? _sectionId.Value
-                                          : (int?)null;
+                    int? sectionIdToUse = null;
+                    if (_sectionId.HasValue)
+                    {
+                        Section sec = ctx.Section
+                            .FirstOrDefault(s => s.IdSection == _sectionId.Value);
+                        if (sec != null)
+                            sectionIdToUse = sec.IdSection;
+                    }
 
-                    var newTask = new Task
+                    Task newTask = new Task
                     {
                         Title = txtTitle.Text.Trim(),
                         Description = txtDescription.Text.Trim(),
                         EndDate = endDateTime,
-                        StatusId = undone.StatusId,
-                        CreatorId = UserSession.IdUser,
+                        ReminderDate = remindDateTime,
+                        StatusId = undoneStatus.StatusId,
+                        CreatorId = userId,
                         PriorityId = priorityIdToUse,
                         ProjectId = projectIdToUse,
-                        SectionId = sectionIdToUse,
-                        ReminderDate = remindDateTime
+                        SectionId = sectionIdToUse
                     };
                     ctx.Task.Add(newTask);
                     ctx.SaveChanges();
 
-                    foreach (var lbl in _labelViewModels.Where(l => l.IsSelected))
+                    foreach (var lbl in _labelViewModels)
                     {
-                        ctx.TaskLabels.Add(new TaskLabels { TaskId = newTask.IdTask, LabelId = lbl.Id });
+                        if (lbl.IsSelected)
+                        {
+                            ctx.TaskLabels.Add(new TaskLabels
+                            {
+                                TaskId = newTask.IdTask,
+                                LabelId = lbl.Id
+                            });
+                        }
                     }
                     ctx.SaveChanges();
                 }
 
                 MessageBox.Show("Задача успешно добавлена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                DialogResult = true;
-                Close();
+                this.DialogResult = true;
+                this.Close();
             }
             catch (DbUpdateException dbEx)
             {
-                var msg = dbEx.InnerException?.InnerException?.Message ?? dbEx.Message;
+                string msg = dbEx.InnerException != null && dbEx.InnerException.InnerException != null
+                    ? dbEx.InnerException.InnerException.Message
+                    : dbEx.Message;
                 MessageBox.Show("Ошибка при сохранении в БД:\n" + msg, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
