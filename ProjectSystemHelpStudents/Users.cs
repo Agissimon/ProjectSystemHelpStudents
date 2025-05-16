@@ -36,6 +36,7 @@ namespace ProjectSystemHelpStudents
         public int RoleUser { get; set; }
         public string Mail { get; set; }
         public Nullable<bool> MustChangePassword { get; set; }
+        public Nullable<System.DateTime> LastPasswordResetRequest { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Comment> Comment { get; set; }

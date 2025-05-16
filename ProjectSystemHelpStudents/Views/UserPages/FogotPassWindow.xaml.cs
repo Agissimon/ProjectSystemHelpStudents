@@ -1,6 +1,5 @@
 ﻿using ProjectSystemHelpStudents.Helper;
 using System;
-using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
 using System.Net;
@@ -55,38 +54,22 @@ namespace ProjectSystemHelpStudents.UsersContent
                     return;
                 }
 
-                int userId = user.IdUser;
-
-                StringDictionary timestamps = Properties.Settings.Default.PasswordResetTimestamps;
-                if (timestamps == null)
+                if (user.LastPasswordResetRequest.HasValue &&
+                    DateTime.Now - user.LastPasswordResetRequest.Value < resetCooldown)
                 {
-                    timestamps = new StringDictionary();
-                    Properties.Settings.Default.PasswordResetTimestamps = timestamps;
+                    DateTime nextAllowed = user.LastPasswordResetRequest.Value.Add(resetCooldown);
+                    MessageBox.Show(
+                        "Новый временный пароль можно запросить не раньше, чем в " +
+                        nextAllowed.ToString("HH:mm:ss") + ".");
+                    return;
                 }
 
-                if (timestamps.ContainsKey(userId.ToString()))
-                {
-                    if (long.TryParse(timestamps[userId.ToString()], out long ticks))
-                    {
-                        DateTime lastRequest = new DateTime(ticks);
-                        if (DateTime.Now - lastRequest < resetCooldown)
-                        {
-                            DateTime nextAllowed = lastRequest.Add(resetCooldown);
-                            MessageBox.Show(
-                                "Новый временный пароль можно запросить не раньше, чем в " +
-                                nextAllowed.ToString("HH:mm:ss") + ".");
-                            return;
-                        }
-                    }
-                }
-
+                // Генерация и сохранение временного пароля
                 string tempPassword = GenerateTemporaryPassword();
                 user.Password = PasswordHelper.HashPassword(tempPassword);
                 user.MustChangePassword = true;
+                user.LastPasswordResetRequest = DateTime.Now;
                 context.SaveChanges();
-
-                timestamps[userId.ToString()] = DateTime.Now.Ticks.ToString();
-                Properties.Settings.Default.Save();
 
                 SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)
                 {
