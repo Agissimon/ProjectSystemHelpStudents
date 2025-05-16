@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -108,11 +109,21 @@ namespace ProjectSystemHelpStudents
         {
             using (var ctx = new TaskManagementEntities1())
             {
-                var comments = ctx.Comment
-                    .Where(c => c.IdTask == _task.IdTask)
-                    .OrderByDescending(c => c.CreatedAt)
-                    .ToList();
-                CommentsListBox.ItemsSource = new ObservableCollection<Comment>(comments);
+                var items = (from c in ctx.Comment
+                             where c.IdTask == _task.IdTask
+                             join u in ctx.Users on c.IdUser equals u.IdUser
+                             orderby c.CreatedAt descending
+                             select new CommentItem
+                             {
+                                 Id = c.Id,
+                                 IdUser = (int)c.IdUser,
+                                 UserName = u.Name,
+                                 Content = c.Content,
+                                 CreatedAt = (DateTime)c.CreatedAt
+                             })
+                            .ToList();
+
+                CommentsListBox.ItemsSource = new ObservableCollection<CommentItem>(items);
             }
         }
 
@@ -283,11 +294,6 @@ namespace ProjectSystemHelpStudents
             }
         }
 
-        private void ButtonAddSubTasks_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Добавление подзадач в разработке.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
         private void SendingCommentButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -384,12 +390,14 @@ namespace ProjectSystemHelpStudents
 
         private void DeleteCommentButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!(sender is Button btn && btn.DataContext is Comment comm)) return;
+            if (!(sender is Button btn && btn.CommandParameter is int commentId))
+                return;
+
             try
             {
                 using (var ctx = new TaskManagementEntities1())
                 {
-                    var dbComm = ctx.Comment.FirstOrDefault(c => c.Id == comm.Id);
+                    var dbComm = ctx.Comment.FirstOrDefault(c => c.Id == commentId);
                     if (dbComm != null)
                     {
                         ctx.Comment.Remove(dbComm);
