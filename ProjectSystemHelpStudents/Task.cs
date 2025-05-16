@@ -20,6 +20,7 @@ namespace ProjectSystemHelpStudents
             this.Comment = new HashSet<Comment>();
             this.Files = new HashSet<Files>();
             this.TaskLabels = new HashSet<TaskLabels>();
+            this.TaskAssignee = new HashSet<TaskAssignee>();
         }
     
         public int IdTask { get; set; }
@@ -28,10 +29,10 @@ namespace ProjectSystemHelpStudents
         public System.DateTime EndDate { get; set; }
         public int PriorityId { get; set; }
         public int StatusId { get; set; }
-        public int IdUser { get; set; }
         public Nullable<int> ProjectId { get; set; }
         public Nullable<int> SectionId { get; set; }
         public Nullable<System.DateTime> ReminderDate { get; set; }
+        public int CreatorId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Comment> Comment { get; set; }
@@ -39,10 +40,12 @@ namespace ProjectSystemHelpStudents
         public virtual ICollection<Files> Files { get; set; }
         public virtual Priority Priority { get; set; }
         public virtual Project Project { get; set; }
+        public virtual Section Section { get; set; }
         public virtual Status Status { get; set; }
-        public virtual Users Users { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaskLabels> TaskLabels { get; set; }
-        public virtual Section Section { get; set; }
+        public virtual Users Users { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<TaskAssignee> TaskAssignee { get; set; }
     }
 }

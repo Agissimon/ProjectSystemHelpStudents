@@ -18,13 +18,14 @@ namespace ProjectSystemHelpStudents
         public Users()
         {
             this.Comment = new HashSet<Comment>();
-            this.Task = new HashSet<Task>();
             this.Filters = new HashSet<Filters>();
+            this.Project = new HashSet<Project>();
+            this.Task = new HashSet<Task>();
+            this.TaskAssignee = new HashSet<TaskAssignee>();
             this.Team = new HashSet<Team>();
             this.TeamInvitation = new HashSet<TeamInvitation>();
             this.TeamInvitation1 = new HashSet<TeamInvitation>();
             this.TeamMember = new HashSet<TeamMember>();
-            this.Project = new HashSet<Project>();
         }
     
         public int IdUser { get; set; }
@@ -41,9 +42,13 @@ namespace ProjectSystemHelpStudents
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Comment> Comment { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Filters> Filters { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Project> Project { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Task { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Filters> Filters { get; set; }
+        public virtual ICollection<TaskAssignee> TaskAssignee { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Team> Team { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -52,7 +57,5 @@ namespace ProjectSystemHelpStudents
         public virtual ICollection<TeamInvitation> TeamInvitation1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TeamMember> TeamMember { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Project> Project { get; set; }
     }
 }

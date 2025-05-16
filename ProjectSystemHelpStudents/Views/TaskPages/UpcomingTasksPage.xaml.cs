@@ -118,7 +118,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                         .Include("Priority")
                         .Include("TaskLabels.Labels")
                         .Where(t => t.Status.Name != "Завершено"
-                                 && t.IdUser == UserSession.IdUser);
+                                 && t.CreatorId == UserSession.IdUser);
 
                     //if (selExecutor > 0)
                     //    query = query.Where(t => t.ExecutorId == selExecutor);

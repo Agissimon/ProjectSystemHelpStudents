@@ -36,7 +36,7 @@ namespace ProjectSystemHelpStudents
                     task.ProjectId = dbTask.ProjectId ?? 0;
                     task.PriorityId = dbTask.PriorityId;
                     task.IsCompleted = dbTask.Status?.Name == "Завершено";
-                    task.IdUser = dbTask.IdUser;
+                    task.IdUser = dbTask.CreatorId;
                     task.ReminderDate = dbTask.ReminderDate;
                 }
             }
@@ -230,7 +230,7 @@ namespace ProjectSystemHelpStudents
                     dbTask.EndDate = _task.EndDate;
                     dbTask.ProjectId = _task.ProjectId;
                     dbTask.PriorityId = _task.PriorityId;
-                    dbTask.IdUser = _task.IdUser;
+                    dbTask.CreatorId = _task.IdUser;
 
                     ctx.TaskLabels.RemoveRange(dbTask.TaskLabels);
                     foreach (var labelVm in _task.AvailableLabels.Where(l => l.IsSelected))

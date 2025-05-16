@@ -27,18 +27,19 @@ namespace ProjectSystemHelpStudents
     
         public virtual DbSet<Comment> Comment { get; set; }
         public virtual DbSet<Files> Files { get; set; }
+        public virtual DbSet<Filters> Filters { get; set; }
+        public virtual DbSet<Labels> Labels { get; set; }
         public virtual DbSet<Priority> Priority { get; set; }
         public virtual DbSet<Project> Project { get; set; }
+        public virtual DbSet<Section> Section { get; set; }
         public virtual DbSet<Status> Status { get; set; }
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<Task> Task { get; set; }
-        public virtual DbSet<Users> Users { get; set; }
-        public virtual DbSet<Filters> Filters { get; set; }
-        public virtual DbSet<Labels> Labels { get; set; }
+        public virtual DbSet<TaskAssignee> TaskAssignee { get; set; }
         public virtual DbSet<TaskLabels> TaskLabels { get; set; }
-        public virtual DbSet<Section> Section { get; set; }
         public virtual DbSet<Team> Team { get; set; }
         public virtual DbSet<TeamInvitation> TeamInvitation { get; set; }
         public virtual DbSet<TeamMember> TeamMember { get; set; }
+        public virtual DbSet<Users> Users { get; set; }
     }
 }

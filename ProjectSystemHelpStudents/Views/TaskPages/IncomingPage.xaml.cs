@@ -51,7 +51,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                         .Include(t => t.Project)
                         .Where(t =>
                             t.Project.Name == "Входящие" &&
-                            t.IdUser == UserSession.IdUser)
+                            t.CreatorId == UserSession.IdUser)
                         .ToList();
 
                     var vms = incoming

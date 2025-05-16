@@ -98,7 +98,6 @@ namespace ProjectSystemHelpStudents
             {
                 using (var ctx = new TaskManagementEntities1())
                 {
-                    // обеспечиваем существование проекта "Входящие"
                     var inboxProject = ctx.Project.FirstOrDefault(p => p.Name == "Входящие");
                     if (inboxProject == null)
                     {
@@ -107,36 +106,31 @@ namespace ProjectSystemHelpStudents
                         ctx.SaveChanges();
                     }
 
-                    // выбор проекта
                     int projectIdToUse;
                     if (_projectId.HasValue && ctx.Project.Any(p => p.ProjectId == _projectId.Value))
                         projectIdToUse = _projectId.Value;
                     else
                         projectIdToUse = inboxProject.ProjectId;
 
-                    // приоритет
                     var priorityName = (cmbPriority.SelectedItem as ComboBoxItem)?.Content?.ToString();
                     var pr = ctx.Priority.FirstOrDefault(p => p.Name == priorityName);
                     int priorityIdToUse = pr?.PriorityId
                                           ?? ctx.Priority.OrderBy(p => p.PriorityId).First().PriorityId;
 
-                    // статус
                     var undone = ctx.Status.FirstOrDefault(s => s.Name == "Не завершено")
                                 ?? throw new InvalidOperationException("Не найден статус 'Не завершено'");
 
-                    // секция
                     int? sectionIdToUse = (_sectionId.HasValue && ctx.Section.Any(s => s.IdSection == _sectionId.Value))
                                           ? _sectionId.Value
                                           : (int?)null;
 
-                    // создаём задачу
                     var newTask = new Task
                     {
                         Title = txtTitle.Text.Trim(),
                         Description = txtDescription.Text.Trim(),
                         EndDate = endDateTime,
                         StatusId = undone.StatusId,
-                        IdUser = UserSession.IdUser,
+                        CreatorId = UserSession.IdUser,
                         PriorityId = priorityIdToUse,
                         ProjectId = projectIdToUse,
                         SectionId = sectionIdToUse,
@@ -145,7 +139,6 @@ namespace ProjectSystemHelpStudents
                     ctx.Task.Add(newTask);
                     ctx.SaveChanges();
 
-                    // сохраняем метки
                     foreach (var lbl in _labelViewModels.Where(l => l.IsSelected))
                     {
                         ctx.TaskLabels.Add(new TaskLabels { TaskId = newTask.IdTask, LabelId = lbl.Id });

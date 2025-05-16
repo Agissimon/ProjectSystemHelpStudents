@@ -19,7 +19,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             try
             {
                 var completedTasks = DBClass.entities.Task
-                    .Where(t => t.Status != null && t.Status.Name == "Завершено" && t.IdUser == UserSession.IdUser)
+                    .Where(t => t.Status != null && t.Status.Name == "Завершено" && t.CreatorId == UserSession.IdUser)
                     .Select(t => new TaskViewModel
                     {
                         Title = t.Title,

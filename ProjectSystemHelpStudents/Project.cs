@@ -17,8 +17,8 @@ namespace ProjectSystemHelpStudents
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Project()
         {
-            this.Task = new HashSet<Task>();
             this.Section = new HashSet<Section>();
+            this.Task = new HashSet<Task>();
         }
     
         public int ProjectId { get; set; }
@@ -31,10 +31,10 @@ namespace ProjectSystemHelpStudents
         public bool IsCompleted { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Task> Task { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Section> Section { get; set; }
         public virtual Team Team { get; set; }
         public virtual Users Users { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Task> Task { get; set; }
     }
 }
