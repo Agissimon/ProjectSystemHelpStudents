@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Data.Entity;
+using ProjectSystemHelpStudents.ViewModels;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {

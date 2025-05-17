@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectSystemHelpStudents.Views.TaskPages"
+        xmlns:fa="clr-namespace:FontAwesome.Sharp;assembly=FontAwesome.Sharp"
         mc:Ignorable="d"
         Title="Добавить"
-        Height="350"
+        Height="380"
         Width="450"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -20,16 +21,50 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Text="Имя" Style="{StaticResource NormalTextBlockStyle}" Margin="0,0,0,5"/>
 
         <TextBox x:Name="NameTextBox" MaxLength="60" Style="{StaticResource InputFieldStyle}" Margin="0,0,0,15" Grid.Row="1"/>
 
-        <StackPanel Grid.Row="2" Name="QueryPanel" Visibility="Collapsed">
-            <TextBlock Text="Запрос" Style="{StaticResource NormalTextBlockStyle}" Margin="0,0,0,5"/>
+        <StackPanel Grid.Row="2" Name="QueryPanel" Visibility="Visible">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Text="Запрос" Style="{StaticResource NormalTextBlockStyle}" VerticalAlignment="Center"/>
+                <Border Width="24" Height="24"
+                        CornerRadius="12"
+                        BorderBrush="White"
+                        BorderThickness="1"
+                        Background="Transparent"
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                    <fa:IconImage Icon="Question"
+                                  Width="14" Height="14"
+                                  Foreground="White"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center">
+                        <fa:IconImage.ToolTip>
+                            <ToolTip Background="#333" Foreground="White" Padding="10" Placement="Top">
+                                <StackPanel>
+                                    <TextBlock Text="Как писать запросы фильтра:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                    <TextBlock Text="• today — задачи на сегодня" Margin="0,2,0,0"/>
+                                    <TextBlock Text="• overdue — просроченные задачи" Margin="0,2,0,0"/>
+                                    <TextBlock Text="• priorityN — приоритет N (например, priority2)" Margin="0,2,0,0"/>
+                                    <TextBlock Text="• @UserId — задачи, назначенные пользователю" Margin="0,2,0,0"/>
+                                    <TextBlock Text="• #LabelId или #LabelName — фильтрация по метке" Margin="0,2,0,0"/>
+                                    <TextBlock Text="• любое слово — ищется в заголовке задачи" Margin="0,2,0,0"/>
+                                    <TextBlock Text="Пример: today priority1 @5 #bug fix" FontStyle="Italic" Margin="0,10,0,0"/>
+                                </StackPanel>
+                            </ToolTip>
+                        </fa:IconImage.ToolTip>
+                    </fa:IconImage>
+                </Border>
+            </StackPanel>
+
             <TextBox x:Name="QueryTextBox" MaxLength="1024" Style="{StaticResource InputFieldStyle}" Margin="0,0,0,15"/>
         </StackPanel>
+
 
         <StackPanel Grid.Row="4" >
             <TextBlock Text="Цвет" Style="{StaticResource NormalTextBlockStyle}" Margin="0,0,0,5"/>
@@ -47,7 +82,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
         </StackPanel>
-        
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="5">
             <Button Content="Отмена" Width="100" Margin="5" Click="Cancel_Click" Style="{StaticResource LoginButtonStyle}"/>
             <Button Content="Добавить" Width="100" Margin="5" Click="Add_Click" Style="{StaticResource LoginButtonStyle}">
