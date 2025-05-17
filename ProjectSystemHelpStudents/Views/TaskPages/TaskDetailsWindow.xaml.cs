@@ -101,18 +101,26 @@ namespace ProjectSystemHelpStudents
 
         private void LoadLabels()
         {
+            int currentUser = UserSession.IdUser;
+
             using (var ctx = new TaskManagementEntities1())
             {
-                var allLabels = ctx.Labels.ToList();
+                var userLabels = ctx.Labels
+                    .Where(l => l.UserId == currentUser)
+                    .ToList();
+
                 _task.AvailableLabels = new ObservableCollection<LabelViewModel>(
-                    allLabels.Select(label => new LabelViewModel
+                    userLabels.Select(label => new LabelViewModel
                     {
                         Id = label.Id,
                         Name = label.Name,
-                        IsSelected = ctx.TaskLabels.Any(tl => tl.TaskId == _task.IdTask && tl.LabelId == label.Id)
+                        IsSelected = ctx.TaskLabels
+                                        .Any(tl => tl.TaskId == _task.IdTask
+                                                && tl.LabelId == label.Id)
                     })
                 );
             }
+
             LabelsListBox.ItemsSource = _task.AvailableLabels;
         }
 
@@ -257,6 +265,16 @@ namespace ProjectSystemHelpStudents
                     ctx.TaskAssignee.AddRange(toAdd);
 
                     ctx.SaveChanges();
+
+                    var selectedIds = ctx.TaskLabels
+                        .Where(tl => tl.TaskId == _task.IdTask)
+                        .Select(tl => tl.LabelId)
+                        .ToList();
+
+                    foreach (var labVm in _task.AvailableLabels)
+                    {
+                        labVm.IsSelected = selectedIds.Contains(labVm.Id);
+                    }
                 }
 
                 MessageBox.Show("Задача сохранена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);

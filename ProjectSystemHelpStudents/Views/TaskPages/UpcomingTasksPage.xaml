@@ -236,7 +236,13 @@
                                                                     </CheckBox.Style>
                                                                 </CheckBox>
                                                                 <StackPanel Margin="10,0,0,0">
-                                                                    <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                        <Rectangle Width="10" Height="10" RadiusX="2" RadiusY="2"
+                                                                                   Fill="{Binding PriorityColor}"
+                                                                                   Margin="0,0,8,0"/>                                                                       
+                                                                        <TextBlock Text="{Binding Title}"
+                                                                                   FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                                                    </StackPanel>
                                                                     <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
                                                                     <ItemsControl ItemsSource="{Binding AvailableLabels}" Margin="0,5,0,0">
                                                                         <ItemsControl.ItemsPanel>
@@ -246,14 +252,25 @@
                                                                         </ItemsControl.ItemsPanel>
                                                                         <ItemsControl.ItemTemplate>
                                                                             <DataTemplate>
-                                                                                <Border
-                                                                                    Background="Transparent"
-                                                                                    Margin="0,0,5,0">
-                                                                                    <TextBlock Text="{Binding Name}" FontSize="12" Foreground="{Binding HexColor}"/>
+                                                                                <Border Background="Transparent" Margin="0,0,5,0">
+                                                                                    <Border.Style>
+                                                                                        <Style TargetType="Border">
+                                                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                                                            <Style.Triggers>
+                                                                                                <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                                                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                                </DataTrigger>
+                                                                                            </Style.Triggers>
+                                                                                        </Style>
+                                                                                    </Border.Style>
+                                                                                    <TextBlock Text="{Binding Name}"
+                                                                                               FontSize="12"
+                                                                                               Foreground="{Binding BackgroundBrush}"/> 
                                                                                 </Border>
                                                                             </DataTemplate>
                                                                         </ItemsControl.ItemTemplate>
-                                                                    </ItemsControl>
+                                                                        </ItemsControl>
+
                                                                 </StackPanel>
                                                             </StackPanel>
 

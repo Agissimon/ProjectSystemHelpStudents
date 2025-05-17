@@ -1,4 +1,5 @@
 ﻿using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -37,7 +38,7 @@ namespace ProjectSystemHelpStudents.Views.TaskPages
         {
             using (var ctx = new TaskManagementEntities1())
             {
-                // только собственные задачи (назначенные или созданные вами)
+                // только собственные задачи
                 var baseQuery = ctx.Task
                     .Include(t => t.Status)
                     .Include(t => t.TaskAssignee)
