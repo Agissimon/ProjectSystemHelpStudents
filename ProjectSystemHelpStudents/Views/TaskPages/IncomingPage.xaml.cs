@@ -1,5 +1,4 @@
-﻿// IncomingPage.xaml.cs
-using ProjectSystemHelpStudents.Helper;
+﻿using ProjectSystemHelpStudents.Helper;
 using System;
 using System.Linq;
 using System.Windows;

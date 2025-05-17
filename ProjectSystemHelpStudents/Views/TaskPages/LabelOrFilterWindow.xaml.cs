@@ -70,31 +70,45 @@ namespace ProjectSystemHelpStudents.Views.TaskPages
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(NameTextBox.Text))
+            var name = NameTextBox.Text?.Trim();
+            if (string.IsNullOrEmpty(name))
             {
-                MessageBox.Show("Имя не может быть пустым.");
+                MessageBox.Show("Имя не может быть пустым.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (name.Contains(" "))
+            {
+                MessageBox.Show("Имя не должно содержать пробелов.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            if (ColorComboBox.SelectedItem == null)
+            if (SelectedColor == null)
             {
-                MessageBox.Show("Выберите цвет.");
+                MessageBox.Show("Выберите цвет.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            if (_isFilterMode && string.IsNullOrWhiteSpace(QueryTextBox.Text))
+            if (_isFilterMode)
             {
-                MessageBox.Show("Запрос не может быть пустым.");
-                return;
+                var query = QueryTextBox.Text?.Trim();
+                if (string.IsNullOrWhiteSpace(query))
+                {
+                    MessageBox.Show("Запрос не может быть пустым.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                InputQuery = query;
+            }
+            else
+            {
+                InputQuery = null;
             }
 
-            InputColor = SelectedColor?.Hex;
-            InputName = NameTextBox.Text;
-            InputQuery = _isFilterMode ? QueryTextBox.Text : null;
+            InputName = name;
+            InputColor = SelectedColor.Hex;
 
             DialogResult = true;
-            Close();
         }
+
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {

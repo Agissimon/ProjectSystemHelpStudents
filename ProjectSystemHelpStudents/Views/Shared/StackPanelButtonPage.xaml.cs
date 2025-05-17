@@ -65,7 +65,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             int count;
             using (var ctx = new TaskManagementEntities1())
             {
-                // считаем В ожидании приглашения
+                // считываем В ожидании приглашения
                 count = ctx.TeamInvitation
                            .Count(ti => ti.InviteeId == currentUserId && ti.Status == "В ожидании");
             }

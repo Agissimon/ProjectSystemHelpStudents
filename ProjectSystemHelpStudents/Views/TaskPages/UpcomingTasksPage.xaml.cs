@@ -385,6 +385,13 @@ namespace ProjectSystemHelpStudents.UsersContent
             DisplayOptionsMenu.IsOpen = !DisplayOptionsMenu.IsOpen;
         }
 
+        private void SortChangedHandler(int index)
+        {
+            Properties.Settings.Default.SortOption = index;
+            Properties.Settings.Default.Save();
+            RefreshTasks();
+        }
+
         private void SortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Properties.Settings.Default.SortOption = SortComboBox.SelectedIndex;
