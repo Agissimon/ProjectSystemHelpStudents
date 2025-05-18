@@ -40,7 +40,13 @@
                                         </CheckBox.Style>
                                     </CheckBox>
                                     <StackPanel Margin="10,0,0,0">
-                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Rectangle Width="10" Height="10" RadiusX="2" RadiusY="2"
+                                                       Fill="{Binding MarkerBrush}"
+                                                       Margin="0,0,8,0"/>
+                                            <TextBlock Text="{Binding Title}"
+                                                       FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                        </StackPanel>
                                         <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" FontSize="14" Margin="0,2,0,2"/>
                                         <TextBlock Text="{Binding EndDate, StringFormat=\{0:dd MMMM yyyy\}}" Foreground="LightGray" FontSize="12"/>
                                     </StackPanel>

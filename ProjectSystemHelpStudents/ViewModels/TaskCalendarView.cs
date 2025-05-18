@@ -4,11 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace ProjectSystemHelpStudents.Views
 {
@@ -130,7 +129,6 @@ namespace ProjectSystemHelpStudents.Views
                 FontWeight = date == DateTime.Today ? FontWeights.Bold : FontWeights.Normal
             });
 
-            // Список карточек
             foreach (var t in tasks.Where(t => !t.IsCompleted && t.EndDate.Date == date))
                 panel.Children.Add(CreateTaskCard(t, grid, tasks));
 
@@ -143,7 +141,9 @@ namespace ProjectSystemHelpStudents.Views
 
             cell.MouseLeftButtonUp += (s, e) =>
             {
-                if (e.OriginalSource is Border || e.OriginalSource is ScrollViewer || e.OriginalSource is TextBlock && ((TextBlock)e.OriginalSource).Text == date.Day.ToString())
+                var origin = e.OriginalSource;
+                if (origin is Border || origin is ScrollViewer ||
+                    (origin is TextBlock tb && tb.Text == date.Day.ToString()))
                 {
                     var win = new AddTaskWindow(date);
                     if (win.ShowDialog() == true)
@@ -168,12 +168,10 @@ namespace ProjectSystemHelpStudents.Views
             };
             cb.Checked += (s, e) =>
             {
-                // Меняем статус в БД
                 var dbt = DBClass.entities.Task.Find(t.IdTask);
                 var done = DBClass.entities.Status.First(st => st.Name == "Завершено");
                 dbt.StatusId = done.StatusId;
                 DBClass.entities.SaveChanges();
-                // Перерисовываем календарь
                 int off = Properties.Settings.Default.CalendarMonthOffset;
                 DateTime bm = DateTime.Today.AddMonths(off);
                 RefreshCalendar(grid, tasks, bm);
@@ -188,7 +186,17 @@ namespace ProjectSystemHelpStudents.Views
                 TextWrapping = TextWrapping.Wrap
             };
 
+            // маркер
+            var marker = new Border
+            {
+                Width = 4,
+                Background = TaskMarkerHelper.GetMarkerBrush(t),
+                Margin = new Thickness(0, 4, 6, 0),
+                VerticalAlignment = VerticalAlignment.Stretch
+            };
+
             var stack = new StackPanel { Orientation = Orientation.Horizontal };
+            stack.Children.Add(marker);
             stack.Children.Add(cb);
             stack.Children.Add(title);
 
@@ -205,7 +213,6 @@ namespace ProjectSystemHelpStudents.Views
             border.MouseLeftButtonUp += (s, e) =>
             {
                 if (e.OriginalSource is CheckBox) return;
-
                 var wnd = new TaskDetailsWindow(t);
                 wnd.ShowDialog();
             };

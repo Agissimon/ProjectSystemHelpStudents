@@ -3,13 +3,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Media;
-using ProjectSystemHelpStudents.Helper; // для LabelViewModel и AssigneeViewModel
+using ProjectSystemHelpStudents.Helper;
 
 namespace ProjectSystemHelpStudents.ViewModels
 {
     public class TaskViewModel : INotifyPropertyChanged
     {
-        // ---- все поля из предыдущего класса ----
         private int _idTask;
         private string _title;
         private string _description;
@@ -25,17 +24,44 @@ namespace ProjectSystemHelpStudents.ViewModels
         {
             Assignees = new ObservableCollection<AssigneeViewModel>();
             AvailableLabels = new ObservableCollection<LabelViewModel>();
-            AvailableLabels.CollectionChanged += (_, __) => OnPropertyChanged(nameof(LabelsFormatted));
         }
 
-        public int IdTask { get => _idTask; set { _idTask = value; OnPropertyChanged(nameof(IdTask)); } }
-        public string Title { get => _title; set { _title = value; OnPropertyChanged(nameof(Title)); } }
-        public string Description { get => _description; set { _description = value; OnPropertyChanged(nameof(Description)); } }
-        public DateTime EndDate { get => _endDate; set { _endDate = value; OnPropertyChanged(nameof(EndDate)); } }
+        public int IdTask
+        {
+            get => _idTask;
+            set { _idTask = value; OnPropertyChanged(nameof(IdTask)); }
+        }
+        public string Title
+        {
+            get => _title;
+            set { _title = value; OnPropertyChanged(nameof(Title)); }
+        }
+        public string Description
+        {
+            get => _description;
+            set { _description = value; OnPropertyChanged(nameof(Description)); }
+        }
+        public DateTime EndDate
+        {
+            get => _endDate;
+            set { _endDate = value; OnPropertyChanged(nameof(EndDate)); }
+        }
         public string EndDateFormatted { get; set; }
-        public bool IsCompleted { get => _isCompleted; set { _isCompleted = value; OnPropertyChanged(nameof(IsCompleted)); } }
-        public string Status { get => _status; set { _status = value; OnPropertyChanged(nameof(Status)); } }
-        public int ProjectId { get => _projectId; set { _projectId = value; OnPropertyChanged(nameof(ProjectId)); } }
+        public bool IsCompleted
+        {
+            get => _isCompleted;
+            set { _isCompleted = value; OnPropertyChanged(nameof(IsCompleted)); }
+        }
+        public string Status
+        {
+            get => _status;
+            set { _status = value; OnPropertyChanged(nameof(Status)); }
+        }
+        public int ProjectId
+        {
+            get => _projectId;
+            set { _projectId = value; OnPropertyChanged(nameof(ProjectId)); }
+        }
 
         public int PriorityId
         {
@@ -45,6 +71,7 @@ namespace ProjectSystemHelpStudents.ViewModels
                 _priorityId = value;
                 OnPropertyChanged(nameof(PriorityId));
                 OnPropertyChanged(nameof(PriorityColor));
+                OnPropertyChanged(nameof(MarkerBrush));
             }
         }
 
@@ -62,8 +89,14 @@ namespace ProjectSystemHelpStudents.ViewModels
             }
         }
 
-        public DateTime? ReminderDate { get => _reminderDate; set { _reminderDate = value; OnPropertyChanged(nameof(ReminderDate)); } }
+        public DateTime? ReminderDate
+        {
+            get => _reminderDate;
+            set { _reminderDate = value; OnPropertyChanged(nameof(ReminderDate)); }
+        }
+
         public ObservableCollection<AssigneeViewModel> Assignees { get; }
+
         public ObservableCollection<LabelViewModel> AvailableLabels
         {
             get => _availableLabels;
@@ -84,28 +117,38 @@ namespace ProjectSystemHelpStudents.ViewModels
                 }
                 OnPropertyChanged(nameof(AvailableLabels));
                 OnPropertyChanged(nameof(LabelsFormatted));
+                OnPropertyChanged(nameof(MarkerBrush));
             }
         }
 
-        private void Labels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-            => OnPropertyChanged(nameof(LabelsFormatted));
+        private void Labels_CollectionChanged(object s, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(LabelsFormatted));
+            OnPropertyChanged(nameof(MarkerBrush));
+        }
         private void Label_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(LabelViewModel.IsSelected))
+            {
                 OnPropertyChanged(nameof(LabelsFormatted));
+                OnPropertyChanged(nameof(MarkerBrush));
+            }
         }
 
-        public string LabelsFormatted =>
-            AvailableLabels == null
+        public string LabelsFormatted
+            => _availableLabels == null
                 ? string.Empty
-                : string.Join(", ", AvailableLabels.Where(l => l.IsSelected).Select(l => l.Name));
+                : string.Join(", ", _availableLabels.Where(l => l.IsSelected).Select(l => l.Name));
 
         public int IdUser { get; set; }
         public object Section { get; set; }
         public int CreatorId { get; set; }
 
+        public Brush MarkerBrush
+            => TaskMarkerHelper.GetMarkerBrush(this);
+
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string name) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        protected void OnPropertyChanged(string name)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
