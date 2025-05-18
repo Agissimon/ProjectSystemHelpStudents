@@ -145,6 +145,7 @@
     <Compile Include="Helper\FileItem.cs" />
     <Compile Include="Helper\FilterParser.cs" />
     <Compile Include="Helper\InverseBoolConverter.cs" />
+    <Compile Include="Helper\InverseBoolToVisibilityConverter.cs" />
     <Compile Include="Helper\NullToBoolConverter.cs" />
     <Compile Include="Helper\NullToVisibilityConverter.cs" />
     <Compile Include="Helper\PasswordHelper.cs" />

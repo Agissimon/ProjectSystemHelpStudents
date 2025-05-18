@@ -58,20 +58,26 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="0,10,0,10" VerticalAlignment="Center" HorizontalAlignment="Stretch">
                                 <StackPanel Orientation="Vertical">
-                                    <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold" Foreground="White" />
-
-                                    <TextBlock Text="{Binding TeamName, StringFormat=Команда: {0}}" 
-                                            FontSize="14" 
-                                            Foreground="#AAAAAA" 
-                                            Margin="0,2,0,0" 
-                                            Visibility="{Binding TeamName, Converter={StaticResource NullToVisibilityConverter}}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold" Foreground="White" />
+                                        <TextBlock Text="Завершён"
+                                                   FontSize="14"
+                                                   Foreground="Gray"
+                                                   Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                   Margin="8,3,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding TeamName, StringFormat=Команда: {0}}"
+                                               FontSize="14"
+                                               Foreground="#AAAAAA"
+                                               Margin="0,2,0,0"
+                                               Visibility="{Binding TeamName, Converter={StaticResource NullToVisibilityConverter}}"/>
                                 </StackPanel>
 
                                 <TextBlock Text="{Binding Icon}" FontSize="16" Margin="10,0,0,0" Foreground="White" />
                                 <Button Style="{StaticResource ButtonOptionsStyle}" Tag="{Binding}" IsEnabled="True" Click="OpenContextMenu_Click">
                                     <TextBlock Text="..." FontSize="16" Foreground="White"/>
                                     <Button.ContextMenu>
-                                        <ContextMenu>
+                                        <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                                             <MenuItem Header="Завершить проект" Click="MarkAsCompleted_Click" Tag="{Binding}">
                                                 <MenuItem.Icon>
                                                     <fa:IconImage Icon="CheckCircle" Width="15" Height="15" Foreground="#444"/>
@@ -89,6 +95,32 @@
                                                     <fa:IconImage Icon="Edit" Width="15" Height="15" Foreground="#444"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
+                                            <Separator />
+                                            <MenuItem Header="Добавить в команду"
+                                                      ItemsSource="{Binding AvailableTeams}">
+                                                <MenuItem.Icon>
+                                                    <fa:IconImage Icon="PeopleGroup" Width="15" Height="15" Foreground="#444"/>
+                                                </MenuItem.Icon>
+                                                <MenuItem.ItemContainerStyle>
+                                                    <Style TargetType="MenuItem">
+                                                        <Setter Property="Icon" Value="{x:Null}" />
+                                                        <Setter Property="Header" Value="{Binding Name}" />
+                                                        <Setter Property="Tag"
+                                                                Value="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=DataContext}" />
+                                                        <EventSetter Event="Click" Handler="AssignProjectToTeam_Click"/>
+                                                        <Setter Property="Padding" Value="8,4"/>
+                                                    </Style>
+                                                </MenuItem.ItemContainerStyle>
+                                            </MenuItem>
+
+                                            <MenuItem Header="Удалить из команды"
+                                                      Click="RemoveProjectFromTeam_Click"
+                                                      Tag="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <fa:IconImage Icon="UserMinus" Width="15" Height="15" Foreground="#444"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator />
                                             <MenuItem Header="Добавить в избранное" Click="AddToFavorites_Click" Tag="{Binding}">
                                                 <MenuItem.Icon>
                                                     <fa:IconImage Icon="Star" Width="15" Height="15" Foreground="#444"/>
