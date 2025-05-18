@@ -2,6 +2,7 @@
 using ProjectSystemHelpStudents.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -74,6 +75,8 @@ namespace ProjectSystemHelpStudents.UsersContent
                     foreach (var section in sections)
                     {
                         var tasks = context.Task
+                            .Include("Priority")
+                            .Include("TaskLabels.Labels")
                             .Where(t => t.ProjectId == _projectId && t.SectionId == section.IdSection)
                             .ToList()
                             .Select(t => new TaskViewModel
@@ -84,9 +87,11 @@ namespace ProjectSystemHelpStudents.UsersContent
                                 Status = t.Status?.Name,
                                 EndDate = t.EndDate,
                                 IsCompleted = t.Status?.Name == "Завершено",
-                                EndDateFormatted = t.EndDate != DateTime.MinValue ? t.EndDate.ToString("dd MMMM yyyy") : "Без срока"
+                                EndDateFormatted = t.EndDate != DateTime.MinValue ? t.EndDate.ToString("dd MMMM yyyy") : "Без срока",
+                                PriorityId = t.PriorityId
                             })
                             .ToList();
+
 
                         sectionTaskGroups.Add(new SectionTaskGroupViewModel
                         {

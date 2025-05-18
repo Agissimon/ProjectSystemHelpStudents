@@ -27,15 +27,25 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // 1) Загрузка списка команд
+            int uid = UserSession.IdUser;
+
+            var memberTeamIds = _ctx.TeamMember
+                                    .Where(tm => tm.UserId == uid)
+                                    .Select(tm => tm.TeamId)
+                                    .ToList();
+
             var teams = _ctx.Team
+                            .Where(t => t.LeaderId == uid 
+                                     || memberTeamIds.Contains(t.TeamId)) 
                             .OrderBy(t => t.Name)
                             .ToList();
-            // Пункт “Без команды”
-            teams.Insert(0, new Team { TeamId = 0, Name = "<Без команды>" });
-            cmbTeams.ItemsSource = teams;
 
-            // 2) Если редактирование — заполняем поля по существующему проекту
+            teams.Insert(0, new Team { TeamId = 0, Name = "<Без команды>" });
+
+            cmbTeams.ItemsSource = teams;
+            cmbTeams.DisplayMemberPath = "Name";
+            cmbTeams.SelectedValuePath = "TeamId";
+
             if (ProjectId.HasValue)
             {
                 var project = _ctx.Project.Find(ProjectId.Value);
@@ -50,13 +60,10 @@ namespace ProjectSystemHelpStudents.UsersContent
                 DescriptionTextBox.Text = project.Description;
                 StartDatePicker.SelectedDate = project.StartDate;
                 EndDatePicker.SelectedDate = project.EndDate;
-
-                // выбираем команду (null → 0)
                 cmbTeams.SelectedValue = project.TeamId ?? 0;
             }
             else
             {
-                // новый проект — по умолчанию “Без команды”
                 cmbTeams.SelectedValue = 0;
             }
         }

@@ -17,9 +17,6 @@ namespace ProjectSystemHelpStudents.UsersContent
             LoadTasks();
         }
 
-        /// <summary>
-        /// Проверяем и создаём (если нужно) проект "Входящие"
-        /// </summary>
         private void EnsureInboxProjectExists()
         {
             try
@@ -60,7 +57,8 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                     var incoming = ctx.Task
                         .Include("Status")
-                        .Include("TaskAssignee")
+                        .Include("Priority")
+                        .Include("TaskLabels.Labels")
                         .ForUser(userId)
                         .Where(t =>
                             (t.ProjectId.HasValue && t.ProjectId.Value == inboxId)
@@ -77,9 +75,12 @@ namespace ProjectSystemHelpStudents.UsersContent
                         IsCompleted = false,
                         EndDate = t.EndDate,
                         EndDateFormatted = t.EndDate != DateTime.MinValue
-                                          ? t.EndDate.ToString("dd MMMM yyyy")
-                                          : "Без срока"
-                    }).ToList();
+                                           ? t.EndDate.ToString("dd MMMM yyyy")
+                                           : "Без срока",
+                        PriorityId = t.PriorityId,
+                        
+                    })
+                    .ToList();
 
                     TasksListView.ItemsSource = vms;
                 }

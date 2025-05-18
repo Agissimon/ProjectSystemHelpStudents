@@ -8,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace ProjectSystemHelpStudents.Views
 {
@@ -19,9 +18,7 @@ namespace ProjectSystemHelpStudents.Views
         /// </summary>
         public static DockPanel CreateBoardView(IEnumerable<TaskViewModel> tasks)
         {
-            // Получаем смещение недель из настроек
             int weekOffset = Properties.Settings.Default.BoardWeekOffset;
-            // Находим текущий понедельник с учётом смещения
             var refDate = DateTime.Today.AddDays(weekOffset * 7);
             int mondayDelta = ((int)refDate.DayOfWeek + 6) % 7;
             DateTime monday = refDate.AddDays(-mondayDelta);
@@ -47,11 +44,9 @@ namespace ProjectSystemHelpStudents.Views
             {
                 Properties.Settings.Default.BoardWeekOffset = 0;
                 Properties.Settings.Default.Save();
-
                 var today = DateTime.Today;
                 int mondayDeltaToday = ((int)today.DayOfWeek + 6) % 7;
                 DateTime mondayToday = today.AddDays(-mondayDeltaToday);
-
                 RefreshBoard(boardGrid, tasks, mondayToday);
             };
 
@@ -87,19 +82,13 @@ namespace ProjectSystemHelpStudents.Views
             bool isCurrentWeek = Properties.Settings.Default.BoardWeekOffset == 0;
             bool overdueExpanded = Properties.Settings.Default.OverdueExpanded;
 
-            // Собираем список 
             var columns = new List<(int index, DateTime? date, IEnumerable<TaskViewModel> tasks)>();
-
             columns.Add((0, null, tasks.Where(t => t.EndDate.Date < today)));
 
-            // Затем — 7 дней недели
             for (int i = 1; i <= 7; i++)
             {
                 var dt = monday.AddDays(i - 1);
-
-                if (isCurrentWeek && dt < today)
-                    continue;
-
+                if (isCurrentWeek && dt < today) continue;
                 var dayTasks = tasks.Where(t => t.EndDate.Date == dt);
                 columns.Add((i, dt, dayTasks));
             }
@@ -257,7 +246,17 @@ namespace ProjectSystemHelpStudents.Views
                 });
             }
 
+            // создаём маркер
+            var marker = new Border
+            {
+                Width = 4,
+                Background = TaskMarkerHelper.GetMarkerBrush(t),
+                Margin = new Thickness(0, 4, 6, 0),
+                VerticalAlignment = VerticalAlignment.Stretch
+            };
+
             var panel = new StackPanel { Orientation = Orientation.Horizontal };
+            panel.Children.Add(marker);
             panel.Children.Add(check);
             panel.Children.Add(info);
 
@@ -292,7 +291,6 @@ namespace ProjectSystemHelpStudents.Views
             var newStatusName = t.IsCompleted ? "Завершено" : "Не завершено";
             db.StatusId = DBClass.entities.Status.First(st => st.Name == newStatusName).StatusId;
             DBClass.entities.SaveChanges();
-
             RefreshBoard(boardGrid, tasks, monday);
         }
     }

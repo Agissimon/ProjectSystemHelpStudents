@@ -25,9 +25,11 @@ namespace ProjectSystemHelpStudents.UsersContent
                     int userId = UserSession.IdUser;
                     var completedTasks = ctx.Task
                         .Include("Status")
-                        .Include("TaskAssignee")
+                        .Include("Priority")
+                        .Include("TaskLabels.Labels")
                         .ForUser(userId)
                         .Where(t => t.Status.Name == "Завершено")
+                        .ToList()
                         .Select(t => new TaskViewModel
                         {
                             IdTask = t.IdTask,
@@ -36,7 +38,18 @@ namespace ProjectSystemHelpStudents.UsersContent
                             Description = t.Description,
                             Status = t.Status.Name,
                             EndDate = t.EndDate,
-                            IsCompleted = true
+                            IsCompleted = true,
+
+                            PriorityId = t.PriorityId,
+                            AvailableLabels = new System.Collections.ObjectModel.ObservableCollection<LabelViewModel>(
+                                t.TaskLabels.Select(tl => new LabelViewModel
+                                {
+                                    Id = tl.Labels.Id,
+                                    Name = tl.Labels.Name,
+                                    HexColor = tl.Labels.Color,
+                                    IsSelected = true
+                                })
+                            )
                         })
                         .ToList();
 
@@ -50,7 +63,8 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при загрузке задач: " + ex.Message);
+                MessageBox.Show("Ошибка при загрузке задач: " + ex.Message,
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

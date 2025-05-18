@@ -191,6 +191,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
             var inviteControl = new InviteUserControl { TeamName = _selectedTeam.Name };
             var win = new Window
             {
+                MaxHeight = 300,
                 Title = "MyTask",
                 Content = inviteControl,
                 SizeToContent = SizeToContent.WidthAndHeight,

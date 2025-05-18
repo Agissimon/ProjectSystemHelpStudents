@@ -5,18 +5,12 @@ using System.Windows.Data;
 
 namespace ProjectSystemHelpStudents.Helper
 {
-    public class NullToVisibilityConverter : IValueConverter
+    public class InverseBoolToVisibilityConverter : IValueConverter
     {
-        /// <summary>
-        /// Если value == null → Collapsed, иначе → Visible.
-        /// Если ConverterParameter="true" → наоборот.
-        /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool invert = parameter?.ToString().ToLower() == "true";
-            bool isNull = value == null;
-            if (invert) isNull = !isNull;
-            return isNull
+            bool b = value is bool && (bool)value;
+            return b
                 ? Visibility.Collapsed
                 : Visibility.Visible;
         }

@@ -2,6 +2,7 @@
 using ProjectSystemHelpStudents.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -54,7 +55,8 @@ namespace ProjectSystemHelpStudents.UsersContent
                     int userId = UserSession.IdUser;
                     var all = ctx.Task
                         .Include("Status")
-                        .Include("TaskAssignee")
+                        .Include("Priority")
+                        .Include("TaskLabels.Labels")
                         .ForUser(userId)
                         .ToList();
 
@@ -66,9 +68,20 @@ namespace ProjectSystemHelpStudents.UsersContent
                         IsCompleted = t.Status.Name == "Завершено",
                         EndDate = t.EndDate,
                         EndDateFormatted = t.EndDate != DateTime.MinValue
-                                              ? t.EndDate.ToString("dd MMMM yyyy")
-                                              : "Без срока"
-                    }).ToList();
+                                             ? t.EndDate.ToString("dd MMMM yyyy")
+                                             : "Без срока",
+
+                        PriorityId = t.PriorityId,
+                        AvailableLabels = new ObservableCollection<LabelViewModel>(
+                            t.TaskLabels.Select(tl => new LabelViewModel
+                            {
+                                Id = tl.Labels.Id,
+                                Name = tl.Labels.Name,
+                                HexColor = tl.Labels.Color,
+                                IsSelected = true
+                            }))
+                    })
+                    .ToList();
 
                     var overdue = vms
                         .Where(vm => vm.EndDate.Date < DateTime.Today && !vm.IsCompleted)

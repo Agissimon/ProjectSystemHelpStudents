@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Collections.Specialized;
+using System.Collections.Generic;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -14,6 +15,7 @@ namespace ProjectSystemHelpStudents.UsersContent
         public ObservableCollection<ProjectViewModel> Projects { get; set; }
         public string ProjectCountText => $"{Projects.Count} проекта";
         private ObservableCollection<ProjectViewModel> AllProjects = new ObservableCollection<ProjectViewModel>();
+        public List<Team> AvailableTeams { get; set; } = new List<Team>();
 
 
         public MyProjectPage()
@@ -33,7 +35,7 @@ namespace ProjectSystemHelpStudents.UsersContent
         private void ApplyFilters()
         {
             if (Projects == null || AllProjects == null)
-                return; // или throw new InvalidOperationException("Projects или AllProjects не инициализированы");
+                return;
 
             string searchText = SearchBox?.Text?.ToLower() ?? "";
             string selectedFilter = (FilterComboBox?.SelectedItem as ComboBoxItem)?.Content as string;
@@ -75,19 +77,31 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void RefreshProjects()
         {
+            int uid = UserSession.IdUser;
+
             using (var ctx = new TaskManagementEntities1())
             {
-                int uid = UserSession.IdUser;
                 var userTeamIds = ctx.TeamMember
                                      .Where(tm => tm.UserId == uid)
                                      .Select(tm => tm.TeamId)
                                      .ToList();
+                var ownTeams = ctx.Team
+                                  .Where(t => t.LeaderId == uid)
+                                  .Select(t => t.TeamId)
+                                  .ToList();
+                var allowedTeamIds = userTeamIds
+                                     .Concat(ownTeams)
+                                     .Distinct()
+                                     .ToList();
+
+                var allowedTeams = ctx.Team
+                                      .Where(t => allowedTeamIds.Contains(t.TeamId))
+                                      .OrderBy(t => t.Name)
+                                      .ToList();
 
                 var userProjects = ctx.Project
-                    .Where(p =>
-                        p.OwnerId == uid ||
-                        (p.TeamId != null && userTeamIds.Contains(p.TeamId.Value))
-                    )
+                    .Where(p => p.OwnerId == uid
+                             || (p.TeamId != null && allowedTeamIds.Contains(p.TeamId.Value)))
                     .OrderBy(p => p.Name)
                     .ToList();
 
@@ -96,8 +110,6 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                 foreach (var p in userProjects)
                 {
-                    var teamName = p.Team != null ? p.Team.Name : null;
-
                     var vm = new ProjectViewModel
                     {
                         ProjectId = p.ProjectId,
@@ -106,16 +118,50 @@ namespace ProjectSystemHelpStudents.UsersContent
                         StartDate = p.StartDate,
                         EndDate = p.EndDate,
                         TeamId = p.TeamId,
-                        TeamName = teamName,
-                        IsCompleted = p.IsCompleted
-                    };
+                        TeamName = p.Team?.Name,
+                        IsCompleted = p.IsCompleted,
 
+                        // наполняем только теми командами, где пользователь есть
+                        AvailableTeams = allowedTeams
+                    };
                     Projects.Add(vm);
                     AllProjects.Add(vm);
                 }
             }
 
             ProjectsListView.ItemsSource = Projects;
+
+        }
+
+
+        private void AssignProjectToTeam_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem mi
+                && mi.DataContext is Team selectedTeam
+                && mi.Tag is ProjectViewModel projectVm)
+            {
+                try
+                {
+                    using (var ctx = new TaskManagementEntities1())
+                    {
+                        var dbProj = ctx.Project.Find(projectVm.ProjectId);
+                        if (dbProj != null)
+                        {
+                            dbProj.TeamId = selectedTeam.TeamId == 0 ? (int?)null : selectedTeam.TeamId;
+                            ctx.SaveChanges();
+                            MessageBox.Show(
+                              $"Проект «{projectVm.Name}» добавлен в команду «{selectedTeam.Name}»",
+                              "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            RefreshProjects();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при назначении команды: {ex.Message}",
+                                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private void AddProject_Click(object sender, RoutedEventArgs e)
@@ -260,6 +306,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                 }
             }
         }
+
         private void ActivateProject_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel project)
@@ -280,6 +327,51 @@ namespace ProjectSystemHelpStudents.UsersContent
                         MessageBox.Show("Проект уже активен или не найден.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
+            }
+        }
+
+        private void RemoveProjectFromTeam_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is MenuItem mi) || !(mi.Tag is ProjectViewModel vm))
+                return;
+
+            try
+            {
+                using (var ctx = new TaskManagementEntities1())
+                {
+                    var project = ctx.Project.Find(vm.ProjectId);
+                    if (project != null && project.TeamId != null)
+                    {
+                        project.TeamId = null;
+                        ctx.SaveChanges();
+
+                        MessageBox.Show(
+                            $"Проект «{vm.Name}» удалён из команды.",
+                            "Успех",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information
+                        );
+                    }
+                    else
+                    {
+                        MessageBox.Show(
+                            "Проект либо уже не состоит ни в одной команде, либо не найден.",
+                            "Информация",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information
+                        );
+                    }
+                }
+                RefreshProjects();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Не удалось удалить проект из команды: {ex.Message}",
+                    "Ошибка",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
             }
         }
     }

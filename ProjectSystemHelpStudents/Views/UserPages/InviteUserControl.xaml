@@ -30,24 +30,26 @@
                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
 
         <Border Grid.Row="2">
-            <ListBox ItemsSource="{Binding Users}"
-                     Style="{StaticResource TransparentListBoxStyle}"
-                     SelectedItem="{Binding SelectedUser}"
-                     BorderThickness="0"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="{Binding Login}"
-                                           Style="{StaticResource NormalTextBlockStyle}" FontSize="18" Foreground="White"/>
-                                <TextBlock Text="{Binding Mail}"
-                                           Style="{StaticResource SmallTextBlockStyle}"/>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" CanContentScroll="True" Style="{StaticResource MinimalDarkScrollViewer}">
+                <ListBox ItemsSource="{Binding Users}"
+                         Style="{StaticResource TransparentListBoxStyle}"
+                         SelectedItem="{Binding SelectedUser}"
+                         BorderThickness="0"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Login}"
+                                               Style="{StaticResource NormalTextBlockStyle}" FontSize="18" Foreground="White"/>
+                                    <TextBlock Text="{Binding Mail}"
+                                               Style="{StaticResource SmallTextBlockStyle}"/>
+                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
         </Border>
 
         <StackPanel Grid.Row="3"

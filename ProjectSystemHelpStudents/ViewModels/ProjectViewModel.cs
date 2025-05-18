@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectSystemHelpStudents.Helper
 {
@@ -19,5 +16,7 @@ namespace ProjectSystemHelpStudents.Helper
         public DateTime? EndDate { get; set; }
         public string TeamName { get; set; }
         public bool IsCompleted { get; set; }
+
+        public List<Team> AvailableTeams { get; set; } = new List<Team>();
     }
 }
