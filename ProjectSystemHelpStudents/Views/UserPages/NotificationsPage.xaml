@@ -1,7 +1,10 @@
 ﻿<UserControl x:Class="ProjectSystemHelpStudents.Views.UserPages.NotificationsPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Background="#222">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ProjectSystemHelpStudents.ViewModels"
+             xmlns:tp="clr-namespace:ProjectSystemHelpStudents.Views.TaskPages"
+             Background="#222">
+    <Grid>
         <StackPanel>
             <TextBlock Text="Управление уведомлениями"
                        Style="{StaticResource NormalTextBlockStyle}"
@@ -27,17 +30,51 @@
                                            FontSize="10"
                                            Foreground="#888"
                                            HorizontalAlignment="Right"/>
-                                <StackPanel Orientation="Horizontal"
-                                            HorizontalAlignment="Right"
-                                            Margin="0,5,0,0">
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Type}" Value="{x:Static vm:NotificationType.TeamInvitation}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
                                     <Button Content="Принять"
                                             Click="Accept_Click"
-                                            Tag="{Binding Payload}"
-                                            Margin="0,0,5,0"/>
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource NormalButtonStyle}"/>
                                     <Button Content="Отклонить"
                                             Click="Reject_Click"
-                                            Tag="{Binding Payload}"/>
+                                            Margin="5,0,0,0"
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource NormalButtonStyle}"/>
                                 </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Type}" 
+                                                            Value="{x:Static vm:NotificationType.TaskAssignee}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+
+                                    <Button Content="Открыть задачу"
+                                              Click="OpenTask_Click"
+                                              CommandParameter="{Binding}"/>
+                                    <Button Content="Игнорировать"
+                                              Click="IgnoreTask_Click"
+                                              Margin="5,0,0,0"
+                                              CommandParameter="{Binding}"/>
+                                </StackPanel>
+
                             </StackPanel>
                         </Border>
                     </DataTemplate>

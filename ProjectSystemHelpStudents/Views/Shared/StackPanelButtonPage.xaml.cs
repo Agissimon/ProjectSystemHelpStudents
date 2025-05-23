@@ -55,24 +55,31 @@ namespace ProjectSystemHelpStudents.UsersContent
 
             UpdateNotificationBadge();
 
-            //UserSession.NotificationsChanged += () => Dispatcher.Invoke(UpdateNotificationBadge); // сделаю если успею... (нет)
+            UserSession.NotificationsChanged += () => Dispatcher.Invoke(UpdateNotificationBadge); // Метка уведомления
 
         }
 
         private void UpdateNotificationBadge()
         {
-            int currentUserId = UserSession.IdUser;
-            int count;
+            int userId = UserSession.IdUser;
+            int inviteCount, assignmentCount;
+
             using (var ctx = new TaskManagementEntities1())
             {
-                // считываем В ожидании приглашения
-                count = ctx.TeamInvitation
-                           .Count(ti => ti.InviteeId == currentUserId && ti.Status == "В ожидании");
+                inviteCount = ctx.TeamInvitation
+                                 .Count(ti => ti.InviteeId == userId
+                                           && ti.Status == "В ожидании"
+                                           && ti.IsNew == true);
+
+                assignmentCount = ctx.TaskAssignee
+                                     .Count(ta => ta.UserId == userId
+                                               && ta.IsNew == true);
             }
 
-            if (count > 0)
+            int total = inviteCount + assignmentCount;
+            if (total > 0)
             {
-                NotificationCountText.Text = count.ToString();
+                NotificationCountText.Text = total.ToString();
                 NotificationBadge.Visibility = Visibility.Visible;
             }
             else

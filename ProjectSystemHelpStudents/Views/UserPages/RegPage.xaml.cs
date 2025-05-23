@@ -140,16 +140,19 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void psbPassword_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            if (chkShowPassword.IsChecked == true)
+            {
+                txbPassword.Text = psbPassword.Password;
+            }
+
             if (psbPassword.Password.Length >= 6)
                 ClearErrorBorder(psbPassword);
-            txbPassword.Text = psbPassword.Password;
         }
 
         private void txbPassword_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (txbPassword.Text.Length >= 6)
                 ClearErrorBorder(txbPassword);
-            psbPassword.Password = txbPassword.Text;
         }
 
         private void chkShowPassword_Checked(object sender, RoutedEventArgs e)
@@ -162,8 +165,8 @@ namespace ProjectSystemHelpStudents.UsersContent
         private void chkShowPassword_Unchecked(object sender, RoutedEventArgs e)
         {
             psbPassword.Password = txbPassword.Text;
-            psbPassword.Visibility = Visibility.Visible;
             txbPassword.Visibility = Visibility.Collapsed;
+            psbPassword.Visibility = Visibility.Visible;
         }
 
         private void btnBack_Click(object sender, RoutedEventArgs e)

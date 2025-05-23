@@ -41,21 +41,20 @@
                 </WrapPanel>
 
                 <TextBlock Text="Приоритет" Style="{StaticResource NormalTextBlockStyle}"/>
-                <ComboBox x:Name="cmbPriority" Width="140" Style="{StaticResource ComboBoxStyle}">
-                    <ComboBoxItem Content="Высокий приоритет"/>
-                    <ComboBoxItem Content="Средний приоритет"/>
-                    <ComboBoxItem Content="Низкий приоритет"/>
-                </ComboBox>
+                <ComboBox x:Name="cmbPriority"
+                          Width="140"
+                          Style="{StaticResource ComboBoxStyle}"
+                          DisplayMemberPath="Name"
+                          SelectedValuePath="PriorityId"
+                          SelectedValue="{Binding PriorityId, Mode=TwoWay}"/>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Исполнитель" 
-                   Style="{StaticResource NormalTextBlockStyle}"
-                   VerticalAlignment="Center"/>
+                    <TextBlock Text="Исполнитель" Style="{StaticResource NormalTextBlockStyle}" VerticalAlignment="Center"/>
                     <ComboBox x:Name="cmbAssignedTo"
-                  Width="140"
-                  Style="{StaticResource ComboBoxStyle}"
-                  DisplayMemberPath="Name"
-                  SelectedValuePath="IdUser"/>
+                              Width="140"
+                              Style="{StaticResource ComboBoxStyle}"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="IdUser"/>
                 </StackPanel>
             </WrapPanel>
 

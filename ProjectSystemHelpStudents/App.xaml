@@ -1,7 +1,8 @@
 ﻿<Application x:Class="ProjectSystemHelpStudents.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="http://schemas.xceed.com/wpf/xaml/toolkit">
-    <!--StartupUri="MainWindow.xaml">-->
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             xmlns:local="http://schemas.xceed.com/wpf/xaml/toolkit" 
+             xmlns:local1="clr-namespace:ProjectSystemHelpStudents.Helper">
 
     <Application.Resources>
         <ResourceDictionary>
@@ -17,7 +18,8 @@
 
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
             <local:NullToBoolConverter x:Key="NullToBool"/>
-
+            <local1:RoleToBoolConverter x:Key="RoleToBoolConverter"/>
+            
             <Style x:Key="BaseDarkStyle" TargetType="Control">
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="Background" Value="#333"/>

@@ -12,6 +12,12 @@ namespace ProjectSystemHelpStudents.Helper
         public static int IdUser { get; set; }
 
         public static event Action<string> UserNameUpdated;
+        public static event Action NotificationsChanged;
+
+        public static void RaiseNotificationsChanged()
+        {
+            NotificationsChanged?.Invoke();
+        }
 
         public static void NotifyUserNameUpdated(string newName)
         {

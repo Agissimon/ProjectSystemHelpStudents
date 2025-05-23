@@ -15,14 +15,6 @@ namespace ProjectSystemHelpStudents.Views.UserPages
         private readonly TaskManagementEntities1 _ctx = new TaskManagementEntities1();
         private TeamViewModel _selectedTeam;
 
-        private class ParticipantItem
-        {
-            public int UserId { get; set; }
-            public string Name { get; set; }
-            public string Status { get; set; }
-            public bool IsInvitation { get; set; }
-        }
-
         public TeamManagementControl()
         {
             InitializeComponent();
@@ -243,24 +235,24 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                 return;
             }
 
-            if (item.IsInvitation)
+            var invites = _ctx.TeamInvitation
+                .Where(ti => ti.TeamId == _selectedTeam.TeamId && ti.InviteeId == item.UserId)
+                .ToList();
+
+            if (invites.Any())
             {
-                var invite = _ctx.TeamInvitation.FirstOrDefault(ti => ti.TeamId == _selectedTeam.TeamId && ti.InviteeId == item.UserId);
-                if (invite != null)
-                {
-                    _ctx.TeamInvitation.Remove(invite);
-                    _ctx.SaveChanges();
-                }
+                _ctx.TeamInvitation.RemoveRange(invites);
             }
-            else
+
+            var member = _ctx.TeamMember
+                .FirstOrDefault(tm => tm.TeamId == _selectedTeam.TeamId && tm.UserId == item.UserId);
+
+            if (member != null)
             {
-                var member = _ctx.TeamMember.FirstOrDefault(tm => tm.TeamId == _selectedTeam.TeamId && tm.UserId == item.UserId);
-                if (member != null)
-                {
-                    _ctx.TeamMember.Remove(member);
-                    _ctx.SaveChanges();
-                }
+                _ctx.TeamMember.Remove(member);
             }
+
+            _ctx.SaveChanges();
 
             PopulateMembers(_selectedTeam.TeamId);
         }

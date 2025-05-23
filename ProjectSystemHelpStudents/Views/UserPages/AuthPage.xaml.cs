@@ -1,4 +1,5 @@
 ﻿using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.Views.AdminPages;
 using System;
 using System.Linq;
 using System.Windows;
@@ -89,7 +90,20 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                 return;
             }
+            if (user.RoleUser == 1)
+            {
+                UserSession.IdUser = user.IdUser;
+                UserSession.NotifyUserNameUpdated(user.Name);
+                MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
 
+                var mainWindow = Application.Current.MainWindow as MainWindow;
+                if (mainWindow != null)
+                {
+                    mainWindow.frmAuth.Content = null;
+                    mainWindow.frmContentUser.Content = null;
+                    mainWindow.frmStackPanelButton.Content = new AdminNavigationPage();
+                }
+            }
             if (user.RoleUser == 2)
             {
                 UserSession.IdUser = user.IdUser;

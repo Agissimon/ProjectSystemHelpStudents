@@ -9,7 +9,7 @@ namespace ProjectSystemHelpStudents.ViewModels
     public enum NotificationType
     {
         TeamInvitation,
-        // TODO: другие типы: Comment, FilterResult и т.п.
+        TaskAssignee
     }
 
     public class NotificationViewModel

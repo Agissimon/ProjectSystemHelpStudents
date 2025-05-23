@@ -21,38 +21,30 @@
                 </Button>
 
                 <Button x:Name="NotificationsButton"
-        Style="{StaticResource TransparentButtonStyle}"
-        Margin="10 5"
-        Click="NotificationsButton_Click">
-                    <!-- Используем Grid, чтобы накладывать бейдж поверх иконки -->
+                        Style="{StaticResource TransparentButtonStyle}"
+                        Margin="10 5"
+                        Click="NotificationsButton_Click">
                     <Grid>
-                        <!-- Сам колокольчик -->
-                        <fa:IconImage Icon="Bell"
-                      Width="20"
-                      Height="20"
-                      Foreground="White"
-                      Margin="0,0,10,0"/>
-                        <!-- Бейдж -->
+                        <fa:IconImage Icon="Bell" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
                         <Border x:Name="NotificationBadge"
-                Background="Red"
-                Width="16"
-                Height="16"
-                CornerRadius="8"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="0,-4,-4,0"
-                Visibility="Collapsed">
+                                Background="Red"
+                                Width="16"
+                                Height="16"
+                                CornerRadius="8"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Margin="0,-4,-4,0"
+                                Visibility="Collapsed">
                             <TextBlock x:Name="NotificationCountText"
-                       Text="0"
-                       FontSize="10"
-                       FontWeight="Bold"
-                       Foreground="White"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
+                                        Text="0"
+                                        FontSize="10"
+                                        FontWeight="Bold"
+                                        Foreground="White"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"/>
                         </Border>
                     </Grid>
                 </Button>
-
 
             </StackPanel>
         
@@ -64,16 +56,10 @@
                    AllowsTransparency="True">
                 <Border Background="#333" Padding="10" CornerRadius="5">
                     <StackPanel>
-                        <Button Content="Редактировать профиль"
-              Style="{StaticResource PopupButtonStyle}"
-              Click="EditProfile_Click"/>
-                        <Button Content="Создать команду"
-              Style="{StaticResource PopupButtonStyle}"
-              Click="CreateTeam_Click"/>
+                        <Button Content="Редактировать профиль" Style="{StaticResource PopupButtonStyle}" Click="EditProfile_Click"/>
+                        <Button Content="Создать команду" Style="{StaticResource PopupButtonStyle}" Click="CreateTeam_Click"/>
                         <Separator Margin="0,5"/>
-                        <Button Content="Выйти"
-              Style="{StaticResource PopupButtonStyle}"
-              Click="Logout_Click"/>
+                        <Button Content="Выйти" Style="{StaticResource PopupButtonStyle}" Click="Logout_Click"/>
                     </StackPanel>
                 </Border>
             </Popup>

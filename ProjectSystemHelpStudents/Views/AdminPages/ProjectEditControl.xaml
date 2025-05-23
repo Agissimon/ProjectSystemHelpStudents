@@ -1,0 +1,14 @@
+﻿<UserControl x:Class="ProjectSystemHelpStudents.Views.AdminPages.ProjectEditControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Margin="10">
+    <StackPanel>
+        <TextBlock Text="Название проекта:" Style="{StaticResource NormalTextBlockStyle}"/>
+        <TextBox x:Name="NameBox" Margin="0,5" Style="{StaticResource InputFieldStyle}"/>
+
+        <TextBlock Text="ID команды:" Style="{StaticResource NormalTextBlockStyle}"/>
+        <TextBox x:Name="TeamBox" Margin="0,5" Style="{StaticResource InputFieldStyle}"/>
+
+        <Button Content="Сохранить" Click="Save_Click" Margin="0,10,0,0" HorizontalAlignment="Center" Style="{StaticResource NormalButtonStyle}"/>
+    </StackPanel>
+</UserControl>

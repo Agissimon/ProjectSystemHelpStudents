@@ -18,6 +18,8 @@ namespace ProjectSystemHelpStudents
         public string FilePath { get; set; }
         public string FileType { get; set; }
         public Nullable<int> TaskId { get; set; }
+        public string FileName { get; set; }
+        public byte[] FileData { get; set; }
     
         public virtual Task Task { get; set; }
     }

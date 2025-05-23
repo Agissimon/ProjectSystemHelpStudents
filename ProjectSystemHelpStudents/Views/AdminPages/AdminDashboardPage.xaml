@@ -1,0 +1,56 @@
+﻿<Page x:Class="ProjectSystemHelpStudents.Views.AdminPages.AdminNavigationPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:fa="clr-namespace:FontAwesome.Sharp;assembly=FontAwesome.Sharp"
+      mc:Ignorable="d"
+      d:DesignHeight="450" d:DesignWidth="200"
+      Title="AdminNavigationPage">
+
+    <Grid Margin="0,0,10,0">
+        <StackPanel Background="#333">
+            <TextBlock Text="Администрирование"
+                 Foreground="White"
+                 FontSize="16"
+                 FontWeight="Bold"
+                 Margin="10,10,0,20"/>
+
+            <Button Style="{StaticResource TransparentButtonStyle}"
+              Margin="10,5"
+              Click="UsersButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:IconImage Icon="Users" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Пользователи" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Style="{StaticResource TransparentButtonStyle}"
+              Margin="10,5"
+              Click="ProjectsButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:IconImage Icon="Folder" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Проекты" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Style="{StaticResource TransparentButtonStyle}"
+              Margin="10,5"
+              Click="SettingsButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:IconImage Icon="Cogs" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Справочники" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Style="{StaticResource TransparentButtonStyle}"
+                    Margin="10,5"
+                    Click="SignOutButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:IconImage Icon="SignOut" Width="20" Height="20" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBlock Text="Выход" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Page>
