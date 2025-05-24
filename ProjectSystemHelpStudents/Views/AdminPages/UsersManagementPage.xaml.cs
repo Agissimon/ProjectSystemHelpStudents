@@ -71,7 +71,7 @@ namespace ProjectSystemHelpStudents.Views.AdminPages
                         Title = "Редактирование пользователя",
                         Content = new UserEditControl(user, _ctx),
                         Width = 320,
-                        Height = 380,
+                        Height = 420,
                         ResizeMode = ResizeMode.NoResize,
                         WindowStartupLocation = WindowStartupLocation.CenterScreen,
                         Owner = Application.Current.MainWindow,

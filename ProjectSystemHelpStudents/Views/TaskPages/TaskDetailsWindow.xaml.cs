@@ -210,12 +210,6 @@ namespace ProjectSystemHelpStudents
             }
         }
 
-        private class UserComparer : IEqualityComparer<Users>
-        {
-            public bool Equals(Users x, Users y) => x?.IdUser == y?.IdUser;
-            public int GetHashCode(Users obj) => obj.IdUser.GetHashCode();
-        }
-
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -275,7 +269,8 @@ namespace ProjectSystemHelpStudents
                         {
                             TaskId = _task.IdTask,
                             UserId = vm.UserId,
-                            IsNew = true
+                            IsNew = true,
+                            AssignedAt = DateTime.Now
                         })
                         .ToList();
 

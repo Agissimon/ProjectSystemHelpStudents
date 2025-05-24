@@ -24,17 +24,34 @@ namespace ProjectSystemHelpStudents.Views.UserPages
 
             using (var ctx = new TaskManagementEntities1())
             {
-                // 1) Вычитываем «сырые» данные по новым приглашениям
+                // Гасим маркеры новых уведомлений (только для бейджа)
+                var newInvites = ctx.TeamInvitation
+                                    .Where(ti => ti.InviteeId == userId
+                                              && ti.Status == "В ожидании"
+                                              && ti.IsNew == true)
+                                    .ToList();
+                foreach (var ti in newInvites)
+                    ti.IsNew = false;
+
+                var newAssignments = ctx.TaskAssignee
+                                        .Where(ta => ta.UserId == userId
+                                                  && ta.IsNew == true)
+                                        .ToList();
+                foreach (var ta in newAssignments)
+                    ta.IsNew = false;
+
+                ctx.SaveChanges();
+
+                // Вычитываем все (ожидающие) приглашения независимо от IsNew
                 var invitesRaw = (from ti in ctx.TeamInvitation
                                   where ti.InviteeId == userId
                                         && ti.Status == "В ожидании"
-                                        && ti.IsNew == true
                                   join u in ctx.Users on ti.InviterId equals u.IdUser
                                   join t in ctx.Team on ti.TeamId equals t.TeamId
                                   orderby ti.CreatedAt descending
                                   select new
                                   {
-                                      InvitationEntity = ti,
+                                      ti,
                                       ti.InvitationId,
                                       ti.CreatedAt,
                                       InviterName = u.Name,
@@ -42,16 +59,15 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                                   })
                                  .ToList();
 
-                // 2) Вычитываем «сырые» данные по новым назначениям
+                // Вычитываем все (активные) назначения независимо от IsNew
                 var assignmentsRaw = (from ta in ctx.TaskAssignee
                                       where ta.UserId == userId
-                                            && ta.IsNew == true
                                       join task in ctx.Task on ta.TaskId equals task.IdTask
                                       join creator in ctx.Users on task.CreatorId equals creator.IdUser
                                       orderby ta.TaskAssigneeId descending
                                       select new
                                       {
-                                          AssigneeEntity = ta,
+                                          ta,
                                           ta.TaskAssigneeId,
                                           ta.AssignedAt,
                                           CreatorName = creator.Name,
@@ -59,7 +75,6 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                                       })
                                      .ToList();
 
-                // 3) Формируем VM в памяти (LINQ-to-Objects)
                 var invites = invitesRaw
                     .Select(x => new NotificationViewModel
                     {
@@ -68,7 +83,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                         Title = "Приглашение в команду",
                         Message = $"{x.InviterName} пригласил вас в «{x.TeamName}»",
                         CreatedAt = x.CreatedAt ?? DateTime.Now,
-                        Payload = x.InvitationEntity
+                        Payload = x.ti
                     })
                     .ToList();
 
@@ -80,33 +95,16 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                         Title = "Вас назначили на задачу",
                         Message = $"{x.CreatorName} назначил вас на «{x.TaskTitle}»",
                         CreatedAt = x.AssignedAt ?? DateTime.Now,
-                        Payload = x.AssigneeEntity
+                        Payload = x.ta
                     })
                     .ToList();
 
-                // 4) Объединяем и сортируем все уведомления
                 allNotifications = invites
                     .Concat(assignments)
                     .OrderByDescending(n => n.CreatedAt)
                     .ToList();
-
-                // 5) Сбрасываем маркер IsNew = 0L для всех показанных уведомлений
-                foreach (var vm in invites)
-                {
-                    var ti = vm.Payload as TeamInvitation;
-                    if (ti != null) ti.IsNew = false;
-                }
-
-                foreach (var vm in assignments)
-                {
-                    var ta = vm.Payload as TaskAssignee;
-                    if (ta != null) ta.IsNew = false;
-                }
-
-                ctx.SaveChanges();
             }
 
-            // 6) Отображаем список и пересчитываем бейдж
             NotificationsList.ItemsSource = allNotifications;
             UserSession.RaiseNotificationsChanged();
         }

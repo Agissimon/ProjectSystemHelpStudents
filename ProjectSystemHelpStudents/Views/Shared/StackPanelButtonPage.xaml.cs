@@ -243,8 +243,9 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                 var visibleProjects = ctx.Project
                     .Where(p =>
-                        p.OwnerId == uid ||
-                        (p.TeamId != null && userTeamIds.Contains(p.TeamId.Value))
+                        (p.OwnerId == uid ||
+                         (p.TeamId != null && userTeamIds.Contains(p.TeamId.Value)))
+                        && p.Name != "Входящие"
                     )
                     .OrderBy(p => p.Name)
                     .ToList();

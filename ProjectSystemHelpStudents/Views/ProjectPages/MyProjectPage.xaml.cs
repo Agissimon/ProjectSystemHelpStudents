@@ -85,10 +85,12 @@ namespace ProjectSystemHelpStudents.UsersContent
                                      .Where(tm => tm.UserId == uid)
                                      .Select(tm => tm.TeamId)
                                      .ToList();
+
                 var ownTeams = ctx.Team
                                   .Where(t => t.LeaderId == uid)
                                   .Select(t => t.TeamId)
                                   .ToList();
+
                 var allowedTeamIds = userTeamIds
                                      .Concat(ownTeams)
                                      .Distinct()
@@ -100,8 +102,11 @@ namespace ProjectSystemHelpStudents.UsersContent
                                       .ToList();
 
                 var userProjects = ctx.Project
-                    .Where(p => p.OwnerId == uid
-                             || (p.TeamId != null && allowedTeamIds.Contains(p.TeamId.Value)))
+                    .Where(p =>
+                        (p.OwnerId == uid ||
+                        (p.TeamId != null && allowedTeamIds.Contains(p.TeamId.Value)))
+                        && p.Name != "Входящие"
+                    )
                     .OrderBy(p => p.Name)
                     .ToList();
 
@@ -120,8 +125,6 @@ namespace ProjectSystemHelpStudents.UsersContent
                         TeamId = p.TeamId,
                         TeamName = p.Team?.Name,
                         IsCompleted = p.IsCompleted,
-
-                        // наполняем только теми командами, где пользователь есть
                         AvailableTeams = allowedTeams
                     };
                     Projects.Add(vm);
@@ -130,9 +133,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
 
             ProjectsListView.ItemsSource = Projects;
-
         }
-
 
         private void AssignProjectToTeam_Click(object sender, RoutedEventArgs e)
         {
