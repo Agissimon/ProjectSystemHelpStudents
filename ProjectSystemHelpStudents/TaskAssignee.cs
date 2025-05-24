@@ -17,7 +17,8 @@ namespace ProjectSystemHelpStudents
         public int TaskAssigneeId { get; set; }
         public int TaskId { get; set; }
         public int UserId { get; set; }
-        public System.DateTime AssignedAt { get; set; }
+        public Nullable<System.DateTime> AssignedAt { get; set; }
+        public bool IsNew { get; set; }
     
         public virtual Task Task { get; set; }
         public virtual Users Users { get; set; }

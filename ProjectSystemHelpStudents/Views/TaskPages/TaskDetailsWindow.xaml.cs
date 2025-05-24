@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace ProjectSystemHelpStudents
 {
@@ -17,6 +19,7 @@ namespace ProjectSystemHelpStudents
     {
         private readonly TaskViewModel _task;
         public event Action TaskUpdated;
+        private const long MAX_FILE_BYTES = 20 * 1024 * 1024; // 20 MB
 
         public TaskDetailsWindow(TaskViewModel task)
         {
@@ -36,7 +39,7 @@ namespace ProjectSystemHelpStudents
                     return;
                 }
 
-                // проверяем, что либо вы — автор, либо ваша запись всё ещё в TaskAssignee
+                // проверка, на автора, либо запись всё ещё в TaskAssignee
                 bool amIAssigned = dbTask.TaskAssignee.Any(ta => ta.UserId == UserSession.IdUser);
                 if (!amIAssigned && dbTask.CreatorId != UserSession.IdUser)
                 {
@@ -152,13 +155,14 @@ namespace ProjectSystemHelpStudents
             {
                 var files = ctx.Files
                     .Where(f => f.TaskId == _task.IdTask)
-                    .ToList()
                     .Select(f => new FileItem
                     {
-                        FileName = Path.GetFileName(f.FilePath),
-                        FilePath = f.FilePath
+                        Id = f.Id,
+                        FileName = f.FileName,
+                        FileType = f.FileType
                     })
                     .ToList();
+
                 FilesListBox.ItemsSource = new ObservableCollection<FileItem>(files);
             }
         }
@@ -168,7 +172,7 @@ namespace ProjectSystemHelpStudents
             int currentUser = UserSession.IdUser;
             using (var ctx = new TaskManagementEntities1())
             {
-                // Все пользователи из вашей команды/проекта
+                // Все пользователи из команды/проекта
                 var teamIds = ctx.TeamMember
                                  .Where(tm => tm.UserId == currentUser)
                                  .Select(tm => tm.TeamId)
@@ -206,13 +210,6 @@ namespace ProjectSystemHelpStudents
             }
         }
 
-        private class UserComparer : IEqualityComparer<Users>
-        {
-            public bool Equals(Users x, Users y) => x?.IdUser == y?.IdUser;
-            public int GetHashCode(Users obj) => obj.IdUser.GetHashCode();
-        }
-
-
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -240,6 +237,13 @@ namespace ProjectSystemHelpStudents
                     if (dbTask == null)
                         throw new InvalidOperationException("Задача не найдена");
 
+                    // 🔒 Проверка на владельца задачи
+                    if (dbTask.CreatorId != UserSession.IdUser)
+                    {
+                        MessageBox.Show("Только автор может изменять задачу.", "Доступ запрещён", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
                     dbTask.Title = _task.Title;
                     dbTask.Description = _task.Description;
                     dbTask.EndDate = _task.EndDate;
@@ -251,7 +255,7 @@ namespace ProjectSystemHelpStudents
                     foreach (var lab in _task.AvailableLabels.Where(l => l.IsSelected))
                         ctx.TaskLabels.Add(new TaskLabels { TaskId = _task.IdTask, LabelId = lab.Id });
 
-                    // назначения не трогаем автора
+                    // Обновление назначений (кроме автора)
                     var toRemove = dbTask.TaskAssignee
                         .Where(ta => !_task.Assignees.Any(vm => vm.IsAssigned && vm.UserId == ta.UserId)
                                      && ta.UserId != dbTask.CreatorId)
@@ -261,10 +265,18 @@ namespace ProjectSystemHelpStudents
                     var exist = dbTask.TaskAssignee.Select(ta => ta.UserId).ToList();
                     var toAdd = _task.Assignees
                         .Where(vm => vm.IsAssigned && !exist.Contains(vm.UserId))
-                        .Select(vm => new TaskAssignee { TaskId = _task.IdTask, UserId = vm.UserId });
-                    ctx.TaskAssignee.AddRange(toAdd);
+                        .Select(vm => new TaskAssignee
+                        {
+                            TaskId = _task.IdTask,
+                            UserId = vm.UserId,
+                            IsNew = true,
+                            AssignedAt = DateTime.Now
+                        })
+                        .ToList();
 
+                    ctx.TaskAssignee.AddRange(toAdd);
                     ctx.SaveChanges();
+                    UserSession.RaiseNotificationsChanged();
 
                     var selectedIds = ctx.TaskLabels
                         .Where(tl => tl.TaskId == _task.IdTask)
@@ -347,21 +359,54 @@ namespace ProjectSystemHelpStudents
 
         private void AddFileButton_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new OpenFileDialog { Title = "Выберите файл", Filter = "Все файлы (*.*)|*.*" };
-            if (dlg.ShowDialog() != true) return;
+            var dlg = new OpenFileDialog
+            {
+                Title = "Выберите файл",
+                Filter = "Все файлы (*.*)|*.*"
+            };
+            if (dlg.ShowDialog() != true)
+                return;
+
+            var fi = new FileInfo(dlg.FileName);
+            if (fi.Length > MAX_FILE_BYTES)
+            {
+                MessageBox.Show(
+                    $"Файл слишком большой. Максимум {MAX_FILE_BYTES / 1024 / 1024} МБ.",
+                    "Ошибка размера",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
             try
             {
-                string destDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TaskFiles");
-                Directory.CreateDirectory(destDir);
-                string destPath = Path.Combine(destDir, Path.GetFileName(dlg.FileName));
-                File.Copy(dlg.FileName, destPath, true);
+                byte[] data = File.ReadAllBytes(dlg.FileName);
                 using (var ctx = new TaskManagementEntities1())
                 {
-                    ctx.Files.Add(new Files { FilePath = destPath, TaskId = _task.IdTask });
+                    var fileEntity = new Files
+                    {
+                        TaskId = _task.IdTask,
+                        FileName = fi.Name,
+                        FileType = fi.Extension,
+                        FileData = data
+                    };
+                    ctx.Files.Add(fileEntity);
                     ctx.SaveChanges();
                 }
+
                 LoadTaskFiles();
-                MessageBox.Show("Файл успешно добавлен к задаче!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Файл успешно добавлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (DbEntityValidationException dbEx)
+            {
+                var sb = new System.Text.StringBuilder("Ошибка валидации при сохранении файла:\n");
+                foreach (var eve in dbEx.EntityValidationErrors)
+                {
+                    sb.AppendLine($"Entity \"{eve.Entry.Entity.GetType().Name}\":");
+                    foreach (var ve in eve.ValidationErrors)
+                        sb.AppendLine($" - Property: \"{ve.PropertyName}\", Error: \"{ve.ErrorMessage}\"");
+                }
+                MessageBox.Show(sb.ToString(), "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
@@ -369,38 +414,40 @@ namespace ProjectSystemHelpStudents
             }
         }
 
-        private void FilesListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void FilesListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (FilesListBox.SelectedItem is FileItem file)
+            if (!(FilesListBox.SelectedItem is FileItem vm)) return;
+
+            using (var ctx = new TaskManagementEntities1())
             {
-                try
-                {
-                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = file.FilePath, UseShellExecute = true });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                var dbFile = ctx.Files.FirstOrDefault(f => f.Id == vm.Id);
+                if (dbFile == null) return;
+
+                string temp = Path.Combine(Path.GetTempPath(), dbFile.FileName);
+                File.WriteAllBytes(temp, dbFile.FileData);
+                Process.Start(new ProcessStartInfo { FileName = temp, UseShellExecute = true });
             }
         }
 
         private void DeleteFileButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!(sender is Button btn && btn.DataContext is FileItem file)) return;
+            if (!(sender is Button btn && btn.DataContext is FileItem fileVm))
+                return;
+
             try
             {
                 using (var ctx = new TaskManagementEntities1())
                 {
-                    var dbFile = ctx.Files.FirstOrDefault(f => f.FilePath == file.FilePath);
+                    var dbFile = ctx.Files.FirstOrDefault(f => f.Id == fileVm.Id);
                     if (dbFile != null)
                     {
                         ctx.Files.Remove(dbFile);
                         ctx.SaveChanges();
                     }
                 }
-                if (File.Exists(file.FilePath)) File.Delete(file.FilePath);
+
                 LoadTaskFiles();
-                MessageBox.Show("Файл успешно удален!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Файл успешно удалён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {

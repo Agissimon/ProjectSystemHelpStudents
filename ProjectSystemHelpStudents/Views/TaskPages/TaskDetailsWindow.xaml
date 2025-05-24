@@ -6,6 +6,7 @@
         Title="MyTask" 
         Icon="/Resources/Icon/logo001.png" 
         MinWidth="720" 
+        MinHeight="600"
         Width="700" 
         Style="{StaticResource SmallWindowStyle}"  
         WindowStartupLocation="CenterScreen">
@@ -37,7 +38,8 @@
                          Style="{StaticResource DarkListBoxStyle}"
                          Background="Transparent"
                          BorderThickness="0"
-                         Padding="0">
+                         Padding="0"
+                         MaxHeight="200">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Background" Value="Transparent"/>
@@ -86,9 +88,9 @@
                             </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
-                    </ListBox>
+                </ListBox>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
                     <TextBox x:Name="CommentTextBox" Style="{StaticResource InputFieldStyle}" TextWrapping="Wrap" AcceptsReturn="True" Width="415"/>
                     <Button Width="43" Height="43" Background="Transparent" Foreground="Gray" BorderBrush="Transparent" Click="AddFileButton_Click">
                         <Image Source="/Resources/Icon/iconscrepki.png" Width="30" Height="30" />
@@ -98,14 +100,16 @@
 
                     <StackPanel Orientation="Vertical" Margin="10">
                         <TextBlock Text="Список файлов" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,5"/>
-                        <ListBox x:Name="FilesListBox" Style="{StaticResource DarkListBoxStyle}" MouseDoubleClick="FilesListBox_MouseDoubleClick">
+                        <ListBox x:Name="FilesListBox" Style="{StaticResource DarkListBoxStyle}" 
+                                 MouseDoubleClick="FilesListBox_MouseDoubleClick"
+                                 MaxHeight="150">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel LastChildFill="True">
                                         <Button Content="✖"
                                         Click="DeleteFileButton_Click"
                                         Style="{StaticResource TransparentButtonStyle}"
-                                        Width="20"
+                                        FontSize="18"
                                         HorizontalAlignment="Right"
                                         Margin="5"
                                         DockPanel.Dock="Right">
@@ -145,8 +149,8 @@
                 <TextBlock Text="Исполнители" Style="{StaticResource TransparentTextBlockStyle}" Margin="0,10,0,5"/>
                 <ScrollViewer MaxHeight="100" Style="{StaticResource MinimalDarkScrollViewer}">
                     <ListBox ItemsSource="{Binding Assignees}"
-                 Style="{StaticResource DarkListBoxStyle}"
-                 BorderThickness="0">       
+                            Style="{StaticResource DarkListBoxStyle}"
+                            BorderThickness="0">       
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <CheckBox Content="{Binding Name}" Foreground="White"

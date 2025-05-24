@@ -150,6 +150,7 @@
     <Compile Include="Helper\NullToVisibilityConverter.cs" />
     <Compile Include="Helper\PasswordHelper.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
+    <Compile Include="Helper\RoleToBoolConverter.cs" />
     <Compile Include="Helper\StatusToVisibilityConverter.cs" />
     <Compile Include="Helper\TaskExtensions.cs" />
     <Compile Include="Helper\TaskLabel.cs" />
@@ -225,6 +226,7 @@
     <Compile Include="ViewModels\ExecutorViewModel.cs" />
     <Compile Include="ViewModels\LabelViewModel.cs" />
     <Compile Include="ViewModels\NotificationViewModel.cs" />
+    <Compile Include="ViewModels\ParticipantItem.cs" />
     <Compile Include="ViewModels\PriorityViewModel.cs" />
     <Compile Include="ViewModels\ProjectViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
@@ -236,6 +238,27 @@
     <Compile Include="ViewModels\TaskViewModel.cs" />
     <Compile Include="ViewModels\TeamMemberViewModel.cs" />
     <Compile Include="ViewModels\TeamViewModel.cs" />
+    <Compile Include="Views\AdminPages\AdminDashboardPage.xaml.cs">
+      <DependentUpon>AdminDashboardPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AdminPages\PriorityEditControl.xaml.cs">
+      <DependentUpon>PriorityEditControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AdminPages\ProjectEditControl.xaml.cs">
+      <DependentUpon>ProjectEditControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AdminPages\ProjectsManagementPage.xaml.cs">
+      <DependentUpon>ProjectsManagementPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AdminPages\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AdminPages\UserEditControl.xaml.cs">
+      <DependentUpon>UserEditControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AdminPages\UsersManagementPage.xaml.cs">
+      <DependentUpon>UsersManagementPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ProjectPages\AddProjectWindow.xaml.cs">
       <DependentUpon>AddProjectWindow.xaml</DependentUpon>
     </Compile>
@@ -339,6 +362,34 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles\WindowStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AdminPages\AdminDashboardPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AdminPages\PriorityEditControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AdminPages\ProjectEditControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AdminPages\ProjectsManagementPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AdminPages\SettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AdminPages\UserEditControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AdminPages\UsersManagementPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

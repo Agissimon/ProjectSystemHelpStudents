@@ -1,94 +1,164 @@
 ﻿using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Data.Entity;
-using ProjectSystemHelpStudents.ViewModels;
+using System.Windows.Media;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
     public partial class IncomingPage : Page
     {
+        private int _inboxProjectId;
+
         public IncomingPage()
         {
             InitializeComponent();
             EnsureInboxProjectExists();
-            LoadTasks();
+            RefreshSectionsAndTasks();
         }
 
         private void EnsureInboxProjectExists()
         {
-            try
+            using (var ctx = new TaskManagementEntities1())
             {
-                using (var ctx = new TaskManagementEntities1())
+                var inbox = ctx.Project
+                    .FirstOrDefault(p => p.Name == "Входящие" && p.OwnerId == UserSession.IdUser);
+                if (inbox == null)
                 {
-                    if (!ctx.Project.Any(p => p.Name == "Входящие"))
-                    {
-                        ctx.Project.Add(new Project { Name = "Входящие" });
-                        ctx.SaveChanges();
-                    }
+                    inbox = new Project { Name = "Входящие", OwnerId = UserSession.IdUser };
+                    ctx.Project.Add(inbox);
+                    ctx.SaveChanges();
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Не удалось убедиться в наличии проекта 'Входящие': " + ex.Message,
-                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                _inboxProjectId = inbox.ProjectId;
             }
         }
 
-        private void LoadTasks()
+        private void RefreshSectionsAndTasks()
         {
-            try
+            var groups = new List<SectionTaskGroupViewModel>();
+
+            using (var ctx = new TaskManagementEntities1())
             {
-                using (var ctx = new TaskManagementEntities1())
-                {
-                    int userId = UserSession.IdUser;
-
-                    var inbox = ctx.Project
-                        .FirstOrDefault(p => p.Name == "Входящие" && p.OwnerId == userId);
-                    if (inbox == null)
-                    {
-                        inbox = new Project { Name = "Входящие", OwnerId = userId };
-                        ctx.Project.Add(inbox);
-                        ctx.SaveChanges();
-                    }
-                    int inboxId = inbox.ProjectId;
-
-                    var incoming = ctx.Task
-                        .Include("Status")
-                        .Include("Priority")
-                        .Include("TaskLabels.Labels")
-                        .ForUser(userId)
-                        .Where(t =>
-                            (t.ProjectId.HasValue && t.ProjectId.Value == inboxId)
-                            || !t.ProjectId.HasValue
-                        )
-                        .Where(t => t.Status.Name != "Завершено")
-                        .ToList();
-
-                    var vms = incoming.Select(t => new TaskViewModel
+                // Задачи без раздела
+                var unsectioned = ctx.Task
+                    .Include(t => t.Status)
+                    .Include(t => t.Priority)
+                    .Where(t => t.ProjectId == _inboxProjectId && t.SectionId == null)
+                    .OrderBy(t => t.EndDate)
+                    .ToList()
+                    .Select(t => new TaskViewModel
                     {
                         IdTask = t.IdTask,
                         Title = t.Title,
                         Description = t.Description,
-                        IsCompleted = false,
+                        IsCompleted = t.Status?.Name == "Завершено",
                         EndDate = t.EndDate,
-                        EndDateFormatted = t.EndDate != DateTime.MinValue
-                                           ? t.EndDate.ToString("dd MMMM yyyy")
-                                           : "Без срока",
                         PriorityId = t.PriorityId,
-                        
                     })
                     .ToList();
 
-                    TasksListView.ItemsSource = vms;
+                if (unsectioned.Any())
+                {
+                    groups.Add(new SectionTaskGroupViewModel
+                    {
+                        SectionId = 0,
+                        SectionName = "Без раздела",
+                        Tasks = unsectioned
+                    });
+                }
+
+                // Существующие разделы
+                var sections = ctx.Section
+                    .Where(s => s.ProjectId == _inboxProjectId)
+                    .ToList();
+
+                foreach (var sec in sections)
+                {
+                    var sectionTasks = ctx.Task
+                        .Include(t => t.Status)
+                        .Where(t => t.ProjectId == _inboxProjectId && t.SectionId == sec.IdSection)
+                        .OrderBy(t => t.EndDate)
+                        .ToList()
+                        .Select(t => new TaskViewModel
+                        {
+                            IdTask = t.IdTask,
+                            Title = t.Title,
+                            Description = t.Description,
+                            IsCompleted = t.Status?.Name == "Завершено",
+                            EndDate = t.EndDate,
+                            PriorityId = t.PriorityId
+                        })
+                        .ToList();
+
+                    groups.Add(new SectionTaskGroupViewModel
+                    {
+                        SectionId = sec.IdSection,
+                        SectionName = sec.Name,
+                        Tasks = sectionTasks
+                    });
                 }
             }
-            catch (Exception ex)
+
+            SectionsTasksControl.ItemsSource = groups;
+        }
+
+        private void OpenAddSectionPopup_Click(object sender, RoutedEventArgs e)
+        {
+            SectionNameTextBox.Text = string.Empty;
+            AddSectionPopup.IsOpen = true;
+        }
+
+        private void ConfirmAddSection_Click(object sender, RoutedEventArgs e)
+        {
+            var name = SectionNameTextBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(name))
             {
-                MessageBox.Show("Ошибка при загрузке входящих задач: " + ex.Message,
-                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Введите название раздела.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            using (var ctx = new TaskManagementEntities1())
+            {
+                ctx.Section.Add(new Section
+                {
+                    ProjectId = _inboxProjectId,
+                    Name = name
+                });
+                ctx.SaveChanges();
+            }
+
+            AddSectionPopup.IsOpen = false;
+            RefreshSectionsAndTasks();
+        }
+
+        private void CancelAddSection_Click(object sender, RoutedEventArgs e)
+        {
+            AddSectionPopup.IsOpen = false;
+        }
+
+        private void ButtonCreateTask_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is int secId)
+            {
+                int? sectionId = secId == 0 ? (int?)null : secId;
+                var addWnd = new AddTaskWindow(_inboxProjectId, sectionId);
+                addWnd.ShowDialog();
+                RefreshSectionsAndTasks();
+            }
+        }
+
+        private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ListView lv && lv.SelectedItem is TaskViewModel vm)
+            {
+                var details = new TaskDetailsWindow(vm);
+                details.TaskUpdated += RefreshSectionsAndTasks;
+                details.ShowDialog();
+                lv.SelectedItem = null;
             }
         }
 
@@ -101,32 +171,83 @@ namespace ProjectSystemHelpStudents.UsersContent
                     var dbTask = ctx.Task.Find(task.IdTask);
                     if (dbTask != null)
                     {
-                        var done = ctx.Status.First(s => s.Name == "Завершено");
-                        var undone = ctx.Status.First(s => s.Name == "Не завершено");
-                        dbTask.StatusId = cb.IsChecked == true ? done.StatusId : undone.StatusId;
+                        var done = ctx.Status.FirstOrDefault(s => s.Name == "Завершено");
+                        var undone = ctx.Status.FirstOrDefault(s => s.Name == "Не завершено");
+                        dbTask.StatusId = cb.IsChecked == true
+                            ? done.StatusId
+                            : undone.StatusId;
                         ctx.SaveChanges();
                     }
                 }
-                LoadTasks();
+                RefreshSectionsAndTasks();
             }
         }
-
-        private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void EditSection_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is ListView lv && lv.SelectedItem is TaskViewModel vm)
+            if (sender is Button button && button.Tag is int sectionId)
             {
-                var wnd = new TaskDetailsWindow(vm);
-                wnd.ShowDialog();
-                lv.SelectedItem = null;
-                LoadTasks();
+                var dialog = new InputDialog("Введите новое название раздела:")
+                {
+                    TitleText = "Редактирование раздела",
+                    PlaceholderText = "Введите название нового раздела"
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    var newSectionName = dialog.InputText;
+                    if (!string.IsNullOrWhiteSpace(newSectionName))
+                    {
+                        using (var context = new TaskManagementEntities1())
+                        {
+                            var section = context.Section.FirstOrDefault(s => s.IdSection == sectionId);
+                            if (section != null)
+                            {
+                                section.Name = newSectionName;
+                                context.SaveChanges();
+                                RefreshSectionsAndTasks();
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        private void ButtonCreateTask_Click(object sender, RoutedEventArgs e)
+        private void DeleteSection_Click(object sender, RoutedEventArgs e)
         {
-            var addWnd = new AddTaskWindow(DateTime.Today);
-            addWnd.ShowDialog();
-            LoadTasks();
+            if (sender is Button button && button.Tag is int sectionId)
+            {
+                var result = MessageBox.Show("Вы уверены, что хотите удалить этот раздел и все его задачи?", "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Yes)
+                {
+                    using (var context = new TaskManagementEntities1())
+                    {
+                        var section = context.Section.FirstOrDefault(s => s.IdSection == sectionId);
+                        if (section != null)
+                        {
+                            var tasks = context.Task.Where(t => t.SectionId == sectionId).ToList();
+
+                            foreach (var task in tasks)
+                            {
+                                var labels = context.TaskLabels.Where(tl => tl.TaskId == task.IdTask).ToList();
+                                context.TaskLabels.RemoveRange(labels);
+
+                                var comments = context.Comment.Where(c => c.IdTask == task.IdTask).ToList();
+                                context.Comment.RemoveRange(comments);
+
+                                var files = context.Files.Where(f => f.TaskId == task.IdTask).ToList();
+                                context.Files.RemoveRange(files);
+                            }
+
+                            context.Task.RemoveRange(tasks);
+
+                            context.Section.Remove(section);
+
+                            context.SaveChanges();
+                            RefreshSectionsAndTasks();
+                        }
+                    }
+                }
+            }
         }
     }
 }

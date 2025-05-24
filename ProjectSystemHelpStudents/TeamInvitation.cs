@@ -20,6 +20,7 @@ namespace ProjectSystemHelpStudents
         public int InviteeId { get; set; }
         public string Status { get; set; }
         public Nullable<System.DateTime> CreatedAt { get; set; }
+        public bool IsNew { get; set; }
     
         public virtual Team Team { get; set; }
         public virtual Users Users { get; set; }

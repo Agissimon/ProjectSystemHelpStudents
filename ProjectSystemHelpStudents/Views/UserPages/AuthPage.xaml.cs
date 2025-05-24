@@ -1,4 +1,5 @@
 ﻿using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.Views.AdminPages;
 using System;
 using System.Linq;
 using System.Windows;
@@ -18,6 +19,17 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void btnLogIn_Click(object sender, RoutedEventArgs e)
         {
+            string password = psbPassword.Visibility == Visibility.Visible
+                  ? psbPassword.Password
+                  : txbPassword.Text;
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                MessageBox.Show("Вы не ввели пароль пользователя");
+                logCount++;
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(txbLogin.Text))
             {
                 MessageBox.Show("Вы не ввели логин пользователя");
@@ -51,12 +63,12 @@ namespace ProjectSystemHelpStudents.UsersContent
                 }
             }
 
-            AttemptLogin();
+            AttemptLogin(password);
         }
 
-        private void AttemptLogin()
+        private void AttemptLogin(string password)
         {
-            string hashedPassword = PasswordHelper.HashPassword(psbPassword.Password);
+            string hashedPassword = PasswordHelper.HashPassword(password);
 
             var user = DBClass.entities.Users
                 .FirstOrDefault(i => i.Login == txbLogin.Text && i.Password == hashedPassword);
@@ -89,7 +101,20 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                 return;
             }
+            if (user.RoleUser == 1)
+            {
+                UserSession.IdUser = user.IdUser;
+                UserSession.NotifyUserNameUpdated(user.Name);
+                MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
 
+                var mainWindow = Application.Current.MainWindow as MainWindow;
+                if (mainWindow != null)
+                {
+                    mainWindow.frmAuth.Content = null;
+                    mainWindow.frmContentUser.Content = null;
+                    mainWindow.frmStackPanelButton.Content = new AdminNavigationPage();
+                }
+            }
             if (user.RoleUser == 2)
             {
                 UserSession.IdUser = user.IdUser;

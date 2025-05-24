@@ -20,9 +20,11 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="FilePath" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="FileType" Type="nvarchar" MaxLength="50" />
+          <Property Name="FilePath" Type="nvarchar" MaxLength="255" />
           <Property Name="TaskId" Type="int" />
+          <Property Name="FileName" Type="nvarchar" MaxLength="255" />
+          <Property Name="FileType" Type="nvarchar" MaxLength="255" />
+          <Property Name="FileData" Type="varbinary(max)" />
         </EntityType>
         <EntityType Name="Filters">
           <Key>
@@ -111,7 +113,8 @@
           <Property Name="TaskAssigneeId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TaskId" Type="int" Nullable="false" />
           <Property Name="UserId" Type="int" Nullable="false" />
-          <Property Name="AssignedAt" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="AssignedAt" Type="datetime2" Precision="7" />
+          <Property Name="IsNew" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="TaskFilters">
           <Key>
@@ -148,6 +151,7 @@
           <Property Name="InviteeId" Type="int" Nullable="false" />
           <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
           <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="IsNew" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="TeamMember">
           <Key>
@@ -292,30 +296,6 @@
             </Principal>
             <Dependent Role="Files">
               <PropertyRef Name="TaskId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Filters_Users">
-          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
-          <End Role="Filters" Type="Self.Filters" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Users">
-              <PropertyRef Name="IdUser" />
-            </Principal>
-            <Dependent Role="Filters">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invitation_Invitee">
-          <End Role="Users" Type="Self.Users" Multiplicity="1" />
-          <End Role="TeamInvitation" Type="Self.TeamInvitation" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Users">
-              <PropertyRef Name="IdUser" />
-            </Principal>
-            <Dependent Role="TeamInvitation">
-              <PropertyRef Name="InviteeId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -535,14 +515,6 @@
             <End Role="Task" EntitySet="Task" />
             <End Role="Files" EntitySet="Files" />
           </AssociationSet>
-          <AssociationSet Name="FK_Filters_Users" Association="Self.FK_Filters_Users">
-            <End Role="Users" EntitySet="Users" />
-            <End Role="Filters" EntitySet="Filters" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invitation_Invitee" Association="Self.FK_Invitation_Invitee">
-            <End Role="Users" EntitySet="Users" />
-            <End Role="TeamInvitation" EntitySet="TeamInvitation" />
-          </AssociationSet>
           <AssociationSet Name="FK_Invitation_Inviter" Association="Self.FK_Invitation_Inviter">
             <End Role="Users" EntitySet="Users" />
             <End Role="TeamInvitation" EntitySet="TeamInvitation" />
@@ -617,10 +589,12 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="FilePath" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="FileType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FilePath" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="FileType" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="TaskId" Type="Int32" />
           <NavigationProperty Name="Task" Relationship="Self.FK_File_Task" FromRole="Files" ToRole="Task" />
+          <Property Name="FileName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="FileData" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <EntityType Name="Filters">
           <Key>
@@ -730,9 +704,10 @@
           <Property Name="TaskAssigneeId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="TaskId" Type="Int32" Nullable="false" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="AssignedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="AssignedAt" Type="DateTime" Precision="7" />
           <NavigationProperty Name="Task" Relationship="Self.FK_TaskAssignee_Task" FromRole="TaskAssignee" ToRole="Task" />
           <NavigationProperty Name="Users" Relationship="Self.FK_TaskAssignee_User" FromRole="TaskAssignee" ToRole="Users" />
+          <Property Name="IsNew" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="TaskLabels">
           <Key>
@@ -769,6 +744,7 @@
           <NavigationProperty Name="Team" Relationship="Self.FK_Invitation_Team" FromRole="TeamInvitation" ToRole="Team" />
           <NavigationProperty Name="Users" Relationship="Self.FK_Invitation_Invitee" FromRole="TeamInvitation" ToRole="Users" />
           <NavigationProperty Name="Users1" Relationship="Self.FK_Invitation_Inviter" FromRole="TeamInvitation" ToRole="Users" />
+          <Property Name="IsNew" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="TeamMember">
           <Key>
@@ -1243,6 +1219,8 @@
           <EntitySetMapping Name="Files">
             <EntityTypeMapping TypeName="TaskManagementModel1.Files">
               <MappingFragment StoreEntitySet="Files">
+                <ScalarProperty Name="FileData" ColumnName="FileData" />
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="FilePath" ColumnName="FilePath" />
                 <ScalarProperty Name="FileType" ColumnName="FileType" />
@@ -1341,6 +1319,7 @@
           <EntitySetMapping Name="TaskAssignee">
             <EntityTypeMapping TypeName="TaskManagementModel1.TaskAssignee">
               <MappingFragment StoreEntitySet="TaskAssignee">
+                <ScalarProperty Name="IsNew" ColumnName="IsNew" />
                 <ScalarProperty Name="TaskAssigneeId" ColumnName="TaskAssigneeId" />
                 <ScalarProperty Name="TaskId" ColumnName="TaskId" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
@@ -1369,6 +1348,7 @@
           <EntitySetMapping Name="TeamInvitation">
             <EntityTypeMapping TypeName="TaskManagementModel1.TeamInvitation">
               <MappingFragment StoreEntitySet="TeamInvitation">
+                <ScalarProperty Name="IsNew" ColumnName="IsNew" />
                 <ScalarProperty Name="InvitationId" ColumnName="InvitationId" />
                 <ScalarProperty Name="TeamId" ColumnName="TeamId" />
                 <ScalarProperty Name="InviterId" ColumnName="InviterId" />

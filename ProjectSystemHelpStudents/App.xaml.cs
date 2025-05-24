@@ -14,6 +14,8 @@ using System.Configuration;
 using ProjectSystemHelpStudents.Helper;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Reflection;
 
 namespace ProjectSystemHelpStudents
 {
@@ -28,6 +30,7 @@ namespace ProjectSystemHelpStudents
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
         [DllImport("user32.dll")]
+
         private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         private const int WM_SHOWAPP = 0x8001;
@@ -47,16 +50,63 @@ namespace ProjectSystemHelpStudents
                 Environment.Exit(0);
             }
 
+            // UI‐исключения
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+
+            // Исключения в других потоках (не UI)
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+            // Исключения в тасках
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         }
 
-        private void App_DispatcherUnhandledException(object sender,
-            System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        #region Глобальный обработчик исключений
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            MessageBox.Show($"Ошибка: {e.Exception.Message}", "Ошибка",
-                            MessageBoxButton.OK, MessageBoxImage.Error);
+            HandleException(e.Exception, "Ошибка в UI-потоке");
             e.Handled = true;
         }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var ex = e.ExceptionObject as Exception
+                     ?? new Exception("Неизвестное необработанное исключение");
+            HandleException(ex, "Ошибка в домене приложения");
+            // если e.IsTerminating == true, процесс всё равно завершится
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            HandleException(e.Exception, "Ошибка в фоновом задании");
+            e.SetObserved();
+        }
+
+        // Централизованный логгер/показ ошибок.
+        private void HandleException(Exception ex, string context)
+        {
+            try
+            {
+                var logPath = Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    "error.log");
+                File.AppendAllText(logPath,
+                    $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{context}] {ex}\n\n");
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MessageBox.Show(
+                        $"{context}:\n{ex.Message}",
+                        "Ошибка",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                });
+            }
+            catch
+            {
+                // чтобы не зациклиться, если даже в логгере упало
+            }
+        }
+        #endregion
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -85,8 +135,14 @@ namespace ProjectSystemHelpStudents
             // Таймер напоминаний (каждую минуту)
             _reminderTimer = new Timer(_ =>
             {
-                try { CheckReminders(); }
-                catch { /* логирование */ }
+                try
+                {
+                    CheckReminders();
+                }
+                catch (Exception ex)
+                {
+                    HandleException(ex, "Ошибка в CheckReminders");
+                }
             },
             null,
             TimeSpan.Zero,
@@ -111,8 +167,14 @@ namespace ProjectSystemHelpStudents
 
             _dailySummaryTimer = new Timer(_ =>
             {
-                try { ShowDailyOverdueSummary(); }
-                catch { /* логирование */ }
+                try
+                {
+                    ShowDailyOverdueSummary();
+                }
+                catch (Exception ex)
+                {
+                    HandleException(ex, "Ошибка в ShowDailyOverdueSummary");
+                }
             },
             null,
             due,
