@@ -203,23 +203,27 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
+            // Сброс сессии
             UserSession.IdUser = 0;
             UserSession.NameUser = null;
 
-            var mainWindow = Application.Current.MainWindow as MainWindow;
+            // Сброс настроек автологина
+            Properties.Settings.Default.RememberMe = false;
+            Properties.Settings.Default.SavedLogin = string.Empty;
+            Properties.Settings.Default.SavedPasswordHash = string.Empty;
+            Properties.Settings.Default.Save();
 
-            if (mainWindow != null)
-            {
-                mainWindow.frmAuth.Content = null;
+            // Скрываем все фреймы контента
+            FrmClass.frmContentUser.Visibility = Visibility.Collapsed;
+            FrmClass.frmContentUser.Content = null;
+            FrmClass.frmStackPanelButton.Visibility = Visibility.Collapsed;
+            FrmClass.frmStackPanelButton.Content = null;
+            FrmClass.frmContentAdmin.Visibility = Visibility.Collapsed;
+            FrmClass.frmContentAdmin.Content = null;
 
-                mainWindow.frmContentUser.Content = null;
-                mainWindow.frmStackPanelButton.Content = null;
-
-                mainWindow.frmAuth.Navigate(new AuthPage());
-
-                Console.WriteLine(UserSession.IdUser);
-                Console.WriteLine(UserSession.NameUser);
-            }
+            // Показываем окно логина
+            FrmClass.frmAuth.Visibility = Visibility.Visible;
+            FrmClass.frmAuth.Content = new AuthPage();
         }
 
         private void DetachButton_Click(object sender, RoutedEventArgs e)
@@ -254,17 +258,6 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
         }
 
-        private void ProjectButton_Click(object sender, RoutedEventArgs e)
-        {
-            Button button = sender as Button;
-            int projectId = (int)button.Tag;
-
-            ProjectDetailsPage content = new ProjectDetailsPage(projectId);
-            FrmClass.frmContentUser.Content = content;
-            StackPanelButtonPage _content = new StackPanelButtonPage();
-            FrmClass.frmStackPanelButton.Content = _content;
-        }
-
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
             SearchWindow addTaskWindow = new SearchWindow();
@@ -273,49 +266,40 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void IncomingButton_Click(object sender, RoutedEventArgs e)
         {
-            IncomingPage content = new IncomingPage();
-            FrmClass.frmContentUser.Content = content;
-            StackPanelButtonPage _content = new StackPanelButtonPage();
-            FrmClass.frmStackPanelButton.Content = _content;
+            FrmClass.NavigateTo(new IncomingPage());
         }
 
         private void TodayButton_Click(object sender, RoutedEventArgs e)
         {
-            TodayPage content = new TodayPage();
-            FrmClass.frmContentUser.Content = content;
-            StackPanelButtonPage _content = new StackPanelButtonPage();
-            FrmClass.frmStackPanelButton.Content = _content;
+            FrmClass.NavigateTo(new TodayPage());
         }
 
         private void UpcomingButton_Click(object sender, RoutedEventArgs e)
         {
-            UpcomingTasksPage content = new UpcomingTasksPage();
-            FrmClass.frmContentUser.Content = content;
-            StackPanelButtonPage _content = new StackPanelButtonPage();
-            FrmClass.frmStackPanelButton.Content = _content;
+            FrmClass.NavigateTo(new UpcomingTasksPage());
         }
 
         private void FiltersButton_Click(object sender, RoutedEventArgs e)
         {
-            FiltersPage content = new FiltersPage();
-            FrmClass.frmContentUser.Content = content;
-            StackPanelButtonPage _content = new StackPanelButtonPage();
-            FrmClass.frmStackPanelButton.Content = _content;
+            FrmClass.NavigateTo(new FiltersPage());
         }
 
         private void CompletedButton_Click(object sender, RoutedEventArgs e)
         {
-            CompletedPage content = new CompletedPage();
-            FrmClass.frmContentUser.Content = content;
-            StackPanelButtonPage _content = new StackPanelButtonPage();
-            FrmClass.frmStackPanelButton.Content = _content;
+            FrmClass.NavigateTo(new CompletedPage());
         }
+
         private void MyProjectButton_Click(object sender, RoutedEventArgs e)
         {
-            MyProjectPage content = new MyProjectPage();
-            FrmClass.frmContentUser.Content = content;
-            StackPanelButtonPage _content = new StackPanelButtonPage();
-            FrmClass.frmStackPanelButton.Content = _content;
-        }     
+            FrmClass.NavigateTo(new MyProjectPage());
+        }
+
+        private void ProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is int projectId)
+            {
+                FrmClass.NavigateTo(new ProjectDetailsPage(projectId));
+            }
+        }
     }
 }

@@ -15,6 +15,16 @@ namespace ProjectSystemHelpStudents.UsersContent
         public AuthPage()
         {
             InitializeComponent();
+
+            // Если есть сохранённые учётки и стоит RememberMe — пытаемся автологин
+            if (Properties.Settings.Default.RememberMe
+                && !string.IsNullOrEmpty(Properties.Settings.Default.SavedLogin)
+                && !string.IsNullOrEmpty(Properties.Settings.Default.SavedPasswordHash))
+            {
+                txbLogin.Text = Properties.Settings.Default.SavedLogin;
+                // вставляем хэш в скрытое поле, чтобы сразу вызвать AttemptLogin:
+                AttemptLogin(Properties.Settings.Default.SavedPasswordHash, isHashed: true);
+            }
         }
 
         private void btnLogIn_Click(object sender, RoutedEventArgs e)
@@ -63,15 +73,19 @@ namespace ProjectSystemHelpStudents.UsersContent
                 }
             }
 
-            AttemptLogin(password);
+            AttemptLogin(password, isHashed: false);
         }
 
-        private void AttemptLogin(string password)
+        private void AttemptLogin(string pwdOrHash, bool isHashed)
         {
-            string hashedPassword = PasswordHelper.HashPassword(password);
+            // Получаем хэш пароля, если пришёл не хэш
+            string hashed = isHashed
+                           ? pwdOrHash
+                           : PasswordHelper.HashPassword(pwdOrHash);
 
+            // Ищем пользователя
             var user = DBClass.entities.Users
-                .FirstOrDefault(i => i.Login == txbLogin.Text && i.Password == hashedPassword);
+                .FirstOrDefault(u => u.Login == txbLogin.Text && u.Password == hashed);
 
             if (user == null)
             {
@@ -80,54 +94,49 @@ namespace ProjectSystemHelpStudents.UsersContent
                 return;
             }
 
+            // Сохраняем в сессии
+            UserSession.IdUser = user.IdUser;
+            UserSession.NotifyUserNameUpdated(user.Name);
+
+            // Обрабатываем Remember Me
+            if (chkRememberMe.IsChecked == true && !isHashed)
+            {
+                Properties.Settings.Default.RememberMe = true;
+                Properties.Settings.Default.SavedLogin = user.Login;
+                Properties.Settings.Default.SavedPasswordHash = hashed;
+                Properties.Settings.Default.Save();
+            }
+            else
+            {
+                Properties.Settings.Default.RememberMe = false;
+                Properties.Settings.Default.SavedLogin = "";
+                Properties.Settings.Default.SavedPasswordHash = "";
+                Properties.Settings.Default.Save();
+            }
+
+            // Навигация далее
+            var mainWin = Application.Current.MainWindow as MainWindow;
+            if (mainWin == null) return;
+
+            // Блок смены пароля
             if (user.MustChangePassword.GetValueOrDefault())
             {
-                UserSession.IdUser = user.IdUser;
-                UserSession.NotifyUserNameUpdated(user.Name);
-
-                var mainWin = Application.Current.MainWindow as MainWindow;
-                   if (mainWin != null)
-                   {
-                    mainWin.frmAuth.Content = null;
-                          
-                    mainWin.frmContentUser.Content = new UserPage(true);
-
-                    mainWin.frmStackPanelButton.Content = new StackPanelButtonPage();
-                   }
-                else
-                {
-                    this.NavigationService?.Navigate(new UserPage());
-                }
-
+                mainWin.frmAuth.Content = null;
+                mainWin.frmContentUser.Content = new UserPage(true);
+                mainWin.frmStackPanelButton.Content = new StackPanelButtonPage();
                 return;
             }
+
+            // Показываем UI в зависимости от роли
             if (user.RoleUser == 1)
             {
-                UserSession.IdUser = user.IdUser;
-                UserSession.NotifyUserNameUpdated(user.Name);
                 MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
-
-                var mainWindow = Application.Current.MainWindow as MainWindow;
-                if (mainWindow != null)
-                {
-                    mainWindow.frmAuth.Content = null;
-                    mainWindow.frmContentUser.Content = null;
-                    mainWindow.frmStackPanelButton.Content = new AdminNavigationPage();
-                }
+                mainWin.ShowAdminUI();
             }
-            if (user.RoleUser == 2)
+            else if (user.RoleUser == 2)
             {
-                UserSession.IdUser = user.IdUser;
-                UserSession.NotifyUserNameUpdated(user.Name);
                 MessageBox.Show("Здравствуйте, " + UserSession.NameUser);
-
-                var mainWindow = Application.Current.MainWindow as MainWindow;
-                if (mainWindow != null)
-                {
-                    mainWindow.frmAuth.Content = null;
-                    mainWindow.frmContentUser.Content = new UpcomingTasksPage();
-                    mainWindow.frmStackPanelButton.Content = new StackPanelButtonPage();
-                }
+                mainWin.ShowUserUI();
             }
         }
 

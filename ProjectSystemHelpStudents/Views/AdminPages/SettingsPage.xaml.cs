@@ -27,7 +27,7 @@ namespace ProjectSystemHelpStudents.Views.AdminPages
             LoadStatuses();
         }
 
-        // ——— PRIORITIES ————————————————————————————————
+        // Приоритет
 
         private void LoadPriorities()
         {
@@ -102,7 +102,7 @@ namespace ProjectSystemHelpStudents.Views.AdminPages
             }
         }
 
-        // ——— STATUSES ——————————————————————————————————
+        // Статус
 
         private void LoadStatuses()
         {
@@ -177,7 +177,6 @@ namespace ProjectSystemHelpStudents.Views.AdminPages
             }
         }
 
-        // ——— Shared edit dialog logic ————————————————
         private void OpenEditDialog(
             object entity,
             bool isNew,
@@ -188,7 +187,7 @@ namespace ProjectSystemHelpStudents.Views.AdminPages
             var prop = entity.GetType().GetProperty("Name");
             var current = prop.GetValue(entity) as string ?? string.Empty;
 
-            // Строим окно
+            // Окно
             var dlg = new Window
             {
                 Title = isNew ? "Добавление" : "Редактирование",
@@ -202,7 +201,9 @@ namespace ProjectSystemHelpStudents.Views.AdminPages
             {
                 Width = 200,
                 Margin = new Thickness(10),
-                Text = current
+                Text = current,
+                Style = (Style)Application.Current.FindResource("InputFieldStyle")
+
             };
             tb.TextChanged += (_, __) => prop.SetValue(entity, tb.Text);
 
@@ -211,7 +212,9 @@ namespace ProjectSystemHelpStudents.Views.AdminPages
                 Content = "OK",
                 IsDefault = true,
                 Margin = new Thickness(10),
-                Padding = new Thickness(10, 4, 10, 4)
+                Padding = new Thickness(10, 4, 10, 4),
+                Style = (Style)Application.Current.FindResource("NormalButtonStyle")
+
             };
             btnOk.Click += (_, __) =>
             {

@@ -1,44 +1,92 @@
-﻿using System.Windows.Navigation;
-using ProjectSystemHelpStudents.UsersContent;
-using ProjectSystemHelpStudents.Helper;
-using System.Windows.Interop;
+﻿using System;
 using System.Windows;
-using System;
+using System.Windows.Interop;
+using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.UsersContent;
+using ProjectSystemHelpStudents.Views.AdminPages;
 
 namespace ProjectSystemHelpStudents
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : System.Windows.Window
+    public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
-            AuthPage authPage = new AuthPage();
-            frmAuth.Content = authPage;
 
-            FrmClass.frmStackPanelButton = frmStackPanelButton;
-            FrmClass.frmAuth = frmAuth;
-            FrmClass.frmReg = frmReg;
-            FrmClass.frmContentUser = frmContentUser;
-            FrmClass.frmContentAdmin = frmContentAdmin;
+            FrmClass.frmReg = this.frmReg;
+            FrmClass.frmAuth = this.frmAuth;
+            FrmClass.frmContentUser = this.frmContentUser;
+            FrmClass.frmContentAdmin = this.frmContentAdmin;
+            FrmClass.frmStackPanelButton = this.frmStackPanelButton;
+
+            ShowLogin();
+        }
+
+        public void ShowLogin()
+        {
+            // Сброс сессии
+            UserSession.IdUser = 0;
+            UserSession.NameUser = null;
+
+            // Показываем только AuthPage
+            frmAuth.Visibility = Visibility.Visible;
+            frmAuth.Content = new AuthPage();
+
+            frmContentUser.Visibility = Visibility.Collapsed;
+            frmContentUser.Content = null;
+
+            frmStackPanelButton.Visibility = Visibility.Collapsed;
+            frmStackPanelButton.Content = null;
+
+            frmContentAdmin.Visibility = Visibility.Collapsed;
+            frmContentAdmin.Content = null;
+        }
+
+        public void ShowAdminUI()
+        {
+            frmAuth.Visibility = Visibility.Collapsed;
+            frmAuth.Content = null;
+
+            frmContentUser.Visibility = Visibility.Collapsed;
+            frmContentUser.Content = null;
+
+            frmStackPanelButton.Visibility = Visibility.Visible;
+            frmStackPanelButton.Content = new AdminNavigationPage();
+
+            frmContentAdmin.Visibility = Visibility.Visible;
+            frmContentAdmin.Content = new UsersManagementPage();
+        }
+
+        public void ShowUserUI()
+        {
+            frmAuth.Visibility = Visibility.Collapsed;
+            frmAuth.Content = null;
+
+            frmContentAdmin.Visibility = Visibility.Collapsed;
+            frmContentAdmin.Content = null;
+
+            frmContentUser.Visibility = Visibility.Visible;
+            frmContentUser.Content = new UpcomingTasksPage();
+
+            frmStackPanelButton.Visibility = Visibility.Visible;
+            frmStackPanelButton.Content = new StackPanelButtonPage();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
-            source.AddHook(WndProc);
+            var source = PresentationSource.FromVisual(this) as HwndSource;
+            source?.AddHook(WndProc);
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == 0x8001)
+            const int WM_SHOWME = 0x8001;
+            if (msg == WM_SHOWME)
             {
-                this.Show();
-                this.WindowState = WindowState.Normal;
-                this.Activate();
+                Show();
+                WindowState = WindowState.Normal;
+                Activate();
                 handled = true;
             }
             return IntPtr.Zero;

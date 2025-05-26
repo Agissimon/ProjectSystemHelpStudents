@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -45,17 +47,75 @@ namespace ProjectSystemHelpStudents.Views.AdminPages
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is int id)
+            if (!(sender is Button btn) || !(btn.Tag is int id))
+                return;
+
+            var owned = _ctx.Project
+                .Include("Task")
+                .Include("Task.Files")
+                .Include("Task.Comment")
+                .Include("Section")
+                .Where(p => p.OwnerId == id)
+                .ToList();
+
+            foreach (var pr in owned)
             {
-                var user = _ctx.Users.Find(id);
-                if (user != null &&
-                    MessageBox.Show($"Удалить пользователя «{user.Name}»?", "Подтверждение",
-                                    MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                // удаляем все зависимости
+                foreach (var t in pr.Task.ToList())
                 {
-                    _ctx.Users.Remove(user);
-                    _ctx.SaveChanges();
-                    _users.Remove(user);
+                    _ctx.Files.RemoveRange(t.Files);
+                    _ctx.Comment.RemoveRange(t.Comment);
+                    _ctx.TaskAssignee.RemoveRange(t.TaskAssignee);
+                    _ctx.TaskFilters.RemoveRange(t.TaskFilters);
+                    _ctx.TaskLabels.RemoveRange(t.TaskLabels);
+                    _ctx.Task.Remove(t);
                 }
+
+                _ctx.Section.RemoveRange(pr.Section);
+
+                _ctx.Project.Remove(pr);
+            }
+
+            var user = _ctx.Users
+                .Include("TaskAssignee")
+                .Include("Comment")
+                .Include("TeamMember")
+                .Include("Filters")
+                .Include("TeamInvitation")
+                .Include("TeamInvitation1")
+                .FirstOrDefault(u => u.IdUser == id);
+
+            if (user == null)
+                return;
+
+            if (MessageBox.Show(
+                    $"Удалить пользователя «{user.Name}»?",
+                    "Подтверждение",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning
+                ) != MessageBoxResult.Yes)
+                return;
+
+            _ctx.TaskAssignee.RemoveRange(user.TaskAssignee);
+            _ctx.Comment.RemoveRange(user.Comment);
+            _ctx.TeamMember.RemoveRange(user.TeamMember);
+            _ctx.Filters.RemoveRange(user.Filters);
+            _ctx.TeamInvitation.RemoveRange(user.TeamInvitation);
+            _ctx.TeamInvitation.RemoveRange(user.TeamInvitation1);
+
+            _ctx.Users.Remove(user);
+
+            try
+            {
+                _ctx.SaveChanges();
+                _users.Remove(user);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                var msg = dbEx.InnerException?.InnerException?.Message
+                          ?? dbEx.InnerException?.Message
+                          ?? dbEx.Message;
+                MessageBox.Show($"Ошибка при удалении:\n{msg}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
