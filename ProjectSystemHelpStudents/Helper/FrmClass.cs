@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using ProjectSystemHelpStudents.UsersContent;
+using ProjectSystemHelpStudents.Views.AdminPages;
 
 namespace ProjectSystemHelpStudents.Helper
 {
@@ -13,16 +14,28 @@ namespace ProjectSystemHelpStudents.Helper
 
         public static void NavigateTo(Page contentPage)
         {
-            // Если хотим навигацию внутри UserContent
             if (frmContentUser != null)
             {
                 frmContentUser.Content = contentPage;
             }
 
-            // Если нужно всегда показывать панель кнопок
             if (frmStackPanelButton != null && !(frmStackPanelButton.Content is StackPanelButtonPage))
             {
                 frmStackPanelButton.Content = new StackPanelButtonPage();
+            }
+        }
+
+        public static void NavigateAdmin(Page page)
+        {
+            if (frmContentAdmin != null)
+            {
+                frmContentAdmin.Content = page;
+            }
+
+            if (frmStackPanelButton != null
+                && !(frmStackPanelButton.Content is AdminNavigationPage))
+            {
+                frmStackPanelButton.Content = new AdminNavigationPage();
             }
         }
     }
