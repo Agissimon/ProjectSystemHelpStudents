@@ -75,18 +75,72 @@ namespace ProjectSystemHelpStudents.Views.AdminPages
 
         private void DeleteProjectButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is int id)
-            {
-                var proj = _ctx.Project.Find(id);
-                if (proj != null)
-                {
-                    _ctx.Project.Remove(proj);
-                    _ctx.SaveChanges();
+            if (!(sender is Button btn) || !(btn.Tag is int id))
+                return;
 
-                    var source = _projectsView.SourceCollection as ObservableCollection<Project>;
-                    var toRemove = source?.FirstOrDefault(p => p.ProjectId == id);
-                    if (toRemove != null) source.Remove(toRemove);
-                }
+            var proj = _ctx.Project
+                .Include("Section")
+                .Include("Task")
+                .Include("Task.Files")
+                .Include("Task.Comment")
+                .Include("Task.TaskAssignee")
+                .Include("Task.TaskFilters")
+                .Include("Task.TaskLabels")
+                .FirstOrDefault(p => p.ProjectId == id);
+
+            if (proj == null)
+                return;
+
+            if (MessageBox.Show(
+                    $"Удалить проект «{proj.Name}» и все связанные данные?",
+                    "Подтверждение",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning
+                ) != MessageBoxResult.Yes)
+                return;
+
+            foreach (var task in proj.Task.ToList())
+            {
+                if (task.Files.Any())
+                    _ctx.Files.RemoveRange(task.Files);
+
+                if (task.Comment.Any())
+                    _ctx.Comment.RemoveRange(task.Comment);
+
+                if (task.TaskAssignee.Any())
+                    _ctx.TaskAssignee.RemoveRange(task.TaskAssignee);
+
+                if (task.TaskFilters.Any())
+                    _ctx.TaskFilters.RemoveRange(task.TaskFilters);
+
+                if (task.TaskLabels.Any())
+                    _ctx.TaskLabels.RemoveRange(task.TaskLabels);
+
+                _ctx.Task.Remove(task);
+            }
+
+            if (proj.Section.Any())
+                _ctx.Section.RemoveRange(proj.Section);
+
+            _ctx.Project.Remove(proj);
+
+            try
+            {
+                _ctx.SaveChanges();
+
+                var source = _projectsView.SourceCollection as ObservableCollection<Project>;
+                var toRemove = source?.FirstOrDefault(p => p.ProjectId == id);
+                if (toRemove != null)
+                    source.Remove(toRemove);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Ошибка при удалении проекта: {ex.Message}",
+                    "Ошибка",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
             }
         }
 

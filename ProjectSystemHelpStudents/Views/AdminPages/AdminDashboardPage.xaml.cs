@@ -17,41 +17,42 @@ namespace ProjectSystemHelpStudents.Views.AdminPages
 
         private void UsersButton_Click(object sender, RoutedEventArgs e)
         {
-            var page = new UsersManagementPage();
-            FrmClass.frmContentUser.Content = page;
+            FrmClass.NavigateTo(new UsersManagementPage());
         }
 
         private void ProjectsButton_Click(object sender, RoutedEventArgs e)
         {
-            var page = new ProjectsManagementPage();
-            FrmClass.frmContentUser.Content = page;
+            FrmClass.NavigateTo(new ProjectsManagementPage());
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            var page = new SettingsPage();
-            FrmClass.frmContentUser.Content = page;
+            FrmClass.NavigateTo(new SettingsPage());
         }
 
         private void SignOutButton_Click(object sender, RoutedEventArgs e)
         {
+            // Сброс сессии
             UserSession.IdUser = 0;
             UserSession.NameUser = null;
 
-            var mainWindow = Application.Current.MainWindow as MainWindow;
+            // Сброс настроек автологина
+            Properties.Settings.Default.RememberMe = false;
+            Properties.Settings.Default.SavedLogin = string.Empty;
+            Properties.Settings.Default.SavedPasswordHash = string.Empty;
+            Properties.Settings.Default.Save();
 
-            if (mainWindow != null)
-            {
-                mainWindow.frmAuth.Content = null;
+            // Скрываем все фреймы контента
+            FrmClass.frmContentUser.Visibility = Visibility.Collapsed;
+            FrmClass.frmContentUser.Content = null;
+            FrmClass.frmStackPanelButton.Visibility = Visibility.Collapsed;
+            FrmClass.frmStackPanelButton.Content = null;
+            FrmClass.frmContentAdmin.Visibility = Visibility.Collapsed;
+            FrmClass.frmContentAdmin.Content = null;
 
-                mainWindow.frmContentUser.Content = null;
-                mainWindow.frmStackPanelButton.Content = null;
-
-                mainWindow.frmAuth.Navigate(new AuthPage());
-
-                Console.WriteLine(UserSession.IdUser);
-                Console.WriteLine(UserSession.NameUser);
-            }
+            // Показываем окно логина
+            FrmClass.frmAuth.Visibility = Visibility.Visible;
+            FrmClass.frmAuth.Content = new AuthPage();
         }
     }
 }

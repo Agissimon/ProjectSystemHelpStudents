@@ -41,5 +41,14 @@
     <Setting Name="PasswordResetTimestamps" Type="System.Collections.Specialized.StringDictionary" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="RememberMe" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SavedLogin" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SavedPasswordHash" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
