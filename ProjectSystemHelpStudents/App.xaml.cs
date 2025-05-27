@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Reflection;
+using ProjectSystemHelpStudents.Properties;
 
 namespace ProjectSystemHelpStudents
 {
@@ -324,26 +325,29 @@ namespace ProjectSystemHelpStudents
             }
         }
 
-        private void MainWindow_Closing(object sender,
-            System.ComponentModel.CancelEventArgs e)
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (!_isReallyClosing)
             {
+                // Отменяем закрытие
                 e.Cancel = true;
-                MainWindow.Hide();
+                // Прячем главное окно
+                this.MainWindow.Hide();
             }
         }
 
         private void ShowMainWindow()
         {
-            if (MainWindow == null)
+            var mw = MainWindow as MainWindow;
+            if (UserSession.IdUser == 0)
             {
-                MainWindow = new MainWindow();
-                MainWindow.Closing += MainWindow_Closing;
+                // если сессии нет — показать логин
+                mw.ShowLogin();
             }
-            MainWindow.Show();
-            MainWindow.WindowState = WindowState.Normal;
-            MainWindow.Activate();
+            // иначе — просто показываем текущий UI
+            mw.Show();
+            mw.WindowState = WindowState.Normal;
+            mw.Activate();
         }
 
         private void ExitApplication()

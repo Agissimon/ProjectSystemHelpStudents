@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Interop;
 using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.Properties;
 using ProjectSystemHelpStudents.UsersContent;
 using ProjectSystemHelpStudents.Views.AdminPages;
 
@@ -13,6 +14,7 @@ namespace ProjectSystemHelpStudents
         {
             InitializeComponent();
 
+            // Регистрируем фреймы
             FrmClass.frmReg = this.frmReg;
             FrmClass.frmAuth = this.frmAuth;
             FrmClass.frmContentUser = this.frmContentUser;
@@ -24,22 +26,32 @@ namespace ProjectSystemHelpStudents
 
         public void ShowLogin()
         {
-            // Сброс сессии
+            // 1) Сброс сессии
             UserSession.IdUser = 0;
             UserSession.NameUser = null;
 
-            // Показываем только AuthPage
-            frmAuth.Visibility = Visibility.Visible;
-            frmAuth.Content = new AuthPage();
+            // 2) Обновляем настройки
+            Properties.Settings.Default.Reload();
 
+            // 3) Если RememberMe == false — очищаем старые Сredentials
+            if (!Properties.Settings.Default.RememberMe)
+            {
+                Properties.Settings.Default.SavedLogin = "";
+                Properties.Settings.Default.SavedPasswordHash = "";
+                Properties.Settings.Default.Save();
+            }
+
+            // 4) Скрываем все панели
             frmContentUser.Visibility = Visibility.Collapsed;
             frmContentUser.Content = null;
-
             frmStackPanelButton.Visibility = Visibility.Collapsed;
             frmStackPanelButton.Content = null;
-
             frmContentAdmin.Visibility = Visibility.Collapsed;
             frmContentAdmin.Content = null;
+
+            // 5) Показываем AuthPage
+            frmAuth.Visibility = Visibility.Visible;
+            frmAuth.Content = new AuthPage();
         }
 
         public void ShowAdminUI()
@@ -84,9 +96,28 @@ namespace ProjectSystemHelpStudents
             const int WM_SHOWME = 0x8001;
             if (msg == WM_SHOWME)
             {
-                Show();
-                WindowState = WindowState.Normal;
-                Activate();
+                if (!Settings.Default.RememberMe)
+                {
+                    // Если ользователь не хотел автологин чистим данные и показываем логин
+                    UserSession.IdUser = 0;
+                    UserSession.NameUser = null;
+
+                    Settings.Default.SavedLogin = "";
+                    Settings.Default.SavedPasswordHash = "";
+                    Settings.Default.Save();
+
+                    ShowLogin();
+                }
+                else
+                {
+                    // Если пользователь хотел автологин просто вернём UI как есть
+                }
+
+                // В любом случае нужно показать само окно
+                this.Show();
+                this.WindowState = WindowState.Normal;
+                this.Activate();
+
                 handled = true;
             }
             return IntPtr.Zero;
