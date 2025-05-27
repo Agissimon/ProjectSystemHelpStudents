@@ -17,7 +17,6 @@ namespace ProjectSystemHelpStudents.UsersContent
     {
         private DateTime _startOfWeek;
         private ObservableCollection<TaskGroupViewModel> _groupedTasks;
-        private bool _isDateManuallyChanged = false;
         private bool _isInitializing = false;
 
         public UpcomingTasksPage()
