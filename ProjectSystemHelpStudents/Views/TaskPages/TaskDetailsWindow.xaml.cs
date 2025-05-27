@@ -263,8 +263,13 @@ namespace ProjectSystemHelpStudents
                     ctx.TaskAssignee.RemoveRange(toRemove);
 
                     var exist = dbTask.TaskAssignee.Select(ta => ta.UserId).ToList();
+
                     var toAdd = _task.Assignees
-                        .Where(vm => vm.IsAssigned && !exist.Contains(vm.UserId))
+                        .Where(vm =>
+                            vm.IsAssigned &&
+                            !exist.Contains(vm.UserId) &&
+                            vm.UserId != _task.IdUser    // пропускаем автора задачи
+                        )
                         .Select(vm => new TaskAssignee
                         {
                             TaskId = _task.IdTask,

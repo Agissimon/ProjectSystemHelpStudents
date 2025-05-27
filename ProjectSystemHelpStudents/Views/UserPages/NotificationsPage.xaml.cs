@@ -24,25 +24,23 @@ namespace ProjectSystemHelpStudents.Views.UserPages
 
             using (var ctx = new TaskManagementEntities1())
             {
-                // Гасим маркеры новых уведомлений (только для бейджа)
+                // Сбросим IsNew у приглашений и назначений (для бейджа), но сами записи оставим в БД до явного удаления.
                 var newInvites = ctx.TeamInvitation
                                     .Where(ti => ti.InviteeId == userId
                                               && ti.Status == "В ожидании"
-                                              && ti.IsNew == true)
+                                              && ti.IsNew)
                                     .ToList();
-                foreach (var ti in newInvites)
-                    ti.IsNew = false;
+                newInvites.ForEach(ti => ti.IsNew = false);
 
                 var newAssignments = ctx.TaskAssignee
                                         .Where(ta => ta.UserId == userId
-                                                  && ta.IsNew == true)
+                                                  && ta.IsNew)
                                         .ToList();
-                foreach (var ta in newAssignments)
-                    ta.IsNew = false;
+                newAssignments.ForEach(ta => ta.IsNew = false);
 
                 ctx.SaveChanges();
 
-                // Вычитываем все (ожидающие) приглашения независимо от IsNew
+                // Вычитываем все (ожидающие) приглашения
                 var invitesRaw = (from ti in ctx.TeamInvitation
                                   where ti.InviteeId == userId
                                         && ti.Status == "В ожидании"
@@ -59,9 +57,10 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                                   })
                                  .ToList();
 
-                // Вычитываем все (активные) назначения независимо от IsNew
+                // Вычитываем все назначения, **кроме тех, что сделал сам пользователь**
                 var assignmentsRaw = (from ta in ctx.TaskAssignee
                                       where ta.UserId == userId
+                                            && ta.Task.CreatorId != userId
                                       join task in ctx.Task on ta.TaskId equals task.IdTask
                                       join creator in ctx.Users on task.CreatorId equals creator.IdUser
                                       orderby ta.TaskAssigneeId descending
@@ -75,6 +74,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                                       })
                                      .ToList();
 
+                // Преобразуем в VM
                 var invites = invitesRaw
                     .Select(x => new NotificationViewModel
                     {
@@ -84,8 +84,7 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                         Message = $"{x.InviterName} пригласил вас в «{x.TeamName}»",
                         CreatedAt = x.CreatedAt ?? DateTime.Now,
                         Payload = x.ti
-                    })
-                    .ToList();
+                    });
 
                 var assignments = assignmentsRaw
                     .Select(x => new NotificationViewModel
@@ -96,9 +95,9 @@ namespace ProjectSystemHelpStudents.Views.UserPages
                         Message = $"{x.CreatorName} назначил вас на «{x.TaskTitle}»",
                         CreatedAt = x.AssignedAt ?? DateTime.Now,
                         Payload = x.ta
-                    })
-                    .ToList();
+                    });
 
+                // Собираем, сортируем
                 allNotifications = invites
                     .Concat(assignments)
                     .OrderByDescending(n => n.CreatedAt)
@@ -168,21 +167,24 @@ namespace ProjectSystemHelpStudents.Views.UserPages
 
         private void IgnoreTask_Click(object sender, RoutedEventArgs e)
         {
-            // Достаём модель уведомления
             var vm = (NotificationViewModel)((Button)sender).CommandParameter;
             if (vm.Type != NotificationType.TaskAssignee)
                 return;
 
-            // Получаем текущий список из UI
-            var current = NotificationsList.ItemsSource
-                             as List<NotificationViewModel>;
-            if (current == null) return;
+            var ta = vm.Payload as TaskAssignee;
+            if (ta == null) return;
 
-            var filtered = current
-                .Where(n => !(n.Type == vm.Type && n.Id == vm.Id))
-                .ToList();
+            using (var ctx = new TaskManagementEntities1())
+            {
+                var dbTa = ctx.TaskAssignee.Find(ta.TaskAssigneeId);
+                if (dbTa != null)
+                {
+                    ctx.TaskAssignee.Remove(dbTa);
+                    ctx.SaveChanges();
+                }
+            }
 
-            NotificationsList.ItemsSource = filtered;
+            LoadNotifications();
         }
     }
 }
