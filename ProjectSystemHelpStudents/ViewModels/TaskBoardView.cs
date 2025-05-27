@@ -13,64 +13,61 @@ namespace ProjectSystemHelpStudents.Views
 {
     public class TaskBoardView
     {
-        /// <summary>
-        /// Создаёт всю панель доски вместе с навигацией.
-        /// </summary>
         public static DockPanel CreateBoardView(IEnumerable<TaskViewModel> tasks)
         {
-            int weekOffset = Properties.Settings.Default.BoardWeekOffset;
-            var refDate = DateTime.Today.AddDays(weekOffset * 7);
-            int mondayDelta = ((int)refDate.DayOfWeek + 6) % 7;
-            DateTime monday = refDate.AddDays(-mondayDelta);
+            int offset = Properties.Settings.Default.BoardWeekOffset;
+            DateTime baseDate = DateTime.Today.AddDays(offset * 7);
 
-            var boardGrid = new Grid { Tag = tasks };
-            RefreshBoard(boardGrid, tasks, monday);
+            // Вычисляем понедельник нужной недели
+            int deltaToMonday = ((int)baseDate.DayOfWeek + 6) % 7;
+            DateTime monday = baseDate.AddDays(-deltaToMonday);
 
-            var navBar = new StackPanel
+            var grid = new Grid { Tag = tasks };
+            RefreshBoard(grid, tasks, monday);
+
+            // Навигация
+            var nav = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Margin = new Thickness(0, 5, 5, 5)
             };
-            var btnStyle = (Style)Application.Current.FindResource("TransparentButtonStyle");
+            var style = (Style)Application.Current.FindResource("TransparentButtonStyle");
+            var btnPrev = new Button { Content = "⟨", Style = style, Margin = new Thickness(2) };
+            var btnToday = new Button { Content = "Сегодня", Style = style, Margin = new Thickness(2) };
+            var btnNext = new Button { Content = "⟩", Style = style, Margin = new Thickness(2) };
 
-            var prev = new Button { Content = "⟨", Style = btnStyle, Margin = new Thickness(2) };
-            var btnToday = new Button { Content = "Сегодня", Style = btnStyle, Margin = new Thickness(2) };
-            var next = new Button { Content = "⟩", Style = btnStyle, Margin = new Thickness(2) };
-
-            prev.Click += (s, e) => ChangeWeekOffset(-1, boardGrid, tasks);
-            next.Click += (s, e) => ChangeWeekOffset(+1, boardGrid, tasks);
+            btnPrev.Click += (s, e) => ChangeWeekOffset(-1, grid, tasks);
+            btnNext.Click += (s, e) => ChangeWeekOffset(+1, grid, tasks);
             btnToday.Click += (s, e) =>
             {
                 Properties.Settings.Default.BoardWeekOffset = 0;
                 Properties.Settings.Default.Save();
-                var today = DateTime.Today;
-                int mondayDeltaToday = ((int)today.DayOfWeek + 6) % 7;
-                DateTime mondayToday = today.AddDays(-mondayDeltaToday);
-                RefreshBoard(boardGrid, tasks, mondayToday);
+                // Переходим на понедельник этой недели
+                DateTime today = DateTime.Today;
+                int d2m = ((int)today.DayOfWeek + 6) % 7;
+                RefreshBoard(grid, tasks, today.AddDays(-d2m));
             };
 
-            navBar.Children.Add(prev);
-            navBar.Children.Add(btnToday);
-            navBar.Children.Add(next);
+            nav.Children.Add(btnPrev);
+            nav.Children.Add(btnToday);
+            nav.Children.Add(btnNext);
 
             var root = new DockPanel();
-            DockPanel.SetDock(navBar, Dock.Top);
-            root.Children.Add(navBar);
-            root.Children.Add(boardGrid);
+            DockPanel.SetDock(nav, Dock.Top);
+            root.Children.Add(nav);
+            root.Children.Add(grid);
             return root;
         }
 
         private static void ChangeWeekOffset(int delta, Grid grid, IEnumerable<TaskViewModel> tasks)
         {
-            int off = Properties.Settings.Default.BoardWeekOffset + delta;
-            Properties.Settings.Default.BoardWeekOffset = off;
+            Properties.Settings.Default.BoardWeekOffset += delta;
             Properties.Settings.Default.Save();
 
-            var refDate = DateTime.Today.AddDays(off * 7);
-            int mondayDelta = ((int)refDate.DayOfWeek + 6) % 7;
-            DateTime monday = refDate.AddDays(-mondayDelta);
-            RefreshBoard(grid, tasks, monday);
+            DateTime baseDate = DateTime.Today.AddDays(Properties.Settings.Default.BoardWeekOffset * 7);
+            int d2m = ((int)baseDate.DayOfWeek + 6) % 7;
+            RefreshBoard(grid, tasks, baseDate.AddDays(-d2m));
         }
 
         private static void RefreshBoard(Grid grid, IEnumerable<TaskViewModel> tasks, DateTime monday)
@@ -79,43 +76,48 @@ namespace ProjectSystemHelpStudents.Views
             grid.ColumnDefinitions.Clear();
 
             DateTime today = DateTime.Today;
-            bool isCurrentWeek = Properties.Settings.Default.BoardWeekOffset == 0;
+            bool isCurrent = Properties.Settings.Default.BoardWeekOffset == 0;
             bool overdueExpanded = Properties.Settings.Default.OverdueExpanded;
 
-            var columns = new List<(int index, DateTime? date, IEnumerable<TaskViewModel> tasks)>();
+            // 0 — просрочено
+            var columns = new List<(int idx, DateTime? date, IEnumerable<TaskViewModel> items)>();
             columns.Add((0, null, tasks.Where(t => t.EndDate.Date < today)));
 
-            for (int i = 1; i <= 7; i++)
+            // Дни: если текущая неделя, начинаем с today, иначе — с monday
+            for (int i = 0; i < 7; i++)
             {
-                var dt = monday.AddDays(i - 1);
-                if (isCurrentWeek && dt < today) continue;
-                var dayTasks = tasks.Where(t => t.EndDate.Date == dt);
-                columns.Add((i, dt, dayTasks));
+                DateTime dt = monday.AddDays(i);
+                if (isCurrent && dt < today)
+                    continue;   // убираем дни до сегодня
+                columns.Add((i + 1, dt, tasks.Where(t => t.EndDate.Date == dt)));
             }
 
+            // ColumnDefinitions
             foreach (var _ in columns)
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
+            // Построение
             for (int colIdx = 0; colIdx < columns.Count; colIdx++)
             {
-                var (i, columnDate, columnTasks) = columns[colIdx];
+                var (idx, date, items) = columns[colIdx];
                 var panel = new StackPanel { Margin = new Thickness(3) };
 
-                if (i == 0)
+                if (idx == 0)
                 {
+                    // Просрочено
                     var exp = new Expander
                     {
-                        Header = $"Просрочено ({columnTasks.Count()})",
+                        Header = $"Просрочено ({items.Count()})",
                         IsExpanded = overdueExpanded,
                         FontSize = 16,
                         FontWeight = FontWeights.Bold,
                         Foreground = Brushes.White
                     };
-                    exp.Expanded += (s, e) => SaveOverdueState(true);
-                    exp.Collapsed += (s, e) => SaveOverdueState(false);
+                    exp.Expanded += (_, __) => SaveOverdueState(true);
+                    exp.Collapsed += (_, __) => SaveOverdueState(false);
 
                     var inner = new StackPanel();
-                    foreach (var t in columnTasks.OrderBy(t => t.EndDate))
+                    foreach (var t in items.OrderBy(t => t.EndDate))
                         inner.Children.Add(CreateTaskCard(t, grid, tasks, monday));
 
                     exp.Content = new ScrollViewer
@@ -129,11 +131,11 @@ namespace ProjectSystemHelpStudents.Views
                 }
                 else
                 {
-                    DateTime dt = columnDate.Value;
-                    string label = GetRelativeLabel(dt, today);
+                    // День
+                    DateTime dt = date.Value;
                     panel.Children.Add(new TextBlock
                     {
-                        Text = $"{dt:dd MMMM} ‧ {label}",
+                        Text = $"{dt:dd MMMM} ‧ {GetRelativeLabel(dt, today)}",
                         FontSize = 16,
                         FontWeight = dt == today ? FontWeights.Bold : FontWeights.Normal,
                         Foreground = dt == today ? Brushes.Red : Brushes.White,
@@ -141,29 +143,30 @@ namespace ProjectSystemHelpStudents.Views
                         Margin = new Thickness(0, 5, 0, 5)
                     });
 
-                    var dayInner = new StackPanel();
-                    foreach (var t in columnTasks.OrderBy(t => t.EndDate))
-                        dayInner.Children.Add(CreateTaskCard(t, grid, tasks, monday));
+                    var inner = new StackPanel();
+                    foreach (var t in items.OrderBy(t => t.EndDate))
+                        inner.Children.Add(CreateTaskCard(t, grid, tasks, monday));
 
                     panel.Children.Add(new ScrollViewer
                     {
-                        Content = dayInner,
+                        Content = inner,
                         VerticalScrollBarVisibility = ScrollBarVisibility.Auto
                     });
                 }
 
-                int idx = i;
+                // Кнопка добавить
                 var btn = new Button
                 {
                     Content = "+ Добавить задачу",
                     Margin = new Thickness(3),
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Style = (Style)Application.Current.FindResource("AddTaskButtonStyle"),
+                    Style = (Style)Application.Current.FindResource("AddTaskButtonStyle")
                 };
+                int j = idx;
                 btn.Click += (s, e) =>
                 {
                     var w = new AddTaskWindow();
-                    DateTime pre = (idx == 0) ? today.AddDays(-1) : monday.AddDays(idx - 1);
+                    DateTime pre = (idx == 0 ? today.AddDays(-1) : monday.AddDays(idx - 1));
                     w.SetPreselectedDate(pre);
                     if (w.ShowDialog() == true)
                         RefreshBoard(grid, tasks, monday);
@@ -180,9 +183,9 @@ namespace ProjectSystemHelpStudents.Views
             }
         }
 
-        private static void SaveOverdueState(bool expanded)
+        private static void SaveOverdueState(bool exp)
         {
-            Properties.Settings.Default.OverdueExpanded = expanded;
+            Properties.Settings.Default.OverdueExpanded = exp;
             Properties.Settings.Default.Save();
         }
 
@@ -196,7 +199,7 @@ namespace ProjectSystemHelpStudents.Views
 
         private static Border CreateTaskCard(
             TaskViewModel t,
-            Grid boardGrid,
+            Grid grid,
             IEnumerable<TaskViewModel> tasks,
             DateTime monday)
         {
@@ -207,8 +210,8 @@ namespace ProjectSystemHelpStudents.Views
                 Margin = new Thickness(0, 0, 6, 0),
                 BorderThickness = new Thickness(2)
             };
-            check.Checked += (s, e) => OnTaskToggled(t, boardGrid, tasks, monday);
-            check.Unchecked += (s, e) => OnTaskToggled(t, boardGrid, tasks, monday);
+            check.Checked += (s, e) => OnTaskToggled(t, grid, tasks, monday);
+            check.Unchecked += (s, e) => OnTaskToggled(t, grid, tasks, monday);
 
             var info = new StackPanel { Orientation = Orientation.Vertical };
             info.Children.Add(new TextBlock
@@ -234,9 +237,9 @@ namespace ProjectSystemHelpStudents.Views
                 FontSize = 11,
                 Margin = new Thickness(0, 2, 0, 0)
             });
-            if (t.AvailableLabels?.Any() == true)
+            if (t.AvailableLabels?.Any(l => l.IsSelected) == true)
             {
-                var lbls = string.Join(", ", t.AvailableLabels.Select(l => l.Name));
+                var lbls = string.Join(", ", t.AvailableLabels.Where(l => l.IsSelected).Select(l => l.Name));
                 info.Children.Add(new TextBlock
                 {
                     Text = $"Метки: {lbls}",
@@ -246,7 +249,6 @@ namespace ProjectSystemHelpStudents.Views
                 });
             }
 
-            // создаём маркер
             var marker = new Border
             {
                 Width = 4,
@@ -255,43 +257,42 @@ namespace ProjectSystemHelpStudents.Views
                 VerticalAlignment = VerticalAlignment.Stretch
             };
 
-            var panel = new StackPanel { Orientation = Orientation.Horizontal };
-            panel.Children.Add(marker);
-            panel.Children.Add(check);
-            panel.Children.Add(info);
+            var row = new StackPanel { Orientation = Orientation.Horizontal };
+            row.Children.Add(marker);
+            row.Children.Add(check);
+            row.Children.Add(info);
 
-            var border = new Border
+            var card = new Border
             {
                 CornerRadius = new CornerRadius(6),
                 Background = new SolidColorBrush(Color.FromRgb(50, 50, 50)),
                 Margin = new Thickness(0, 4, 0, 0),
                 Padding = new Thickness(6),
-                Child = panel,
+                Child = row,
                 Cursor = Cursors.Hand
             };
-
-            border.MouseLeftButtonUp += (s, e) =>
+            card.MouseLeftButtonUp += (s, e) =>
             {
                 if (e.OriginalSource is CheckBox) return;
-                var wnd = new TaskDetailsWindow(t);
-                if (wnd.ShowDialog() == true)
-                    RefreshBoard(boardGrid, tasks, monday);
+                var w = new TaskDetailsWindow(t);
+                if (w.ShowDialog() == true)
+                    RefreshBoard(grid, tasks, monday);
             };
-
-            return border;
+            return card;
         }
 
         private static void OnTaskToggled(
             TaskViewModel t,
-            Grid boardGrid,
+            Grid grid,
             IEnumerable<TaskViewModel> tasks,
             DateTime monday)
         {
             var db = DBClass.entities.Task.First(x => x.IdTask == t.IdTask);
-            var newStatusName = t.IsCompleted ? "Завершено" : "Не завершено";
-            db.StatusId = DBClass.entities.Status.First(st => st.Name == newStatusName).StatusId;
+            db.StatusId = t.IsCompleted
+                ? DBClass.entities.Status.First(st => st.Name == "Завершено").StatusId
+                : DBClass.entities.Status.First(st => st.Name == "Не завершено").StatusId;
             DBClass.entities.SaveChanges();
-            RefreshBoard(boardGrid, tasks, monday);
+            RefreshBoard(grid, tasks, monday);
         }
     }
 }
