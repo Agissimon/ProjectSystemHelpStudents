@@ -203,27 +203,15 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
-            // Сброс сессии
-            UserSession.IdUser = 0;
-            UserSession.NameUser = null;
-
-            // Сброс настроек автологина
+            // 1) Сбрасываем автологин
             Properties.Settings.Default.RememberMe = false;
-            Properties.Settings.Default.SavedLogin = string.Empty;
-            Properties.Settings.Default.SavedPasswordHash = string.Empty;
+            Properties.Settings.Default.SavedLogin = "";
+            Properties.Settings.Default.SavedPasswordHash = "";
             Properties.Settings.Default.Save();
 
-            // Скрываем все фреймы контента
-            FrmClass.frmContentUser.Visibility = Visibility.Collapsed;
-            FrmClass.frmContentUser.Content = null;
-            FrmClass.frmStackPanelButton.Visibility = Visibility.Collapsed;
-            FrmClass.frmStackPanelButton.Content = null;
-            FrmClass.frmContentAdmin.Visibility = Visibility.Collapsed;
-            FrmClass.frmContentAdmin.Content = null;
-
-            // Показываем окно логина
-            FrmClass.frmAuth.Visibility = Visibility.Visible;
-            FrmClass.frmAuth.Content = new AuthPage();
+            // 2) Возвращаемся на экран логина
+            var mw = Application.Current.MainWindow as MainWindow;
+            mw?.ShowLogin();
         }
 
         private void DetachButton_Click(object sender, RoutedEventArgs e)

@@ -9,6 +9,7 @@ using System.Windows.Media;
 using ProjectSystemHelpStudents.Views;
 using System.Globalization;
 using ProjectSystemHelpStudents.ViewModels;
+using System.Text.RegularExpressions;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -26,10 +27,6 @@ namespace ProjectSystemHelpStudents.UsersContent
             TasksListView.ItemsSource = _groupedTasks;
             _startOfWeek = StartOfWeek(DateTime.Today);
             Loaded += UpcomingTasksPage_Loaded;
-        }
-        private void MonthDayPicker_CalendarClosed(object sender, RoutedEventArgs e)
-        {
-            _isDateManuallyChanged = true;
         }
 
         private void UpcomingTasksPage_Loaded(object sender, RoutedEventArgs e)
@@ -87,7 +84,7 @@ namespace ProjectSystemHelpStudents.UsersContent
             {
                 SortComboBox.ItemsSource = new List<string> { "Умная", "Дата", "Приоритет" };
 
-                // Исполнители: все пользователи, которые либо авторы, либо приглашены в задачю
+                // Исполнители, которые либо авторы, либо приглашены в задачю
                 var executorIds = ctx.Task
                     .Where(t => t.CreatorId == userId
                              || t.TaskAssignee.Any(ta => ta.UserId == userId))
@@ -104,7 +101,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                 executors.Insert(0, new ExecutorViewModel { IdUser = 0, FullName = "Все" });
                 ExecutorComboBox.ItemsSource = executors;
 
-                // Приоритеты: только те, что реально встречаются в задачах пользователя
+                // Приоритеты, что реально встречаются в задачах пользователя
                 var priorityIds = ctx.Task
                     .Where(t => t.CreatorId == userId
                              || t.TaskAssignee.Any(ta => ta.UserId == userId))
@@ -120,7 +117,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                 priorities.Insert(0, new PriorityViewModel { PriorityId = 0, Name = "Все" });
                 PriorityComboBox.ItemsSource = priorities;
 
-                // Метки: только те, что есть в метках задач пользователя
+                // Метки только те, что есть в метках задач пользователя
                 var labelIds = ctx.TaskLabels
                     .Where(tl =>
                         ctx.Task.Any(t =>
@@ -308,32 +305,36 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void MonthDayPicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!_isDateManuallyChanged)
-                return;
-
             if (MonthDayPicker.SelectedDate is DateTime selectedDate)
             {
-                _startOfWeek = StartOfWeek(selectedDate);
-                RefreshPage();
+                UpdateMonthText(selectedDate);
+            }
+        }
 
-                // Отображаем только задачи за выбранную дату
-                var filteredGroups = new ObservableCollection<TaskGroupViewModel>();
+        private void MonthDayPicker_CalendarClosed(object sender, RoutedEventArgs e)
+        {
+            if (MonthDayPicker.SelectedDate is DateTime selectedDate)
+            {
+                // Обновляем начало недели, если нужно переидти на эту неделю
+                _startOfWeek = StartOfWeek(selectedDate);
+
+                var filtered = new ObservableCollection<TaskGroupViewModel>();
                 foreach (var group in _groupedTasks)
                 {
-                    var matchingTasks = group.Tasks
-                        .Where(task => task.EndDate.Date == selectedDate.Date)
+                    var matches = group.Tasks
+                        .Where(t => t.EndDate.Date == selectedDate.Date)
                         .ToList();
-
-                    if (matchingTasks.Any())
+                    if (matches.Any())
                     {
-                        filteredGroups.Add(new TaskGroupViewModel
+                        filtered.Add(new TaskGroupViewModel
                         {
                             DateHeader = group.DateHeader,
-                            Tasks = new ObservableCollection<TaskViewModel>(matchingTasks)
+                            Tasks = new ObservableCollection<TaskViewModel>(matches)
                         });
                     }
                 }
-                TasksListView.ItemsSource = filteredGroups;
+
+                TasksListView.ItemsSource = filtered;
             }
         }
 
