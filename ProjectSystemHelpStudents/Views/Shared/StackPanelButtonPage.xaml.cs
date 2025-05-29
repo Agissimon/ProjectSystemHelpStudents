@@ -44,8 +44,8 @@ namespace ProjectSystemHelpStudents.UsersContent
                 NameUser = UserSession.NameUser.Split(' ')[0];
             }
 
-            GenerateProjectButtons();
             RefreshProjectStackPanel = GenerateProjectButtons;
+            GenerateProjectButtons();
             SubscribeToProjectAddedEvent();
 
             UserSession.UserNameUpdated += (newName) =>

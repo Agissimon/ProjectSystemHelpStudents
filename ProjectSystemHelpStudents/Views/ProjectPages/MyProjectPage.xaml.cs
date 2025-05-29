@@ -242,41 +242,65 @@ namespace ProjectSystemHelpStudents.UsersContent
 
         private void DeleteProject_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel projectToDelete)
-            {
-                try
-                {
-                    using (var context = new TaskManagementEntities1())
-                    {
-                        var project = context.Project.FirstOrDefault(p => p.ProjectId == projectToDelete.ProjectId);
-
-                        if (project != null)
-                        {
-                            var tasks = context.Task.Where(t => t.ProjectId == project.ProjectId).ToList();
-                            context.Task.RemoveRange(tasks);
-                            context.SaveChanges();
-
-                            context.Project.Remove(project);
-                            context.SaveChanges();
-
-                            Dispatcher.Invoke(() => Projects.Remove(projectToDelete));
-
-                            MessageBox.Show("Проект успешно удален!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Проект не найден в базе данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при удалении проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            else
+            if (!(sender is MenuItem menuItem && menuItem.Tag is ProjectViewModel projectVm))
             {
                 MessageBox.Show("Ошибка: Данные проекта не найдены.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            try
+            {
+                using (var ctx = new TaskManagementEntities1())
+                {
+                    var proj = ctx.Project
+                                 .Include("Task")
+                                 .Include("Section")
+                                 .FirstOrDefault(p => p.ProjectId == projectVm.ProjectId);
+
+                    if (proj == null)
+                    {
+                        MessageBox.Show("Проект не найден в базе данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    var result = MessageBox.Show(
+                        $"Вы собираетесь удалить проект «{projectVm.Name}».\n" +
+                        $"Это также удаляет все связанные задачи и разделы.\n\n" +
+                        "Продолжить?",
+                        "Предупреждение",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning);
+
+                    if (result != MessageBoxResult.Yes)
+                    {
+                        return;
+                    }
+
+                    if (proj.Task != null && proj.Task.Any())
+                    {
+                        ctx.Task.RemoveRange(proj.Task);
+                    }
+
+                    if (proj.Section != null && proj.Section.Any())
+                    {
+                        ctx.Section.RemoveRange(proj.Section);
+                    }
+
+                    ctx.SaveChanges();
+
+                    ctx.Project.Remove(proj);
+                    ctx.SaveChanges();
+
+                    MessageBox.Show("Проект успешно удален!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    RefreshProjects();
+
+                    StackPanelButtonPage.RefreshProjectStackPanel?.Invoke();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при удалении проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

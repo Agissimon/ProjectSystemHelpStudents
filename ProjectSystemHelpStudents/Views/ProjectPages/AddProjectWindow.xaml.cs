@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using ProjectSystemHelpStudents.Helper;
+using ProjectSystemHelpStudents.UsersContent;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -101,6 +102,9 @@ namespace ProjectSystemHelpStudents.UsersContent
 
                     _ctx.SaveChanges();
                     IsProjectUpdated = true;
+
+                    ProjectAdded?.Invoke(proj);
+                    StackPanelButtonPage.RefreshProjectStackPanel?.Invoke();
                     MessageBox.Show("Проект обновлён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
@@ -120,6 +124,7 @@ namespace ProjectSystemHelpStudents.UsersContent
                     IsProjectAdded = true;
 
                     ProjectAdded?.Invoke(proj);
+                    StackPanelButtonPage.RefreshProjectStackPanel?.Invoke();
 
                     MessageBox.Show("Проект добавлен.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
