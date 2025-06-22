@@ -53,45 +53,90 @@ namespace ProjectSystemHelpStudents.UsersContent
                 using (var ctx = new TaskManagementEntities1())
                 {
                     int userId = UserSession.IdUser;
-                    var all = ctx.Task
+                    var today = DateTime.Today;
+                    var tomorrow = today.AddDays(1);
+
+                    // Задачи за сегодня (EndDate >= сегодня 00:00 и < завтра 00:00)
+                    var todayTasks = ctx.Task
                         .Include("Status")
                         .Include("Priority")
                         .Include("TaskLabels.Labels")
-                        .ForUser(userId)
+                        .Where(t =>
+                            t.EndDate >= today && t.EndDate < tomorrow &&
+                            t.Status.Name != "Завершено" &&
+                            (t.CreatorId == userId
+                             || t.TaskAssignee.Any(ta => ta.UserId == userId))
+                        )
                         .ToList();
 
-                    var vms = all.Select(t => new TaskViewModel
-                    {
-                        IdTask = t.IdTask,
-                        Title = t.Title,
-                        Description = t.Description,
-                        IsCompleted = t.Status.Name == "Завершено",
-                        EndDate = t.EndDate,
-                        EndDateFormatted = t.EndDate != DateTime.MinValue
-                                             ? t.EndDate.ToString("dd MMMM yyyy")
-                                             : "Без срока",
-
-                        PriorityId = t.PriorityId,
-                        AvailableLabels = new ObservableCollection<LabelViewModel>(
-                            t.TaskLabels.Select(tl => new LabelViewModel
-                            {
-                                Id = tl.Labels.Id,
-                                Name = tl.Labels.Name,
-                                HexColor = tl.Labels.Color,
-                                IsSelected = true
-                            }))
-                    })
-                    .ToList();
-
-                    var overdue = vms
-                        .Where(vm => vm.EndDate.Date < DateTime.Today && !vm.IsCompleted)
-                        .ToList();
-                    var today = vms
-                        .Where(vm => vm.EndDate.Date == DateTime.Today && !vm.IsCompleted)
+                    // Просроченные задачи (EndDate < сегодня 00:00)
+                    var overdueTasks = ctx.Task
+                        .Include("Status")
+                        .Include("Priority")
+                        .Include("TaskLabels.Labels")
+                        .Where(t =>
+                            t.EndDate < today &&
+                            t.Status.Name != "Завершено" &&
+                            (t.CreatorId == userId
+                             || t.TaskAssignee.Any(ta => ta.UserId == userId))
+                        )
                         .ToList();
 
-                    OverdueTasksListView.ItemsSource = overdue;
-                    TasksListView.ItemsSource = today;
+                    // Проекция в VM
+                    var todayVms = todayTasks
+                        .Select(t => new TaskViewModel
+                        {
+                            IdTask = t.IdTask,
+                            Title = t.Title,
+                            Description = t.Description,
+                            IsCompleted = t.Status.Name == "Завершено",
+                            EndDate = t.EndDate,
+                            EndDateFormatted = t.EndDate != DateTime.MinValue
+                                                  ? t.EndDate.ToString("dd MMMM yyyy")
+                                                  : "Без срока",
+                            PriorityId = t.PriorityId,
+                            AvailableLabels = new ObservableCollection<LabelViewModel>(
+                                t.TaskLabels.Select(tl => new LabelViewModel
+                                {
+                                    Id = tl.Labels.Id,
+                                    Name = tl.Labels.Name,
+                                    HexColor = tl.Labels.Color,
+                                    IsSelected = true
+                                })
+                            )
+                        })
+                        .ToList();
+
+                    var overdueVms = overdueTasks
+                        .Select(t => new TaskViewModel
+                        {
+                            IdTask = t.IdTask,
+                            Title = t.Title,
+                            Description = t.Description,
+                            IsCompleted = t.Status.Name == "Завершено",
+                            EndDate = t.EndDate,
+                            EndDateFormatted = t.EndDate != DateTime.MinValue
+                                                  ? t.EndDate.ToString("dd MMMM yyyy")
+                                                  : "Без срока",
+                            PriorityId = t.PriorityId,
+                            AvailableLabels = new ObservableCollection<LabelViewModel>(
+                                t.TaskLabels.Select(tl => new LabelViewModel
+                                {
+                                    Id = tl.Labels.Id,
+                                    Name = tl.Labels.Name,
+                                    HexColor = tl.Labels.Color,
+                                    IsSelected = true
+                                })
+                            )
+                        })
+                        .ToList();
+
+                    // Привязываем к ListView
+                    OverdueTasksListView.ItemsSource = overdueVms;
+                    TasksListView.ItemsSource = todayVms;
+
+                    foreach (var vm in todayVms) vm.RefreshMarker();
+                    foreach (var vm in overdueVms) vm.RefreshMarker();
                 }
             }
             catch (Exception ex)

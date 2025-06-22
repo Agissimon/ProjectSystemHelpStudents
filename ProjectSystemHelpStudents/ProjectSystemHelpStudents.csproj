@@ -141,19 +141,16 @@
     <Compile Include="Filters.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Helper\ExpanderStateManager.cs" />
     <Compile Include="Helper\FileItem.cs" />
     <Compile Include="Helper\FilterParser.cs" />
+    <Compile Include="Helper\HexToBrushConverter.cs" />
     <Compile Include="Helper\InverseBoolConverter.cs" />
-    <Compile Include="Helper\InverseBoolToVisibilityConverter.cs" />
-    <Compile Include="Helper\NullToBoolConverter.cs" />
     <Compile Include="Helper\NullToVisibilityConverter.cs" />
     <Compile Include="Helper\PasswordHelper.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
     <Compile Include="Helper\RoleToBoolConverter.cs" />
     <Compile Include="Helper\StatusToVisibilityConverter.cs" />
     <Compile Include="Helper\TaskExtensions.cs" />
-    <Compile Include="Helper\TaskLabel.cs" />
     <Compile Include="Helper\TaskMarkerHelper.cs" />
     <Compile Include="Helper\TimeOnlyConverter.cs" />
     <Compile Include="Labels.cs">
@@ -188,7 +185,6 @@
     </Compile>
     <Compile Include="Services\UserSession.cs" />
     <Compile Include="Services\UserSettingsHelper.cs" />
-    <Compile Include="Helper\ConvertorsColors.cs" />
     <Compile Include="Helper\DBClass.cs" />
     <Compile Include="Helper\FrmClass.cs" />
     <Compile Include="Status.cs">
