@@ -49,6 +49,9 @@ namespace ProjectSystemHelpStudents.UsersContent
                     context.SaveChanges();
                 }
                 MessageBox.Show("Пользователь успешно зарегистрирован.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                AuthPage authPage = new AuthPage();
+                FrmClass.frmAuth.Content = authPage;
             }
             catch (Exception ex)
             {

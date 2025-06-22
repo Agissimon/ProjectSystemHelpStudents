@@ -156,6 +156,14 @@ namespace ProjectSystemHelpStudents.UsersContent
         {
             if (!(sender is Button btn) || !(btn.CommandParameter is int filterId)) return;
 
+            var result = MessageBox.Show(
+                "Вы уверены, что хотите удалить этот фильтр?",
+                "Подтверждение удаления",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes)
+                return;
+
             try
             {
                 using (var ctx = new TaskManagementEntities1())
@@ -178,6 +186,14 @@ namespace ProjectSystemHelpStudents.UsersContent
         private void DeleteLabel_Clik(object sender, RoutedEventArgs e)
         {
             if (!(sender is Button btn) || !(btn.CommandParameter is int labelId)) return;
+
+            var result = MessageBox.Show(
+                "Вы уверены, что хотите удалить эту метку?",
+                "Подтверждение удаления",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes)
+                return;
 
             try
             {

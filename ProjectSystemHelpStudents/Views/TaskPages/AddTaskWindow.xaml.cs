@@ -51,7 +51,7 @@ namespace ProjectSystemHelpStudents
             using (var ctx = new TaskManagementEntities1())
             {
                 var priorities = ctx.Priority
-                                    .OrderBy(p => p.Name)
+                                    .OrderBy(p => p.PriorityId)
                                     .ToList();
                 cmbPriority.ItemsSource = priorities;
                 cmbPriority.SelectedValue = priorities.FirstOrDefault()?.PriorityId;

@@ -214,19 +214,44 @@ namespace ProjectSystemHelpStudents
         {
             try
             {
+                bool hasDate = dpEditRemindDate.SelectedDate.HasValue;
+                bool hasTimeText = !string.IsNullOrWhiteSpace(tbEditRemindTime.Text);
+                TimeSpan parsedTime;
+
+                if (hasDate)
+                {
+                    // Если дата есть, но время не введено или некорректно — ругаемся
+                    if (!hasTimeText)
+                    {
+                        MessageBox.Show("Пожалуйста, укажите время напоминания.", "Валидация", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                    if (!TimeSpan.TryParse(tbEditRemindTime.Text, out parsedTime))
+                    {
+                        MessageBox.Show("Неверный формат времени. Используйте чч:мм.", "Валидация", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                }
+                else if (hasTimeText)
+                {
+                    // Если время есть, а даты нет — тоже не даём сохранить
+                    MessageBox.Show("Пожалуйста, выберите дату для напоминания.", "Валидация", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Собираем новое значение напоминания
+                DateTime? newRem = null;
+                if (hasDate && TimeSpan.TryParse(tbEditRemindTime.Text, out parsedTime))
+                {
+                    newRem = dpEditRemindDate.SelectedDate.Value.Date + parsedTime;
+                }
+
                 _task.Title = TitleTextBox.Text.Trim();
                 _task.Description = DescriptionTextBox.Text.Trim();
                 _task.EndDate = EndDatePicker.SelectedDate ?? DateTime.Now;
                 _task.ProjectId = (int?)(ProjectComboBox.SelectedValue) ?? _task.ProjectId;
                 _task.PriorityId = (int?)(PriorityComboBox.SelectedValue) ?? _task.PriorityId;
-
-                DateTime? newRem = null;
-                if (dpEditRemindDate.SelectedDate.HasValue
-                    && TimeSpan.TryParse(tbEditRemindTime.Text, out var ts))
-                {
-                    newRem = dpEditRemindDate.SelectedDate.Value.Date + ts;
-                }
-
+                                
                 using (var ctx = new TaskManagementEntities1())
                 {
                     var dbTask = ctx.Task

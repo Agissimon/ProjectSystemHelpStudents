@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Data.Entity;
 using System.Windows.Media;
+using System.Collections.ObjectModel;
 
 namespace ProjectSystemHelpStudents.UsersContent
 {
@@ -43,22 +44,19 @@ namespace ProjectSystemHelpStudents.UsersContent
 
             using (var ctx = new TaskManagementEntities1())
             {
-                // Задачи без раздела
-                var unsectioned = ctx.Task
+                // подтягиваем метки
+                var allTasks = ctx.Task
                     .Include(t => t.Status)
                     .Include(t => t.Priority)
-                    .Where(t => t.ProjectId == _inboxProjectId && t.SectionId == null)
+                    .Include("TaskLabels.Labels")
+                    .Where(t => t.ProjectId == _inboxProjectId)
+                    .ToList();
+
+                // раздел «Без раздела»
+                var unsectioned = allTasks
+                    .Where(t => t.SectionId == null)
                     .OrderBy(t => t.EndDate)
-                    .ToList()
-                    .Select(t => new TaskViewModel
-                    {
-                        IdTask = t.IdTask,
-                        Title = t.Title,
-                        Description = t.Description,
-                        IsCompleted = t.Status?.Name == "Завершено",
-                        EndDate = t.EndDate,
-                        PriorityId = t.PriorityId,
-                    })
+                    .Select(t => MapToViewModel(t))
                     .ToList();
 
                 if (unsectioned.Any())
@@ -71,27 +69,17 @@ namespace ProjectSystemHelpStudents.UsersContent
                     });
                 }
 
-                // Существующие разделы
+                // остальные секции
                 var sections = ctx.Section
                     .Where(s => s.ProjectId == _inboxProjectId)
                     .ToList();
 
                 foreach (var sec in sections)
                 {
-                    var sectionTasks = ctx.Task
-                        .Include(t => t.Status)
-                        .Where(t => t.ProjectId == _inboxProjectId && t.SectionId == sec.IdSection)
+                    var sectionTasks = allTasks
+                        .Where(t => t.SectionId == sec.IdSection)
                         .OrderBy(t => t.EndDate)
-                        .ToList()
-                        .Select(t => new TaskViewModel
-                        {
-                            IdTask = t.IdTask,
-                            Title = t.Title,
-                            Description = t.Description,
-                            IsCompleted = t.Status?.Name == "Завершено",
-                            EndDate = t.EndDate,
-                            PriorityId = t.PriorityId
-                        })
+                        .Select(t => MapToViewModel(t))
                         .ToList();
 
                     groups.Add(new SectionTaskGroupViewModel
@@ -104,6 +92,36 @@ namespace ProjectSystemHelpStudents.UsersContent
             }
 
             SectionsTasksControl.ItemsSource = groups;
+        }
+
+        private TaskViewModel MapToViewModel(ProjectSystemHelpStudents.Task t)
+        {
+            var vm = new TaskViewModel
+            {
+                IdTask = t.IdTask,
+                Title = t.Title,
+                Description = t.Description,
+                IsCompleted = t.Status?.Name == "Завершено",
+                EndDate = t.EndDate,
+                PriorityId = t.PriorityId,
+                Status = t.Status?.Name,
+                EndDateFormatted = t.EndDate != DateTime.MinValue
+                    ? t.EndDate.ToString("dd MMMM yyyy")
+                    : "Без срока"
+            };
+
+            // инициализируем AvailableLabels
+            vm.AvailableLabels = new ObservableCollection<LabelViewModel>(
+                t.TaskLabels.Select(tl => new LabelViewModel
+                {
+                    Id = tl.Labels.Id,
+                    Name = tl.Labels.Name,
+                    HexColor = tl.Labels.Color,
+                    IsSelected = true
+                })
+            );
+
+            return vm;
         }
 
         private void OpenAddSectionPopup_Click(object sender, RoutedEventArgs e)

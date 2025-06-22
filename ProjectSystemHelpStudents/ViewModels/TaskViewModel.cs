@@ -19,6 +19,7 @@ namespace ProjectSystemHelpStudents.ViewModels
         private int _priorityId;
         private DateTime? _reminderDate;
         private ObservableCollection<LabelViewModel> _availableLabels;
+        public static event Action<TaskViewModel> LabelsChanged;
 
         public TaskViewModel()
         {
@@ -74,6 +75,10 @@ namespace ProjectSystemHelpStudents.ViewModels
                 OnPropertyChanged(nameof(MarkerBrush));
             }
         }
+        public void RefreshMarker()
+        {
+            OnPropertyChanged(nameof(MarkerBrush));
+        }
 
         public Brush PriorityColor
         {
@@ -125,15 +130,22 @@ namespace ProjectSystemHelpStudents.ViewModels
         {
             OnPropertyChanged(nameof(LabelsFormatted));
             OnPropertyChanged(nameof(MarkerBrush));
+
+            LabelsChanged?.Invoke(this);
         }
+
         private void Label_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            // фильтруем по нужному свойству
             if (e.PropertyName == nameof(LabelViewModel.IsSelected))
             {
+                // чтобы обновились текстовое представление меток
                 OnPropertyChanged(nameof(LabelsFormatted));
                 OnPropertyChanged(nameof(MarkerBrush));
+                LabelsChanged?.Invoke(this);
             }
         }
+
 
         public string LabelsFormatted
             => _availableLabels == null
